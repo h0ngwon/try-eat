@@ -1,15 +1,14 @@
 import React from 'react';
-import styled from 'styled-components';
-import { firebaseApp } from './shared/firebase';
-
-const Test = styled.div`
-    background-color : ${(props) => props.theme.mainColor};
-`
-
-console.log(firebaseApp);
+import Router from './shared/Router';
+import Nav from './components/ui/Nav';
 
 const App = () => {
-    return <Test>App</Test>;
+    return (
+        <>
+            <Nav />
+            <Router />
+        </>
+    );
 };
 
 export default App;
