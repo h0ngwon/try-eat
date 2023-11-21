@@ -6,7 +6,7 @@ import reportWebVitals from './reportWebVitals';
 import { ThemeProvider } from 'styled-components';
 import GlobalStyles from './styles/GlobalStyles';
 import theme from './styles/theme'
-import GlobalFonts from './fonts/fonts';
+import GlobalFonts from './fonts/GlobalFonts';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

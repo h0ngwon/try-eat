@@ -21,7 +21,7 @@ const GlobalFonts = createGlobalStyle`
         src: local('GmarketSansTTFLight'), local('GmarketSansTTFLight');
         font-style: normal;
         src: url(${GmarketSansOtfLight}) format('truetype');
-        }
+    }
     @font-face {
     font-family: 'EF_jejudoldam';
     src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2210-EF@1.0/EF_jejudoldam.woff2') format('woff2');
