@@ -6,12 +6,14 @@ import reportWebVitals from './reportWebVitals';
 import { ThemeProvider } from 'styled-components';
 import GlobalStyles from './styles/GlobalStyles';
 import theme from './styles/theme'
+import GlobalFonts from './fonts/fonts';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <React.StrictMode>
         <ThemeProvider theme={theme}>
             <GlobalStyles />
+            <GlobalFonts/>
             <App />
         </ThemeProvider>
     </React.StrictMode>
