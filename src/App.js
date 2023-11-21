@@ -1,11 +1,12 @@
-import './App.css';
-import './styles/reset.css'
+import React from 'react';
+import styled from 'styled-components';
 
-function App() {
-    return (
-        <div className="App">
-        </div>
-    );
-}
+const Test = styled.div`
+    background-color : ${(props) => props.theme.mainColor};
+`
+
+const App = () => {
+    return <Test>App</Test>;
+};
 
 export default App;
