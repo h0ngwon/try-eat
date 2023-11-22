@@ -1,24 +1,25 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import CreatePost from '../components/CreatePost';
 
-const Home = () => {
+const PostEditDetail = () => {
     const navigate = useNavigate();
 
     return (
-        <>
-            <h1>Home</h1>
+        <div>
+            <CreatePost navigate={navigate} />
             <button
                 style={{
                     marginTop: '100px'
                 }}
                 onClick={() => {
-                    navigate('/editDetail');
+                    navigate('/');
                 }}
             >
-                글쓰기
+                홈으로 가기
             </button>
-        </>
+        </div>
     );
 };
 
-export default Home;
+export default PostEditDetail;
