@@ -1,6 +1,6 @@
 import React from 'react';
 import data from '../samplePost.json';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 //auto scroll 자동으로 스크롤을 내려줌
 
 const Home = () => {
@@ -44,8 +44,8 @@ const Home = () => {
                         right: '4rem',
                         bottom: '4rem',
                         borderRadius: '50%',
-                        height: '6rem',
-                        width: '6rem'
+                        height: '5rem',
+                        width: '5rem'
                     }}
                     onClick={() => {
                         window.scrollTo({
