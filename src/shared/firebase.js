@@ -1,21 +1,25 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-    apiKey: process.env.REACT_APP_API_KEY,
-    authDomain: 'sparta-week8.firebaseapp.com',
-    projectId: 'sparta-week8',
-    storageBucket: 'sparta-week8.appspot.com',
-    messagingSenderId: '891799028993',
-    appId: '1:891799028993:web:37b42ffdb858eb53d94700',
-    measurementId: 'G-3BBL12R3ED'
+    apiKey: 'AIzaSyAuR3yllYRqqU-O7aDA00z2DDHUf6fZK_Y',
+    authDomain: 'fir-test2-9cc58.firebaseapp.com',
+    projectId: 'fir-test2-9cc58',
+    storageBucket: 'fir-test2-9cc58.appspot.com',
+    messagingSenderId: '516454141672',
+    appId: '1:516454141672:web:15b894afa37e2f3cc2835d'
 };
 
 // Initialize Firebase
-const firebaseApp = initializeApp(firebaseConfig);
-
-export { firebaseApp };
+// React에서 정상적으로 동작하는 지 확인하기 위해서 임시로 export 시켜줍니다. app이 정상적으로 출력되는 것을 확인하고 나면, 지워줍니다.
+export const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+export const storage = getStorage(app);
