@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import defaultImage from '../assets/defaultImage.jpg';
+import defaultImage from '../assets/default.jpeg';
 import sampleUserinfo from '../shared/sampleUserinfo.json';
 import samplePost from '../shared/samplePost.json';
 import { db } from '../shared/firebase';
+<<<<<<< HEAD
 
 import { addDoc, collection, getDocs, query, serverTimestamp } from 'firebase/firestore';
+=======
+import { collection, getDocs, query } from 'firebase/firestore';
+>>>>>>> 189a1d415f91431b4609deefca18d55fb72063b8
 
 export default function MyPage() {
     const [userInfo, setUserInfo] = useState(sampleUserinfo);
