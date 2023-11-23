@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import data from '../samplePost.json';
 import styled, { css } from 'styled-components';
-import like from '../assets/찜하기.png';
+// import like from '../assets/찜하기.png';
 import { db } from '../shared/firebase';
 import { addDoc, collection, doc, getDoc, getDocs, orderBy, query, serverTimestamp } from 'firebase/firestore';
 import { useNavigate } from 'react-router';
 // import dislike from '../assets/안찜하기.png';
 //auto scroll 자동으로 스크롤을 내려줌
 
-const Home = () => {
+const HomePage = () => {
     //데이터 넣기
     // useEffect(() => {
     //     const collectionRef = collection(db, 'article');
@@ -23,17 +22,14 @@ const Home = () => {
             const q = query(collection(db, 'article'), orderBy('timestamp', 'desc'));
             const docSnap = await getDocs(q);
             const fbdata = docSnap.docs.map((doc) => doc.data());
-            // docSnap.forEach((doc) => {
-            //     const a = { id: doc.id,  };
             setFbDB(fbdata);
-            // });
         };
         fetchData();
     }, []);
 
     const navigate = useNavigate();
     const onHandleNavigate = (id) => {
-        navigate(`/${id}`);
+        navigate(`/detailpage/${id}`);
     };
     return (
         <>
@@ -60,7 +56,7 @@ const Home = () => {
                                 <figure>
                                     <img
                                         src={itme.image}
-                                        alt="이미지"
+                                        alt='이미지'
                                         style={{
                                             maxWidth: '100%'
                                         }}
@@ -99,7 +95,7 @@ const Home = () => {
     );
 };
 
-export default Home;
+export default HomePage;
 
 const Container = styled.ul`
     width: 80%;
@@ -122,13 +118,13 @@ const CardList = styled.li`
         grid-row: auto/ span 2;
     }
 `;
-const Like = styled.img`
-    ${({ $heart }) => {
-        if ($heart) {
-            console.log(like);
-            return css`
-                src: ${like};
-            `;
-        }
-    }}
-`;
+// const Like = styled.img`
+//     ${({ $heart }) => {
+//         if ($heart) {
+//             console.log(like);
+//             return css`
+//                 src: ${like};
+//             `;
+//         }
+//     }}
+// `;

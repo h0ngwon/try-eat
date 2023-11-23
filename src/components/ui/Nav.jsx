@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router';
 
 import styled from 'styled-components';
 
@@ -26,11 +27,12 @@ const TabList = styled.ul`
     gap: 20px;
     color: ${(props) => props.theme.textColor};
 `;
-
 const Nav = () => {
+    const navigate = useNavigate();
+
     return (
         <Navbar>
-            <LogoContainer>Try Eat</LogoContainer>
+            <LogoContainer onClick={() => navigate('/')}>Try Eat</LogoContainer>
             <TabList>
                 <li>회원가입</li>
                 <li>로그인</li>
