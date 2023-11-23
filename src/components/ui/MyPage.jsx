@@ -27,9 +27,12 @@ export default function MyPage() {
                 <PostList>
                     {samplePost.map((post) => {
                         return (
-                            // 컴포넌트
+                            // 컴포넌트 post
                             <Post key={post.id}>
-                                <PostImage src={post.image} alt="이미지" />
+                                <div>
+                                    <PostImage src={post.image} alt="이미지" />
+                                </div>
+
                                 <PostTitle>{post.title}</PostTitle>
                                 <PostComment>{post.comment}</PostComment>
                                 <Buttons>
@@ -117,7 +120,7 @@ const PostList = styled.ul`
 
     justify-content: center;
     flex-wrap: wrap;
-    gap: 30px;
+    gap: 100px;
 `;
 const Post = styled.div`
     display: flex;
@@ -150,6 +153,7 @@ const PostImage = styled.img`
     height: 400px;
     border: 1px solid darkgray;
     margin-bottom: 20px;
+    object-fit: cover;
 `;
 
 const PostTitle = styled.p`
