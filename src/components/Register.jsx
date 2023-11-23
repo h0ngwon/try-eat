@@ -183,11 +183,10 @@ const Register = () => {
 
         try {
             uploadImage();
-            await updateProfile(auth.currentUser, { displayName: nickname, photoURL: imageUrl ? imageUrl: null });
+            await updateProfile(auth.currentUser, { displayName: nickname, photoURL: imageUrl ? imageUrl : null });
         } catch (error) {
             console.error(error);
         }
-
     };
 
     return (
