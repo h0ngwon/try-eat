@@ -18,16 +18,16 @@ function Modal() {
     return (
         <Container>
             <Box1>
-                <p>닉네임</p>
+                <p>닉네임 </p>
                 <input value={nickname} onChange={nickNameChangeHandler} />
                 <Button1 onClick={() => {}}> 중복확인 </Button1>
             </Box1>
             <Box2>
-                <p>소개</p> <TextArea placeholder="최대 15자까지 입력 가능합니다."></TextArea>
+                <p>소개</p> <TextArea placeholder='최대 15자까지 입력 가능합니다.'></TextArea>
             </Box2>
             <Box3>
                 <p>프로필</p>
-                <img src=" " />
+                <img src=' ' />
                 <Button1> 등록하기 </Button1>
             </Box3>
 
