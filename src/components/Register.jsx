@@ -66,9 +66,7 @@ const IdDuplicateBtn = styled.button`
     }
 `;
 
-const PasswordContainer = styled(IdContainer)`
-    flex-basis: 32%;
-`;
+const PasswordContainer = styled(IdContainer)``;
 const PasswordLabelContainer = styled(IdLabelContainer)``;
 const PasswordLabel = styled(IdLabel)``;
 const PasswordInput = styled(IdInput)``;
