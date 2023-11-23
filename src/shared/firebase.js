@@ -2,12 +2,14 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, updateProfile } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
-import { onAuthStateChanged } from 'firebase/auth';
+import { getFirestore, doc, setDoc } from 'firebase/firestore';
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+
 const firebaseConfig = {
     apiKey: 'AIzaSyATc1AO8364B3qtiH4QNkLp68K4C1mhTh4',
     authDomain: 'fir-test-fea6e.firebaseapp.com',
@@ -21,4 +23,4 @@ const firebaseConfig = {
 const firebaseApp = initializeApp(firebaseConfig);
 const auth = getAuth(firebaseApp);
 const storage = getStorage(firebaseApp);
-export { firebaseApp, auth, updateProfile, storage, onAuthStateChanged };
+export { firebaseApp, auth, updateProfile, storage };

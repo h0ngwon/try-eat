@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-
+// import { onAuthStateChanged } from 'firebase/auth';
 function Modal({ users, setUsers }) {
     const [nickname, setNickname] = useState();
     const [comment, setComment] = useState();
     const [selectedFile, setSelectedFile] = useState();
 
-    useEffect(() => {});
+    // useEffect(() => {});
 
     // const user = users.filter((item) => {
     //     return item.id === id;

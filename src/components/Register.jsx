@@ -1,8 +1,7 @@
-import React, { useRef, useState } from 'react';
-import defaultImage from '../assets/default.jpeg';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { auth, storage } from '../shared/firebase';
+import { auth, db, doc, setDoc, storage } from '../shared/firebase';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 
 const Header = styled.header`
@@ -138,9 +137,10 @@ const Register = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [nickname, setNickname] = useState('');
     const [comment, setComment] = useState('');
-    const [image, setImage] = useState(null);
-    const [imageUrl, setImageUrl] = useState(null);
-    const imgRef = useRef();
+    const [imageUpload, setImageUpload] = useState('');
+    const [image, setImage] = useState('');
+    const fileRef = useRef();
+
     const emailHandler = (e) => {
         setEmail(e.target.value);
     };
@@ -162,27 +162,28 @@ const Register = () => {
     };
 
     const previewImageHandler = (e) => {
-        const file = imgRef.current.files[0];
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = (e) => {
-            setImage(reader.result);
-        };
-        setImageUrl(file);
+        setImageUpload(e.target.files[0]);
     };
 
-    const uploadImage = async () => {
-        const imageRef = ref(storage, `${auth.currentUser.uid}/profile`);
-        await uploadBytes(imageRef, imageUrl);
-    };
+    useEffect(() => {
+        const imageRef = ref(storage, `${auth.currentUser?.uid}/profile`);
+        if (!imageUpload) return;
+        uploadBytes(imageRef, imageUpload).then((snapshot) => {
+            getDownloadURL(snapshot.ref).then((url) => {
+                setImage(url);
+            });
+        });
+    }, [imageUpload]);
 
     const submitHandler = async (e) => {
         e.preventDefault();
         await createUserWithEmailAndPassword(auth, email, confirmPassword);
-
+        await setDoc(doc(db, 'userInfo', nickname), { comment });
         try {
-            uploadImage();
-            await updateProfile(auth.currentUser, { displayName: nickname, photoURL: imageUrl ? imageUrl : null });
+            await updateProfile(auth.currentUser, {
+                displayName: nickname,
+                photoURL: image
+            });
         } catch (error) {
             console.error(error);
         }
@@ -270,8 +271,9 @@ const Register = () => {
                             id='file'
                             name='file'
                             accept='image/*'
-                            ref={imgRef}
                             onChange={previewImageHandler}
+                            ref={fileRef}
+                            required
                         />
                     </ProfileInputLabel>
                 </ProfileContainer>
