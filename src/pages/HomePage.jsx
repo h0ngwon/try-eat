@@ -40,6 +40,16 @@ const HomePage = () => {
                     justifyContent: 'center'
                 }}
             >
+                <button
+                    style={{
+                        marginTop: '100px'
+                    }}
+                    onClick={() => {
+                        navigate('/editDetail');
+                    }}
+                >
+                    글쓰기
+                </button>
                 <Container>
                     {fbDB.map((itme) => {
                         return (
