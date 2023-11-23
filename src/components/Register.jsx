@@ -141,7 +141,6 @@ const Register = () => {
     const [image, setImage] = useState(null);
     const [imageUrl, setImageUrl] = useState(null);
     const imgRef = useRef();
-
     const emailHandler = (e) => {
         setEmail(e.target.value);
     };
@@ -183,11 +182,10 @@ const Register = () => {
 
         try {
             uploadImage();
-            await updateProfile(auth.currentUser, { displayName: nickname, photoURL: imageUrl ? imageUrl: null });
+            await updateProfile(auth.currentUser, { displayName: nickname, photoURL: imageUrl ? imageUrl : null });
         } catch (error) {
             console.error(error);
         }
-
     };
 
     return (

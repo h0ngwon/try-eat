@@ -1,33 +1,64 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-function Modal() {
+function Modal({ users, setUsers }) {
     const [nickname, setNickname] = useState();
-    const [contents, setContents] = useState();
-    const [photo, setPhoto] = useState();
+    const [comment, setComment] = useState();
+    const [selectedFile, setSelectedFile] = useState();
 
-    // 회원가입때 저장된 닉네임, 소개, 프로필사진 데이터 불러오기
+    useEffect(() => {});
+
+    // const user = users.filter((item) => {
+    //     return item.id === id;
+    // });
+    // console.log('000', user);
+    // 회원가입때 저장된 닉네임, 소개, 프로필사진 데이터 불러오기 -> 머지 후
+    // 새로운 데이터를 받아서 저장하기 (수정)
+    // - 닉네임, 코맨트, 이미지파일 -
     // 불러온 데이터를 수정 후 다시 저장하기
     //
+
+    // const fileUp
 
     const nickNameChangeHandler = (e) => {
         setNickname(e.target.value);
         console.log(nickname);
     };
+    const commentChangeHandler = (e) => {
+        setComment(e.target.value);
+        console.log(comment);
+    };
+
+    const handleFileSelect = (event) => {
+        setSelectedFile(event.target.value);
+        console.log(selectedFile);
+    };
 
     return (
-        <Container>
+        <Container
+            onSubmit={(event) => {
+                event.preventDefault();
+                // const newUser = {
+                //     nickname,
+                //     comment,
+                //     selectedFile
+                // };
+                // setUsers(newUser);
+                // console.log
+            }}
+        >
             <Box1>
-                <p>닉네임 </p>
-                <input value={nickname} onChange={nickNameChangeHandler} />
-                <Button1 onClick={() => {}}> 중복확인 </Button1>
+                <StP>닉네임 </StP>
+                <input placeholder={users[0].nickname} value={nickname} onChange={nickNameChangeHandler} />
+                <Button1> 중복확인 </Button1>
             </Box1>
             <Box2>
-                <p>소개</p> <TextArea placeholder='최대 15자까지 입력 가능합니다.'></TextArea>
+                <StP>소개</StP>{' '}
+                <TextArea placeholder={users[0].comment} value={comment} onChange={commentChangeHandler}></TextArea>
             </Box2>
             <Box3>
-                <p>프로필</p>
-                <img src=' ' />
+                <StP>프로필</StP>
+                <StImg type='file' onChange={handleFileSelect} />
                 <Button1> 등록하기 </Button1>
             </Box3>
 
@@ -38,7 +69,7 @@ function Modal() {
     );
 }
 
-const Container = styled.div`
+const Container = styled.form`
     width: 450px;
     height: 400px;
     margin: 100px auto 0px auto;
@@ -46,7 +77,6 @@ const Container = styled.div`
     background-color: beige;
     display: flex;
     flex-direction: column;
-    align-content: space-evenly;
 `;
 
 const Box1 = styled.div`
@@ -54,18 +84,21 @@ const Box1 = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-evenly;
+    background-color: aliceblue;
 `;
 const Box2 = styled.div`
     margin: 20px;
     display: flex;
     align-items: center;
     justify-content: space-evenly;
+    background-color: bisque;
 `;
 const Box3 = styled.div`
     margin: 20px;
     display: flex;
     align-items: center;
     justify-content: space-evenly;
+    background-color: antiquewhite;
 `;
 const Box4 = styled.div`
     margin: 20px;
@@ -99,5 +132,16 @@ const TextArea = styled.textarea`
     border-radius: 15px;
     border: none;
     resize: none;
+`;
+const StP = styled.p`
+    width: 70px;
+    background-color: green;
+`;
+const StImg = styled.input`
+    /* width: 100px;
+    height: 100px; */
+    border-radius: 10px;
+    background-color: white;
+    object-fit: contain;
 `;
 export default Modal;
