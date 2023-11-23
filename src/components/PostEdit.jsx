@@ -3,16 +3,18 @@ import { useState } from 'react';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { styled } from 'styled-components';
 import { auth, storage } from '../shared/firebase';
+import { addDoc, getDoc, collection, query } from 'firebase/firestore';
 
 // 클릭한 게시물의 아이디값을 가져와서 일치하는것만 제외하고 다시 그려줌
 // 등록이나 삭제 후 마이페이지로 자동이동
 // 등록완료 버튼 클릭 시 ‘이대로 등록하시겠습니까?’ 모달창
 // 삭제버튼 클릭 시 “정말 삭제하시겠습니까?” 모달창
 
-const CreatePost = ({ navigate }) => {
+const PostEdit = ({ navigate }) => {
+    const [tryPost, setTryPost] = useState('');
     const [title, setTitle] = useState('');
-    const [imageFile, setImageFile] = useState(null);
     const [content, setContent] = useState('');
+    const [imageFile, setImageFile] = useState(null);
     const [imageUrl, setImageUrl] = useState(null);
 
     const onSubmit = (e) => {
@@ -27,6 +29,7 @@ const CreatePost = ({ navigate }) => {
         setContent(event.target.value);
     };
 
+    // 이미지 미리보기
     const imageChangeHandler = (event) => {
         const file = event.target.files[0];
         const reader = new FileReader();
@@ -41,13 +44,33 @@ const CreatePost = ({ navigate }) => {
         });
     };
 
+    // 이미지 업로드 버튼
+    // 이미지 업로드시에 데이터가 쌓이는 것이 아니라 교체된다..?
     const uploadHandler = async () => {
-        const imageRef = ref(storage, `${auth.currentUser.uid}/Post-image`); //uid아직 없어서 ${auth.currentUser.uid} 오류남
-        await uploadBytes(imageRef, imageUrl);
+        const uploadCheck = window.confirm('등록하시겠습니까?');
+        if (uploadCheck) {
+            const imageRef = ref(storage, `${auth.currentUser.uid}/Post-image`);
+            await uploadBytes(imageRef, imageUrl);
 
-        const downloadURL = await getDownloadURL(imageRef);
-        console.log('downloadURL', downloadURL);
+            const downloadURL = await getDownloadURL(imageRef);
+            console.log('downloadURL', downloadURL);
+            navigate('/mypage');
+        } else {
+            return;
+        }
     };
+
+    // 삭제버튼
+    // const deleteHandler =
+
+    // 데이터 추가하기
+    // const addPost = async (event) => {
+    //     event.preventDefault();
+    //     const newPost = { title: title, content: content };
+    //     setPost((prev) => {
+    //         return [];
+    //     });
+    // };
 
     return (
         <div>
@@ -75,7 +98,7 @@ const CreatePost = ({ navigate }) => {
                             style={{ display: 'none' }}
                             onChange={(e) => imageChangeHandler(e)}
                         />
-                        <ImgUploadButton for='inputFile'>O</ImgUploadButton>
+                        <ImgUploadButton htmlFor='inputFile'>O</ImgUploadButton>
                         <ImgDeleteButton>X</ImgDeleteButton>
                     </ButtonWrap>
                     <ImageWrap>
@@ -220,4 +243,4 @@ const Button = styled.button`
         transition: all 0.3s;
     }
 `;
-export default CreatePost;
+export default PostEdit;

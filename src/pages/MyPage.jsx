@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import defaultImage from './defaultImage.jpg';
-import sampleUserinfo from '../../shared/sampleUserinfo.json';
-import samplePost from '../../shared/samplePost.json';
+import defaultImage from '../assets/defaultImage.jpg';
+import sampleUserinfo from '../shared/sampleUserinfo.json';
+import samplePost from '../shared/samplePost.json';
+
 export default function MyPage() {
     const [userInfo, setUserInfo] = useState(sampleUserinfo);
     const [posts, setPosts] = useState(samplePost);
@@ -30,7 +31,7 @@ export default function MyPage() {
                             // 컴포넌트 post
                             <Post key={post.id}>
                                 <div>
-                                    <PostImage src={post.image} alt="이미지" />
+                                    <PostImage src={post.image} alt='이미지' />
                                 </div>
 
                                 <PostTitle>{post.title}</PostTitle>

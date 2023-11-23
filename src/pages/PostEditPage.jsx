@@ -1,11 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import CreatePost from '../components/CreatePost';
+import PostEdit from '../components/PostEdit';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../shared/firebase';
 import { useEffect } from 'react';
 
-const PostEditDetail = () => {
+const PostEditPage = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -17,7 +17,7 @@ const PostEditDetail = () => {
 
     return (
         <div>
-            <CreatePost navigate={navigate} />
+            <PostEdit navigate={navigate} />
             <button
                 style={{
                     marginTop: '100px'
@@ -32,4 +32,4 @@ const PostEditDetail = () => {
     );
 };
 
-export default PostEditDetail;
+export default PostEditPage;

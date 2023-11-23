@@ -1,11 +1,12 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from '../components/Layout';
-import PostEditDetail from '../pages/PostEditDetail';
+import PostEditDetail from '../pages/PostEditPage';
 import RegisterPage from '../pages/RegisterPage';
 import HomePage from '../pages/HomePage';
 import LoginPage from '../pages/LoginPage';
 import DetailPage from '../pages/DetailPage';
+import MyPage from '../pages/MyPage';
 
 const Router = () => {
     return (
@@ -16,9 +17,9 @@ const Router = () => {
                     <Route path='/editDetail' element={<PostEditDetail />} />
                     <Route path='/register' element={<RegisterPage />} />
                     <Route path='/detailpage/:id' element={<DetailPage />} />
-                    <Route path='*' element={<Navigate replace to='/' />} />
                 </Route>
                 <Route path='/login' element={<LoginPage />} />
+                <Route path='mypage' element={<MyPage />} />
             </Routes>
         </BrowserRouter>
     );
