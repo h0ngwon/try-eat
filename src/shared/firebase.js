@@ -2,12 +2,13 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, updateProfile } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
-import { getFirestore, doc, setDoc} from 'firebase/firestore';
+import { getFirestore, doc, setDoc } from 'firebase/firestore';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+
 const firebaseConfig = {
     apiKey: process.env.REACT_APP_API_KEY,
     authDomain: 'sparta-week8.firebaseapp.com',
@@ -22,5 +23,5 @@ const firebaseConfig = {
 const firebaseApp = initializeApp(firebaseConfig);
 const auth = getAuth(firebaseApp);
 const storage = getStorage(firebaseApp)
-const db = getFirestore(firebaseApp)
-export { firebaseApp, auth, updateProfile, storage, db, doc, setDoc };
+export const db = getFirestore(firebaseApp)
+export { firebaseApp, auth, updateProfile, storage, doc, setDoc };
