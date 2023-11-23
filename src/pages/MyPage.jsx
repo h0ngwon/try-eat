@@ -5,11 +5,29 @@ import sampleUserinfo from '../shared/sampleUserinfo.json';
 import samplePost from '../shared/samplePost.json';
 import { db } from '../shared/firebase';
 
-import { collection, getDocs, query } from 'firebase/firestore';
+import { addDoc, collection, getDocs, query, serverTimestamp } from 'firebase/firestore';
 
 export default function MyPage() {
     const [userInfo, setUserInfo] = useState(sampleUserinfo);
     const [posts, setPosts] = useState();
+    useEffect(() => {
+        const a = () => {
+            const collectionRef = collection(db, 'user');
+            sampleUserinfo.forEach((item) => {
+                addDoc(collectionRef, { ...item, timestamp: serverTimestamp() });
+            });
+        };
+        a();
+    }, []);
+    // useEffect(() => {
+    //     const a = () => {
+    //         const collectionRef = collection(db, 'post');
+    //         samplePost.forEach((item) => {
+    //             addDoc(collectionRef, { ...item, timestamp: serverTimestamp() })
+    //         });
+    //     };
+    //     a();
+    // }, []);
 
     useEffect(() => {
         const fetchData = async () => {
