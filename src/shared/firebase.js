@@ -10,18 +10,19 @@ import { getFirestore, doc, setDoc } from 'firebase/firestore';
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
 const firebaseConfig = {
-    apiKey: process.env.REACT_APP_API_KEY,
-    authDomain: 'sparta-week8.firebaseapp.com',
-    projectId: 'sparta-week8',
-    storageBucket: 'sparta-week8.appspot.com',
-    messagingSenderId: '891799028993',
-    appId: '1:891799028993:web:37b42ffdb858eb53d94700',
-    measurementId: 'G-3BBL12R3ED'
+    // 여기 부분 수정
+    apiKey: 'AIzaSyAsXpX92uLpwLh9t5FSZi4OT258q7q9yik',
+    authDomain: 'sparta-teamproject.firebaseapp.com',
+    projectId: 'sparta-teamproject',
+    storageBucket: 'sparta-teamproject.appspot.com',
+    messagingSenderId: '617798694319',
+    appId: '1:617798694319:web:737b06eefba79c4c6f6b5a'
 };
 
 // Initialize Firebase
+const app = initializeApp(firebaseConfig);
 const firebaseApp = initializeApp(firebaseConfig);
 const auth = getAuth(firebaseApp);
-const storage = getStorage(firebaseApp)
-export const db = getFirestore(firebaseApp)
+const storage = getStorage(firebaseApp);
+export const db = getFirestore(firebaseApp);
 export { firebaseApp, auth, updateProfile, storage, doc, setDoc };
