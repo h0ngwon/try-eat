@@ -3,12 +3,12 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import PostEditDetail from '../pages/PostEditPage';
 import Modal from '../components/Modal';
-import MyPage from '../components/ui/MyPage';
+import MyPage from '../pages/MyPage';
 import RegisterPage from '../pages/RegisterPage';
 import HomePage from '../pages/HomePage';
 import LoginPage from '../pages/LoginPage';
 import DetailPage from '../pages/DetailPage';
-import dummy from '../sampleUserinfo.json';
+import dummy from '../shared/sampleUserinfo.json';
 import { useState } from 'react';
 
 const Router = () => {

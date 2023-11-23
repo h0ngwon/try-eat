@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import defaultImage from './defaultImage.jpg';
-import sampleUserinfo from '../../shared/sampleUserinfo.json';
-import samplePost from '../../shared/samplePost.json';
-import { db } from '../../shared/firebase';
+import defaultImage from '../assets/defaultImage.jpg';
+import sampleUserinfo from '../shared/sampleUserinfo.json';
+import samplePost from '../shared/samplePost.json';
+import { db } from '../shared/firebase';
 
 import { collection, getDocs, query } from 'firebase/firestore';
 
