@@ -13,6 +13,7 @@ const CreatePost = ({ navigate }) => {
     const [title, setTitle] = useState('');
     const [imageFile, setImageFile] = useState(null);
     const [content, setContent] = useState('');
+    const [imageUrl, setImageUrl] = useState(null);
 
     const onSubmit = (e) => {
         e.preventDefault();
@@ -36,12 +37,13 @@ const CreatePost = ({ navigate }) => {
                 setImageFile(reader.result || null);
                 resolve();
             };
+            setImageUrl(file);
         });
     };
 
     const uploadHandler = async () => {
-        const imageRef = ref(storage, `/${imageFile.name}`); //uid아직 없어서 ${auth.currentUser.uid} 오류남
-        await uploadBytes(imageRef, imageFile);
+        const imageRef = ref(storage, `${auth.currentUser.uid}/Post-image`); //uid아직 없어서 ${auth.currentUser.uid} 오류남
+        await uploadBytes(imageRef, imageUrl);
 
         const downloadURL = await getDownloadURL(imageRef);
         console.log('downloadURL', downloadURL);
@@ -53,9 +55,9 @@ const CreatePost = ({ navigate }) => {
                 <FormWrap onSubmit={onSubmit}>
                     <InputTitle
                         value={title}
-                        type="text"
+                        type='text'
                         onChange={titleChangeHandler}
-                        placeholder="제목을 입력해주세요(최대 15자)"
+                        placeholder='제목을 입력해주세요(최대 15자)'
                         maxLength={15}
                     />
                     <div
@@ -67,13 +69,13 @@ const CreatePost = ({ navigate }) => {
                     ></div>
                     <ButtonWrap>
                         <ImageInput
-                            id="inputFile"
-                            type="file"
-                            accept="image/*"
+                            id='inputFile'
+                            type='file'
+                            accept='image/*'
                             style={{ display: 'none' }}
                             onChange={(e) => imageChangeHandler(e)}
                         />
-                        <ImgUploadButton for="inputFile">O</ImgUploadButton>
+                        <ImgUploadButton for='inputFile'>O</ImgUploadButton>
                         <ImgDeleteButton>X</ImgDeleteButton>
                     </ButtonWrap>
                     <ImageWrap>
@@ -84,9 +86,9 @@ const CreatePost = ({ navigate }) => {
 
                     <InputContent
                         value={content}
-                        type="text"
+                        type='text'
                         onChange={contentChangeHandler}
-                        placeholder="설명을 입력해주세요(최대 300자)"
+                        placeholder='설명을 입력해주세요(최대 300자)'
                         maxLength={300}
                     />
                     <ButtonWrap>
