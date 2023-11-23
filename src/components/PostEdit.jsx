@@ -64,13 +64,13 @@ const PostEdit = ({ navigate }) => {
     // const deleteHandler =
 
     // 데이터 추가하기
-    // const addPost = async (event) => {
-    //     event.preventDefault();
-    //     const newPost = { title: title, content: content };
-    //     setPost((prev) => {
-    //         return [];
-    //     });
-    // };
+    const addPost = async (event) => {
+        event.preventDefault();
+        const newPost = { title: title, content: content };
+        setPost((prev) => {
+            return [...tryPost, newPost];
+        });
+    };
 
     return (
         <div>

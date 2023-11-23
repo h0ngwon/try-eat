@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import defaultImage from '../assets/defaultImage.jpg';
+import defaultImage from '../assets/default.jpeg';
 import sampleUserinfo from '../shared/sampleUserinfo.json';
 import samplePost from '../shared/samplePost.json';
 import { db } from '../shared/firebase';
