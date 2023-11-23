@@ -1,9 +1,40 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import data from '../samplePost.json';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
+import like from '../assets/찜하기.png';
+import { db } from '../shared/firebase';
+import { addDoc, collection, doc, getDoc, getDocs, orderBy, query, serverTimestamp } from 'firebase/firestore';
+import { useNavigate } from 'react-router';
+// import dislike from '../assets/안찜하기.png';
 //auto scroll 자동으로 스크롤을 내려줌
 
 const Home = () => {
+    //데이터 넣기
+    // useEffect(() => {
+    //     const collectionRef = collection(db, 'article');
+    //     data.forEach((item) => {
+    //         addDoc(collectionRef, { ...item, timestamp: serverTimestamp() });
+    //     });
+    // }, []);
+    const [fbDB, setFbDB] = useState([]);
+    useEffect(() => {
+        const fetchData = async () => {
+            //최신순정렬
+            const q = query(collection(db, 'article'), orderBy('timestamp', 'desc'));
+            const docSnap = await getDocs(q);
+            const fbdata = docSnap.docs.map((doc) => doc.data());
+            // docSnap.forEach((doc) => {
+            //     const a = { id: doc.id,  };
+            setFbDB(fbdata);
+            // });
+        };
+        fetchData();
+    }, []);
+
+    const navigate = useNavigate();
+    const onHandleNavigate = (id) => {
+        navigate(`/${id}`);
+    };
     return (
         <>
             <main
@@ -14,13 +45,16 @@ const Home = () => {
                 }}
             >
                 <Container>
-                    {data.map((itme) => {
+                    {fbDB.map((itme) => {
                         return (
                             <CardList
                                 key={itme.id}
                                 style={{
                                     backgroundColor: 'yellow',
                                     border: '3px solid red'
+                                }}
+                                onClick={() => {
+                                    onHandleNavigate(itme.id);
                                 }}
                             >
                                 <figure>
@@ -34,6 +68,9 @@ const Home = () => {
                                 </figure>
                                 <p>{itme.title}</p>
                                 <p>{itme.content}</p>
+                                {/* <figure>
+                                    <Like src={like} $heart={true} />
+                                </figure> */}
                             </CardList>
                         );
                     })}
@@ -84,4 +121,14 @@ const CardList = styled.li`
     &:nth-child(10n + 3) {
         grid-row: auto/ span 2;
     }
+`;
+const Like = styled.img`
+    ${({ $heart }) => {
+        if ($heart) {
+            console.log(like);
+            return css`
+                src: ${like};
+            `;
+        }
+    }}
 `;
