@@ -1,4 +1,4 @@
-import { createGlobalStyle} from 'styled-components'
+import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyles = createGlobalStyle`
     html, body, div, span, applet, object, iframe,
@@ -45,6 +45,6 @@ table {
 	border-collapse: collapse;
 	border-spacing: 0;
 }
-`
+`;
 
 export default GlobalStyles;
