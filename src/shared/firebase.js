@@ -9,12 +9,12 @@ import { updateProfile } from 'firebase/auth';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyAitIVUmb2UlT4AoxvPfwMtw0ZuloGyWxo",
-    authDomain: "pleasebe-1cfe1.firebaseapp.com",
-    projectId: "pleasebe-1cfe1",
-    storageBucket: "pleasebe-1cfe1.appspot.com",
-    messagingSenderId: "805807962626",
-    appId: "1:805807962626:web:9184537cd6b06e506d451b"
+    apiKey: 'AIzaSyAsXpX92uLpwLh9t5FSZi4OT258q7q9yik',
+    authDomain: 'sparta-teamproject.firebaseapp.com',
+    projectId: 'sparta-teamproject',
+    storageBucket: 'sparta-teamproject.appspot.com',
+    messagingSenderId: '617798694319',
+    appId: '1:617798694319:web:737b06eefba79c4c6f6b5a'
 };
 
 // Initialize Firebase
