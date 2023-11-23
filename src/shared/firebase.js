@@ -6,13 +6,12 @@ import { initializeApp } from 'firebase/app';
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-    apiKey: process.env.REACT_APP_API_KEY,
-    authDomain: 'sparta-week8.firebaseapp.com',
-    projectId: 'sparta-week8',
-    storageBucket: 'sparta-week8.appspot.com',
-    messagingSenderId: '891799028993',
-    appId: '1:891799028993:web:37b42ffdb858eb53d94700',
-    measurementId: 'G-3BBL12R3ED'
+    apiKey: 'AIzaSyATc1AO8364B3qtiH4QNkLp68K4C1mhTh4',
+    authDomain: 'fir-test-fea6e.firebaseapp.com',
+    projectId: 'fir-test-fea6e',
+    storageBucket: 'fir-test-fea6e.appspot.com',
+    messagingSenderId: '916379241605',
+    appId: '1:916379241605:web:1d711e248b357a3f7fedec'
 };
 
 // Initialize Firebase
