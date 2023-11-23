@@ -1,0 +1,86 @@
+[
+    {
+        "id": "1",
+        "title": "창원 양꼬치 맛집",
+        "comment": "저녁시간에 웨이팅 기본. 저번주 주말에 6시에 갔다가 추운데 벌벌 떨었습니다",
+        "image": "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMjA3MTFfMTU3%2FMDAxNjU3NTMwNzc2Mzcz.g0C8BuAzSrVQq-Tc-_Z7eH1K8nSITjaYfmm_x4Ey2S0g.uqv7l9yfUDFa7USxz_10H5h_hvELD50Y9fFxZ7jFB08g.JPEG.jhs_0905%2F00001.jpg&type=a340",
+        "like": "true"
+    },
+    {
+        "id": "2",
+        "title": "22222대충만든 데이터 2222222",
+        "comment": "22222대충만든 데이터 2222222",
+        "image": "https://src.hidoc.co.kr/image/lib/2020/11/9/1604911318873_0.jpg",
+        "like": "true"
+    },
+    {
+        "id": "3",
+        "title": "3333333 대충만든 데이터 3333333",
+        "comment": "3333333 대충만든 데이터 3333333",
+        "image": "https://cdn.kormedi.com/wp-content/uploads/2020/11/ed94bcec9e90.jpg",
+        "like": "flase"
+    },
+    {
+        "id": "4",
+        "title": "444444444 대충만든 데이터 444444444",
+        "comment": "444444444 대충만든 데이터 444444444",
+        "image": "https://png.pngtree.com/element_our/png/20181123/traditional-korean-stone-pot-mix-rice-png_242811.jpg",
+        "like": "true"
+    },
+    {
+        "id": "5",
+        "title": "55555555555 대충만든 데이터 55555555555",
+        "comment": "55555555555 대충만든 데이터 55555555555",
+        "image": "https://mediahub.seoul.go.kr/wp-content/uploads/2020/10/d13ea4a756099add8375e6c795b827ab.jpg",
+        "like": "flase"
+    },
+    {
+        "id": "6",
+        "title": "66666666 대충만든 데이터 66666666",
+        "comment": "66666666 대충만든 데이터 66666666",
+        "image": "https://images.chosun.com/resizer/oJbVV2cRZAhAkj2nyF_TrcoiYU0=/616x0/smart/cloudfront-ap-northeast-1.images.arcpublishing.com/chosun/TSW6ENRRKBAKRLPHYT3VR3MG74.jpg",
+        "like": "true"
+    },
+    {
+        "id": "7",
+        "title": "7777777 대충만든 데이터 7777777",
+        "comment": "7777777 대충만든 데이터 7777777",
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKUnRTSzsITMQe6z3rDCaCW2Z1Xi8S_K4-VbVIWbOLZdbikfvkIWQt2L4L3y_N693iDgU&usqp=CAU",
+        "like": "flase"
+    },
+    {
+        "id": "8",
+        "title": "888888888888 대충만든 데이터 888888888888",
+        "comment": "888888888888 대충만든 데이터 888888888888",
+        "image": "https://www.busan.kr.emb-japan.go.jp/files/100466906.png",
+        "like": "true"
+    },
+    {
+        "id": "9",
+        "title": "999999999999 대충만든 데이터 999999999999",
+        "comment": "999999999999 대충만든 데이터 999999999999",
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSne-KMXnhUqmq3YaL-CT50GQvOXEsdYksjtw&usqp=CAU",
+        "like": "flase"
+    },
+    {
+        "id": "10",
+        "title": "1010101010101 대충만든 데이터 1010101010101",
+        "comment": "1010101010101 대충만든 데이터 1010101010101",
+        "image": "https://cdn.tourtoctoc.com/news/photo/202308/1746_10588_5940.jpg",
+        "like": "true"
+    },
+    {
+        "id": "11",
+        "title": "101101101101 대충만든 데이터 101101101101",
+        "comment": "101101101101 대충만든 데이터 101101101101",
+        "image": "https://image.ohou.se/i/bucketplace-v2-development/uploads/cards/advices/166557187458549420.jpg?gif=1&w=480&webp=1",
+        "like": "true"
+    },
+    {
+        "id": "12",
+        "title": "1021020102102 대충만든 데이터 1021020102102",
+        "comment": "1021020102102 대충만든 데이터 1021020102102",
+        "image": "https://tgzzmmgvheix1905536.cdn.ntruss.com/2021/01/62b7a76c394847078682de0c235c399d",
+        "like": "flase"
+    }
+]
