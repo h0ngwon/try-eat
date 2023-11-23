@@ -20,6 +20,7 @@ const Router = () => {
                     <Route path='/register' element={<RegisterPage />} />
                     <Route path='/detailpage/:id' element={<DetailPage />} />
                 </Route>
+                <Route path='/modal' element={<Modal users={users} setUsers={setUsers} />} />
                 <Route path='/mypage' element={<MyPage />} />
                 <Route path='/login' element={<LoginPage />} />
             </Routes>
