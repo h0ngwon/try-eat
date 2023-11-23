@@ -1,13 +1,31 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import defaultImage from '../assets/defaultImage.jpg';
-import sampleUserinfo from '../shared/sampleUserinfo.json';
-import samplePost from '../shared/samplePost.json';
+import defaultImage from './defaultImage.jpg';
+import sampleUserinfo from '../../shared/sampleUserinfo.json';
+import samplePost from '../../shared/samplePost.json';
+import { db } from '../../shared/firebase';
+
+import { collection, getDocs, query } from 'firebase/firestore';
 
 export default function MyPage() {
     const [userInfo, setUserInfo] = useState(sampleUserinfo);
-    const [posts, setPosts] = useState(samplePost);
-    console.log(samplePost);
+    const [posts, setPosts] = useState();
+
+    useEffect(() => {
+        const fetchData = async () => {
+            // collection 이름이 samplePost인 collection의 모든 document를 가져옴
+
+            const q = query(collection(db, 'samplePost'));
+
+            const querySnapshot = await getDocs(q);
+
+            const fbdata = querySnapshot.docs.map((doc) => doc.data());
+            setPosts(fbdata);
+        };
+
+        fetchData();
+    }, []);
+    console.log(posts);
     return (
         <>
             <Header>
@@ -33,10 +51,10 @@ export default function MyPage() {
                                 <div>
                                     <PostImage src={post.image} alt='이미지' />
                                 </div>
-
                                 <PostTitle>{post.title}</PostTitle>
                                 <PostComment>{post.comment}</PostComment>
                                 <Buttons>
+                                    <div>♥️</div>
                                     <Button>수정</Button>
                                     <Button>삭제</Button>
                                 </Buttons>
@@ -48,6 +66,7 @@ export default function MyPage() {
         </>
     );
 }
+
 const Header = styled.div`
     display: block;
     justify-content: center;
