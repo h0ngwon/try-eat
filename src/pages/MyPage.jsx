@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 import styled from 'styled-components';
 import defaultImage from '../assets/default.jpeg';
 import { db } from '../shared/firebase';
@@ -6,7 +6,11 @@ import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { useNavigate } from 'react-router';
 
 export default function MyPage() {
-    const [name, setName] = useState('');
+    //회원정보
+    // const [userInfo, setUserInfo] = useState([]);
+    // const [nickname, setNikcname] = useState('');
+    // const [comment, setComment] = useState('');
+    // const [avatar, setAvatar] = useState();
 
     const [posts, setPosts] = useState([]);
     const navigate = useNavigate();
@@ -24,6 +28,27 @@ export default function MyPage() {
     }, []);
     console.log(posts);
 
+    //로그인한 회원 정보 가져오기
+    // useEffect(() => {
+    //     // 새로고침 되었을때도 값 유지
+    //     firebase.auth().onAuthStateChanged(function () {
+    //         const userId = firebase.auth().currentUser.uid;
+    //         const query = firebase.database().ref(${userid});
+    //         const loadData = async () => {
+    //             try {
+    //                 await query.once('value').then(function (snapshot) {
+    //                     setTel(snapshot.val().tel);
+    //                     setName(snapshot.val().name);
+    //                     setPwd(snapshot.val().password);
+    //                 });
+    //             } catch (error) {
+    //                 console.log(error);
+    //             }
+    //         };
+    //         loadData();
+    //     });
+    // }, []);
+
     // post 삭제 기능
     const deletePost = (post) => {
         const deleted = posts.filter((data) => {
@@ -35,6 +60,7 @@ export default function MyPage() {
     return (
         <>
             <Header>
+                <LogoContainer onClick={() => navigate('/')}>Try Eat</LogoContainer>
                 {/* 로고 만들어서 home으로 이동하기 */}
                 <Title>마이페이지</Title>
             </Header>
@@ -60,6 +86,7 @@ export default function MyPage() {
             <PostContainer>
                 {/* PostList.jsx 컴포넌트 생성 */}
                 <PostList>
+                    {/* 로그인한 회원 아이디 비교해서 필터링 */}
                     {posts.map((post) => {
                         return (
                             // Post.jsx 컴포넌트 생성
@@ -87,10 +114,10 @@ export default function MyPage() {
                                     >
                                         수정
                                     </Button>
-                                    {/* 삭제하시겠습니까? alret창 띄우기 네 or 아니오 */}
                                     {/* 삭제 기능 리덕스로 구현해보기 */}
                                     <Button
                                         onClick={() => {
+                                            alert('삭제하시겠습니까?');
                                             deletePost(post);
                                         }}
                                     >
@@ -107,16 +134,22 @@ export default function MyPage() {
 }
 
 const Header = styled.div`
-    display: block;
-    justify-content: center;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-items: center;
+    /* justify-content: center; */
+    /* grid-template-columns: 1fr 1fr 1fr; */
     border-bottom: 2px solid lightgrey;
+    height: 120px;
 `;
 
-const Title = styled.h1`
+const Title = styled.span`
+    display: flex;
     margin: 30px 30px;
     font-size: 30px;
     font-weight: 500;
+    margin: 0;
+    padding: 20px;
 `;
 
 const ProfileEdit = styled.section`
@@ -157,6 +190,9 @@ const EditBtn = styled.button`
     border-radius: 15px;
     border: 0px;
     cursor: pointer;
+    &:hover {
+        transform: scale(1.1);
+    }
 `;
 
 const PostContainer = styled.section`
@@ -217,6 +253,10 @@ const PostImage = styled.img`
     border: 1px solid darkgray;
     margin-bottom: 20px;
     object-fit: cover;
+    cursor: pointer;
+    &:hover {
+        transform: scale(1.1);
+    }
 `;
 
 const PostTitle = styled.p`
@@ -225,4 +265,14 @@ const PostTitle = styled.p`
 
 const PostComment = styled.p`
     height: 150px;
+`;
+
+const LogoContainer = styled.span`
+    margin-left: 20px;
+    font-size: 36px;
+    color: #e14d2a;
+    font-family: 'EF_jejudoldam';
+    margin: 0;
+    padding: 20px;
+    margin-right: 600px;
 `;
