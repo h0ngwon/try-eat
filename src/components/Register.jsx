@@ -1,8 +1,8 @@
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth, db, doc, setDoc, storage } from '../shared/firebase';
-import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 
 const Header = styled.header`
     width: 100%;

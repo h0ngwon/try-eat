@@ -1,0 +1,37 @@
+{
+    "plugins": ["import"],
+    "rules": {
+        "import/order": [
+            "error",
+            {
+                "groups": [
+                    "builtin",
+                    "external",
+                    "internal",
+                    ["parent", "sibling"],
+                    "index",
+                    "object",
+                    "type",
+                    "unknown"
+                ],
+                "pathGroups": [
+                    {
+                        "pattern": "{react*, react*/**}",
+                        "group": "external",
+                        "position": "before"
+                    },
+                    {
+                        "pattern": "components/*",
+                        "group": "unknown"
+                    }
+                ],
+                "pathGroupsExcludedImportTypes" : ["react", "unknown"],
+                "newlines-between": "always",
+                "alphabetize": {
+                    "oreder": "asc",
+                    "caseInsensitive": true
+                }
+            }
+        ]
+    }
+}

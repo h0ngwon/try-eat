@@ -1,9 +1,7 @@
-import React from 'react';
-import { useState } from 'react';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import React, { useState } from 'react';
 import { styled } from 'styled-components';
 import { auth, storage } from '../shared/firebase';
-import { addDoc, getDoc, collection, query } from 'firebase/firestore';
 
 // 클릭한 게시물의 아이디값을 가져와서 일치하는것만 제외하고 다시 그려줌
 // 등록이나 삭제 후 마이페이지로 자동이동

@@ -1,11 +1,10 @@
-/* eslint-disable import/no-named-as-default */
-import React from 'react';
-import { useNavigate } from 'react-router';
-import { useDispatch, useSelector } from 'react-redux';
-import styled from 'styled-components';
-import { auth } from '../../shared/firebase';
-import { logout } from '../../redux/reducers/stateReducer';
 import { signOut } from 'firebase/auth';
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router';
+import styled from 'styled-components';
+import { logout } from '../../redux/reducers/stateReducer';
+import { auth } from '../../shared/firebase';
 
 const Navbar = styled.nav`
     display: flex;
@@ -49,7 +48,7 @@ const Nav = () => {
     const navigate = useNavigate();
     const isLogin = useSelector((state) => state.stateReducer.isLogin);
 
-    const signout =  async (e) => {
+    const signout = async (e) => {
         dispatch(logout());
         await signOut(auth);
     };

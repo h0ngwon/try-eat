@@ -1,12 +1,12 @@
+import { faGithub, faGoogle } from '@fortawesome/free-brands-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { GithubAuthProvider, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { auth } from '../shared/firebase';
-import { signInWithEmailAndPassword, GoogleAuthProvider, GithubAuthProvider, signInWithPopup } from 'firebase/auth';
-import { login } from '../redux/reducers/stateReducer';
 import { useNavigate } from 'react-router-dom';
 import { styled } from 'styled-components';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGoogle, faGithub } from '@fortawesome/free-brands-svg-icons';
+import { login } from '../redux/reducers/stateReducer';
+import { auth } from '../shared/firebase';
 
 const Header = styled.header`
     width: 100%;

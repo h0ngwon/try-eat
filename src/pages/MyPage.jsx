@@ -1,9 +1,9 @@
-import React, { useEffect, useReducer, useState } from 'react';
+import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 import styled from 'styled-components';
 import defaultImage from '../assets/default.jpeg';
 import { db } from '../shared/firebase';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
-import { useNavigate } from 'react-router';
 
 export default function MyPage() {
     //회원정보
