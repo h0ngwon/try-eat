@@ -21,13 +21,14 @@ function Modal({ users, setUsers }) {
                     ...doc.data()
                 };
                 initialUser.push(data);
-                console.log('1234', data);
             });
             setUserList(initialUser);
+            console.log('1234', querySnapshot);
         };
         fetchData();
     }, []);
     console.log('12312312313213', userList);
+
     //    파일 업로드
     const [fileImage, setFileImage] = useState(user.avatar);
     const saveFileImage = (e) => {
