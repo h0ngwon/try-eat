@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useState } from 'react';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { styled } from 'styled-components';
-import { auth, storage } from '../shared/firebase';
-import { addDoc, getDoc, collection, query } from 'firebase/firestore';
+import { auth, db, storage } from '../shared/firebase';
+import { addDoc, getDoc, collection, query, getDocs, doc } from 'firebase/firestore';
 
 // 클릭한 게시물의 아이디값을 가져와서 일치하는것만 제외하고 다시 그려줌
 // 등록이나 삭제 후 마이페이지로 자동이동
@@ -11,7 +11,7 @@ import { addDoc, getDoc, collection, query } from 'firebase/firestore';
 // 삭제버튼 클릭 시 “정말 삭제하시겠습니까?” 모달창
 
 const PostEdit = ({ navigate }) => {
-    const [tryPost, setTryPost] = useState('');
+    const [uploadPost, setUploadPost] = useState('');
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [imageFile, setImageFile] = useState(null);
@@ -44,7 +44,10 @@ const PostEdit = ({ navigate }) => {
         });
     };
 
-    // 이미지 업로드 버튼
+    const cancelBtn = () => {
+        navigate('/mypage');
+    };
+    // 업로드 버튼
     // 이미지 업로드시에 데이터가 쌓이는 것이 아니라 교체된다..?
     const uploadHandler = async () => {
         const uploadCheck = window.confirm('등록하시겠습니까?');
@@ -54,22 +57,51 @@ const PostEdit = ({ navigate }) => {
 
             const downloadURL = await getDownloadURL(imageRef);
             console.log('downloadURL', downloadURL);
-            navigate('/mypage');
+            setImageFile('');
+            // navigate('/detailpage/:id');
         } else {
             return;
         }
     };
 
-    // 삭제버튼
-    // const deleteHandler =
+    const imageDeleteBtn = () => {
+        const deleteCheck = window.confirm('삭제하시겠습니까?');
+        if (deleteCheck) {
+            setImageFile(null);
+            const imageDeleteBtnRef = useRef();
+            imageDeleteBtnRef.current.remove();
+        }
+    };
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const q = query(collection(db, 'uploadPost'));
+            const querySnapshot = await getDocs(q);
+
+            const initialPost = [];
+            querySnapshot.forEach((doc) => {
+                const data = {
+                    id: doc.id,
+                    ...doc.data()
+                };
+                console.log('data', data);
+                initialPost.push(data);
+            });
+            setUploadPost(initialPost);
+        };
+        fetchData();
+    }, []);
 
     // 데이터 추가하기
     const addPost = async (event) => {
         event.preventDefault();
         const newPost = { title: title, content: content };
-        setPost((prev) => {
-            return [...tryPost, newPost];
+        setUploadPost((prev) => {
+            return [...uploadPost, newPost];
         });
+
+        setTitle('');
+        setContent('');
     };
 
     return (
@@ -99,7 +131,7 @@ const PostEdit = ({ navigate }) => {
                             onChange={(e) => imageChangeHandler(e)}
                         />
                         <ImgUploadButton htmlFor='inputFile'>O</ImgUploadButton>
-                        <ImgDeleteButton>X</ImgDeleteButton>
+                        <ImgDeleteButton onClick={imageDeleteBtn}>X</ImgDeleteButton>
                     </ButtonWrap>
                     <ImageWrap>
                         {/* <ImageButton onClick={uploadHandler}>업로드</ImageButton> */}
@@ -115,8 +147,9 @@ const PostEdit = ({ navigate }) => {
                         maxLength={300}
                     />
                     <ButtonWrap>
-                        <Button onClick={uploadHandler}>등록</Button>
-                        <Button>삭제</Button>
+                        <Button onClick={uploadHandler}>이미지등록</Button>
+                        <Button onClick={addPost}>게시물등록</Button>
+                        <Button onClick={cancelBtn}>취소</Button>
                     </ButtonWrap>
                 </FormWrap>
             </Container>
@@ -187,6 +220,10 @@ const ImgUploadButton = styled.label`
     height: 40px;
     background-color: white;
     border: 2px solid black;
+    &:hover {
+        transform: scale(1.1);
+        transition: all 0.2s;
+    }
 `;
 
 const ImgDeleteButton = styled.button`
@@ -195,6 +232,10 @@ const ImgDeleteButton = styled.button`
     background-color: white;
     border: 2px solid black;
     margin-left: 10px;
+    &:hover {
+        transform: scale(1.1);
+        transition: all 0.3s;
+    }
 `;
 
 const Img = styled.img`
