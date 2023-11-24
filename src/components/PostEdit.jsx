@@ -3,19 +3,37 @@ import { useState } from 'react';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { styled } from 'styled-components';
 import { auth, db, storage } from '../shared/firebase';
-import { addDoc, getDoc, collection, query, getDocs, doc } from 'firebase/firestore';
+import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { uuidv4 } from '@firebase/util';
 
-// 클릭한 게시물의 아이디값을 가져와서 일치하는것만 제외하고 다시 그려줌
-// 등록이나 삭제 후 마이페이지로 자동이동
+// 등록하기 클릭 후 상세페이지로 자동이동
+// 취소하기 클릭 후 마이페이지로 자동이동
+// 글쓰기를 클릭해서 접근하면 이미지와 내용이 비어있고 버튼이 '등록하기'
+// 마이페이지 게시물 수정으로 접근하면 이미지와 내용이 들어있고 버튼이 '수정완료'
+
+// 유효성검사
+// 로그인 하지 않은 상태로 게시물 등록하면 '로그인이 필요합니다' 모달창
 // 등록완료 버튼 클릭 시 ‘이대로 등록하시겠습니까?’ 모달창
-// 삭제버튼 클릭 시 “정말 삭제하시겠습니까?” 모달창
 
 const PostEdit = ({ navigate }) => {
-    const [uploadPost, setUploadPost] = useState('');
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [imageFile, setImageFile] = useState(null);
     const [imageUrl, setImageUrl] = useState(null);
+    const [inputImg, setInputImg] = useState('');
+
+    const fileInput = useRef();
+    const user = auth.currentUser;
+    const displayName = user.displayName;
+
+    const postToAdd = {
+        id: uuidv4(),
+        title,
+        content,
+        timestamp: serverTimestamp(),
+        image: imageFile,
+        nickname: displayName
+    };
 
     const onSubmit = (e) => {
         e.preventDefault();
@@ -48,17 +66,35 @@ const PostEdit = ({ navigate }) => {
         navigate('/mypage');
     };
     // 업로드 버튼
-    // 이미지 업로드시에 데이터가 쌓이는 것이 아니라 교체되는건가..?
     const uploadHandler = async () => {
         const uploadCheck = window.confirm('등록하시겠습니까?');
         if (uploadCheck) {
-            const imageRef = ref(storage, `${auth.currentUser.uid}/Post-image`);
-            await uploadBytes(imageRef, imageUrl);
+            if (title === '') {
+                alert('제목을 입력해주세요');
+                return;
+            }
+            if (!inputImg && !imageUrl) {
+                alert('이미지를 업로드해주세요');
+                return;
+            }
+            if (content === '') {
+                alert('설명을 입력해주세요');
+                return;
+            }
 
-            const downloadURL = await getDownloadURL(imageRef);
-            console.log('downloadURL', downloadURL);
-            setImageFile('');
-            // navigate('/detailpage/:id');
+            try {
+                await setDoc(doc(db, 'Post', postToAdd.id), postToAdd);
+
+                const imageRef = ref(storage, `${postToAdd.id}/Post-image`);
+                await uploadBytes(imageRef, imageUrl);
+                await getDownloadURL(imageRef);
+                setImageFile('');
+                setTitle('');
+                setContent('');
+                // navigate('/detailpage/:id');
+            } catch (error) {
+                console.error(error);
+            }
         } else {
             return;
         }
@@ -68,41 +104,12 @@ const PostEdit = ({ navigate }) => {
     const imageDeleteBtn = () => {
         const deleteCheck = window.confirm('삭제하시겠습니까?');
         if (deleteCheck) {
-            setImageFile(null);
+            setImageFile('');
+            fileInput.current.value = '';
+            setInputImg('');
         } else {
             return;
         }
-    };
-
-    useEffect(() => {
-        const fetchData = async () => {
-            const q = query(collection(db, 'uploadPost'));
-            const querySnapshot = await getDocs(q);
-
-            const initialPost = [];
-            querySnapshot.forEach((doc) => {
-                const data = {
-                    id: doc.id,
-                    ...doc.data()
-                };
-                console.log('data', data);
-                initialPost.push(data);
-            });
-            setUploadPost(initialPost);
-        };
-        fetchData();
-    }, []);
-
-    //
-    const addPost = async (event) => {
-        event.preventDefault();
-        const newPost = { title: title, content: content };
-        setUploadPost((prev) => {
-            return [...uploadPost, newPost];
-        });
-
-        setTitle('');
-        setContent('');
     };
 
     return (
@@ -127,7 +134,9 @@ const PostEdit = ({ navigate }) => {
                         <ImageInput
                             id='inputFile'
                             type='file'
+                            ref={fileInput}
                             accept='image/*'
+                            value={inputImg}
                             style={{ display: 'none' }}
                             onChange={(e) => imageChangeHandler(e)}
                         />
@@ -148,9 +157,8 @@ const PostEdit = ({ navigate }) => {
                         maxLength={300}
                     />
                     <ButtonWrap>
-                        <Button onClick={uploadHandler}>이미지등록</Button>
-                        <Button onClick={addPost}>게시물등록</Button>
-                        <Button onClick={cancelBtn}>취소</Button>
+                        <Button onClick={uploadHandler}>등록하기</Button>
+                        <Button onClick={cancelBtn}>취소하기</Button>
                     </ButtonWrap>
                 </FormWrap>
             </Container>

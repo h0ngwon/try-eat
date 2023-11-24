@@ -24,9 +24,9 @@ const HomePage = () => {
             const fbdata = docSnap.docs.map((doc) => doc.data());
             setFbDB(fbdata);
         };
+
         fetchData();
     }, []);
-
     const navigate = useNavigate();
     const onHandleNavigate = (id) => {
         navigate(`/detailpage/${id}`);
@@ -40,16 +40,6 @@ const HomePage = () => {
                     justifyContent: 'center'
                 }}
             >
-                <button
-                    style={{
-                        marginTop: '100px'
-                    }}
-                    onClick={() => {
-                        navigate('/post');
-                    }}
-                >
-                    글쓰기
-                </button>
                 <Container>
                     {fbDB.map((itme) => {
                         return (
