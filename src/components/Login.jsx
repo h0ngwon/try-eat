@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { auth } from '../shared/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import styled from 'styled-components';
 import { login } from '../redux/reducers/stateReducer';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
 const Header = styled.header`
     width: 100%;
@@ -13,6 +14,7 @@ const Header = styled.header`
     padding: 20px;
     font-family: 'EF_jejudoldam';
     color: ${(props) => props.theme.mainColor};
+    cursor: pointer;
 `;
 
 const Container = styled.form`
@@ -84,6 +86,7 @@ const GoogleLoginBtn = styled(LoginBtn)`
 `;
 
 const Login = () => {
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -109,7 +112,7 @@ const Login = () => {
     };
     return (
         <>
-            <Header>Try Eat</Header>
+            <Header onClick={() => navigate('/')}>Try Eat</Header>
             <Container onSubmit={signIn}>
                 <IdContainer>
                     <IdLabelContainer>

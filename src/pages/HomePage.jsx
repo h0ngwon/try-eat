@@ -45,7 +45,7 @@ const HomePage = () => {
                         marginTop: '100px'
                     }}
                     onClick={() => {
-                        navigate('/editDetail');
+                        navigate('/post');
                     }}
                 >
                     글쓰기

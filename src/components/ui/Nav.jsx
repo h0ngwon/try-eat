@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router';
-
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 const Navbar = styled.nav`
@@ -20,6 +20,7 @@ const LogoContainer = styled.div`
     font-size: 36px;
     color: ${(props) => props.theme.textColor};
     font-family: 'EF_jejudoldam';
+    cursor: pointer;
 `;
 
 const TabList = styled.ul`
@@ -31,24 +32,33 @@ const TabList = styled.ul`
 `;
 
 const TabListItem = styled.li`
-    cursor:pointer;
+    cursor: pointer;
     padding: 10px;
     border-radius: 24px;
     &:hover {
-        background-color: ${props => props.theme.hoverColor};
+        background-color: ${(props) => props.theme.hoverColor};
     }
-`
+`;
 
 const Nav = () => {
     const navigate = useNavigate();
+    const isLogin = useSelector((state) => state.stateReducer.isLogin);
 
     return (
         <Navbar>
             <LogoContainer onClick={() => navigate('/')}>Try Eat</LogoContainer>
-            <TabList>
-                <TabListItem onClick={() => navigate('/register')}>회원가입</TabListItem>
-                <TabListItem onClick={() => navigate('/login')}>로그인</TabListItem>
-            </TabList>
+            {isLogin ? (
+                <TabList>
+                    <TabListItem onClick={() => navigate('/post')}>글쓰기</TabListItem>
+                    <TabListItem>로그아웃</TabListItem>
+                    <TabListItem onClick={() => navigate('/mypage')}>마이페이지</TabListItem>
+                </TabList>
+            ) : (
+                <TabList>
+                    <TabListItem onClick={() => navigate('/register')}>회원가입</TabListItem>
+                    <TabListItem onClick={() => navigate('/login')}>로그인</TabListItem>
+                </TabList>
+            )}
         </Navbar>
     );
 };
