@@ -1,33 +1,48 @@
-import { collection, query, getDocs } from 'firebase/firestore';
+import { getDoc, doc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
+import dummy from '../shared/sampleUserinfo.json';
 import styled from 'styled-components';
-import { db } from '../shared/firebase';
+import { auth, db, onAuthStateChanged } from '../shared/firebase';
+import { useNavigate } from 'react-router-dom';
+import { getDownloadURL, ref } from 'firebase/storage';
+import { storage } from '../shared/firebase';
 
-function Modal({ users, setUsers }) {
-    const user = users[0];
-    const [userList, setUserList] = useState(users);
-    const [name, setName] = useState(user.nickname);
-    const [comment, setComment] = useState(user.comment);
+function Modal() {
+    const navigate = useNavigate();
+    const user = dummy[0];
+    const [userList, setUserList] = useState(dummy);
+    const [name, setName] = useState();
+    const [comment, setComment] = useState();
+    console.log('sfjklksajdf;alskjf', auth.currentUser);
+    // 로그인 한 후 로그인 사용자 정보를 가져오기
+    // displayname 기준으로 firestore, storage의 데이터 가져오기
+    // --> 현재 로그인된 사람의 displayName과
+    // 가져온거 수정해서 다시 저장하기.
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const displayName = user.displayName;
+                const photoUrl = user.photoURL;
+                setName(displayName);
+                setFileImage(photoUrl);
+            } else {
+                navigate('/');
+            }
+        });
+
+        return () => unsubscribe();
+    }, []);
 
     useEffect(() => {
         const fetchData = async () => {
-            const q = query(collection(db, 'user'));
-            const querySnapshot = await getDocs(q);
-
-            const initialUser = [];
-            querySnapshot.forEach((doc) => {
-                const data = {
-                    id: doc.id,
-                    ...doc.data()
-                };
-                initialUser.push(data);
-            });
-            setUserList(initialUser);
-            console.log('1234', querySnapshot);
+            const docRef = doc(db, 'userInfo', auth.currentUser.displayName);
+            const docSnap = await getDoc(docRef);
+            setComment(docSnap.data().comment);
         };
+
         fetchData();
     }, []);
-    console.log('12312312313213', userList);
 
     //    파일 업로드
     const [fileImage, setFileImage] = useState(user.avatar);

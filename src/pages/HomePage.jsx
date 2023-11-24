@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import likeIt from '../assets/찜하기.png';
 import { db } from '../shared/firebase';
+import { auth } from '../shared/firebase';
 import {
     addDoc,
     collection,
@@ -34,7 +35,7 @@ const HomePage = () => {
         };
         fetchData();
     }, []);
-
+    console.log('12311223', auth.currentUser);
     const navigate = useNavigate();
     const onHandleNavigate = (e, id) => {
         console.log('target', e.target);
