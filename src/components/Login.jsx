@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { auth } from '../shared/firebase';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, GoogleAuthProvider, GithubAuthProvider, signInWithPopup } from 'firebase/auth';
 import { login } from '../redux/reducers/stateReducer';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGoogle, faGithub } from '@fortawesome/free-brands-svg-icons';
 
 const Header = styled.header`
     width: 100%;
@@ -59,6 +61,7 @@ const PasswordContainer = styled(IdContainer)``;
 const PasswordLabelContainer = styled(IdLabelContainer)``;
 const PasswordLabel = styled(IdLabel)``;
 const PasswordInput = styled(IdInput)``;
+
 const LoginBtn = styled.button`
     font-size: 30px;
     padding: 20px;
@@ -75,6 +78,13 @@ const LoginBtn = styled.button`
     }
 `;
 
+const SocialBtnsContainer = styled.div`
+    width: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+`;
+
 const GoogleLoginBtn = styled(LoginBtn)`
     border: 2.5px solid black;
     background-color: #fff;
@@ -85,9 +95,22 @@ const GoogleLoginBtn = styled(LoginBtn)`
     }
 `;
 
+const GoogleLogo = styled(FontAwesomeIcon)`
+    color: #e14d2a;
+    margin-right: 10px;
+`;
+
+const GithubLoginBtn = styled(GoogleLoginBtn)``;
+
+const GithubLogo = styled(FontAwesomeIcon)`
+    color: #e14d2a;
+    margin-right: 10px;
+`;
 const Login = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const googleProvider = new GoogleAuthProvider();
+    const githubProvider = new GithubAuthProvider();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -111,6 +134,21 @@ const Login = () => {
 
         navigate('/');
     };
+
+    const socialLogin = async (auth, Provider) => {
+        await signInWithPopup(auth, Provider)
+            .then((res) => {
+                const user = res.user.displayName;
+                console.log(user);
+            })
+            .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                console.log(errorCode, errorMessage);
+            });
+        dispatch(login());
+        navigate('/');
+    }
 
     return (
         <>
@@ -137,8 +175,17 @@ const Login = () => {
                     />
                 </PasswordContainer>
                 <LoginBtn>로그인</LoginBtn>
-                <GoogleLoginBtn>구글로 시작하기</GoogleLoginBtn>
             </Container>
+            <SocialBtnsContainer>
+                <GoogleLoginBtn onClick={() => {socialLogin(auth, googleProvider)}}>
+                    <GoogleLogo icon={faGoogle} spin />
+                    구글로 시작하기
+                </GoogleLoginBtn>
+                <GithubLoginBtn onClick={() => {socialLogin(auth, githubProvider)}}>
+                    <GithubLogo icon={faGithub} spin spinReverse />
+                    Github으로 시작하기
+                </GithubLoginBtn>
+            </SocialBtnsContainer>
         </>
     );
 };

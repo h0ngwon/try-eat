@@ -50,8 +50,6 @@ const Nav = () => {
 
     const signout =  async (e) => {
         dispatch(logout());
-        console.log(auth);
-        console.log(isLogin);
         await signOut(auth);
     };
 
