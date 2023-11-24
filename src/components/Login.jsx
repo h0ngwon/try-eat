@@ -103,13 +103,13 @@ const Login = () => {
         e.preventDefault();
 
         try {
-            const userCredentials = await signInWithEmailAndPassword(auth, email, password);
+            await signInWithEmailAndPassword(auth, email, password);
             dispatch(login());
-            console.log(userCredentials);
         } catch (e) {
             console.log(e);
         }
     };
+
     return (
         <>
             <Header onClick={() => navigate('/')}>Try Eat</Header>

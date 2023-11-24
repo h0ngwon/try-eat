@@ -1,7 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
+import { auth } from '../../shared/firebase';
+import { logout } from '../../redux/reducers/stateReducer';
+import { signOut } from 'firebase/auth';
 
 const Navbar = styled.nav`
     display: flex;
@@ -41,8 +44,16 @@ const TabListItem = styled.li`
 `;
 
 const Nav = () => {
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const isLogin = useSelector((state) => state.stateReducer.isLogin);
+
+    const signout =  async (e) => {
+        dispatch(logout());
+        console.log(auth);
+        console.log(isLogin);
+        await signOut(auth);
+    };
 
     return (
         <Navbar>
@@ -50,7 +61,7 @@ const Nav = () => {
             {isLogin ? (
                 <TabList>
                     <TabListItem onClick={() => navigate('/post')}>글쓰기</TabListItem>
-                    <TabListItem>로그아웃</TabListItem>
+                    <TabListItem onClick={() => signout()}>로그아웃</TabListItem>
                     <TabListItem onClick={() => navigate('/mypage')}>마이페이지</TabListItem>
                 </TabList>
             ) : (
