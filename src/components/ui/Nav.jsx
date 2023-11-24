@@ -24,9 +24,21 @@ const LogoContainer = styled.div`
 
 const TabList = styled.ul`
     display: flex;
+    align-items: center;
+    justify-content: center;
     gap: 20px;
     color: ${(props) => props.theme.textColor};
 `;
+
+const TabListItem = styled.li`
+    cursor:pointer;
+    padding: 10px;
+    border-radius: 24px;
+    &:hover {
+        background-color: ${props => props.theme.hoverColor};
+    }
+`
+
 const Nav = () => {
     const navigate = useNavigate();
 
@@ -34,8 +46,8 @@ const Nav = () => {
         <Navbar>
             <LogoContainer onClick={() => navigate('/')}>Try Eat</LogoContainer>
             <TabList>
-                <li onClick={() => navigate('/register')}>회원가입</li>
-                <li onClick={() => navigate('/login')}>로그인</li>
+                <TabListItem onClick={() => navigate('/register')}>회원가입</TabListItem>
+                <TabListItem onClick={() => navigate('/login')}>로그인</TabListItem>
             </TabList>
         </Navbar>
     );

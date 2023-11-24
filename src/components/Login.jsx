@@ -1,7 +1,9 @@
-import { signInWithEmailAndPassword } from 'firebase/auth';
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import { useDispatch } from 'react-redux';
 import { auth } from '../shared/firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import styled from 'styled-components';
+import { login } from '../redux/reducers/stateReducer';
 
 const Header = styled.header`
     width: 100%;
@@ -82,6 +84,7 @@ const GoogleLoginBtn = styled(LoginBtn)`
 `;
 
 const Login = () => {
+    const dispatch = useDispatch();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -95,14 +98,14 @@ const Login = () => {
 
     const signIn = async (e) => {
         e.preventDefault();
-        
-        try{
+
+        try {
             const userCredentials = await signInWithEmailAndPassword(auth, email, password);
+            dispatch(login());
             console.log(userCredentials);
-        } catch(e) {
+        } catch (e) {
             console.log(e);
         }
-
     };
     return (
         <>
