@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 // import like from '../assets/찜하기.png';
 import { db } from '../shared/firebase';
-import { addDoc, collection, doc, getDoc, getDocs, orderBy, query, serverTimestamp } from 'firebase/firestore';
+import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { useNavigate } from 'react-router';
 // import dislike from '../assets/안찜하기.png';
 //auto scroll 자동으로 스크롤을 내려줌
@@ -45,7 +45,7 @@ const HomePage = () => {
                         marginTop: '100px'
                     }}
                     onClick={() => {
-                        navigate('/editDetail');
+                        navigate('/post');
                     }}
                 >
                     글쓰기
