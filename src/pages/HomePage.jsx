@@ -56,99 +56,117 @@ const HomePage = () => {
         setFbDB(likechage);
         updateLike();
     };
-    useEffect(() => {
-        const loading = setTimeout(() => {
-            setIsLoading(false);
-        }, 3000);
-        return () => clearTimeout(loading);
-    }, []);
 
     return (
         <>
-            {!isLoading ? (
-                <p
+            <main
+                style={{
+                    position: 'relative',
+                    display: 'flex',
+                    justifyContent: 'center'
+                }}
+            >
+                <button
                     style={{
-                        margin: '100px',
-                        fontSize: '10rem'
+                        marginTop: '100px'
+                    }}
+                    onClick={() => {
+                        navigate('/editDetail');
                     }}
                 >
-                    맛집 추천중...
-                </p>
-            ) : (
-                <main
-                    style={{
-                        position: 'relative',
-                        display: 'flex',
-                        justifyContent: 'center'
+                    글쓰기
+                </button>
+                <Container>
+                    {fbDB.map((itme) => {
+                        return (
+                            <CardList
+                                key={itme.id}
+                                $img={itme.image}
+                                onClick={(e) => {
+                                    onHandleNavigate(e, itme.id);
+                                }}
+                            >
+                                <CardImgWrap>
+                                    <img
+                                        src={itme.image}
+                                        alt='이미지'
+                                        style={{
+                                            width: '100%',
+                                            height: '100%',
+                                            objectFit: 'cover'
+                                        }}
+                                    />
+                                </CardImgWrap>
+                                <CardTextWrap>
+                                    <CardTitle>{itme.title}</CardTitle>
+                                    <CardContent>{itme.content}</CardContent>
+                                </CardTextWrap>
+                                <LikeWrap onClick={(e) => onHandleLike(e, itme)}>
+                                    {JSON.parse(itme.like) ? <Like src={likeIt} /> : <Like src={soso} />}
+                                </LikeWrap>
+                            </CardList>
+                        );
+                    })}
+                </Container>
+                <TopBtn
+                    onClick={() => {
+                        window.scrollTo({
+                            top: 0,
+                            left: 0,
+                            behavior: 'smooth'
+                        });
                     }}
                 >
-                    <button
-                        style={{
-                            marginTop: '100px'
-                        }}
-                        onClick={() => {
-                            navigate('/editDetail');
-                        }}
-                    >
-                        글쓰기
-                    </button>
-                    <Container>
-                        {fbDB.map((itme) => {
-                            return (
-                                <CardList
-                                    key={itme.id}
-                                    style={{
-                                        backgroundColor: 'yellow',
-                                        border: '3px solid red'
-                                    }}
-                                    onClick={(e) => {
-                                        onHandleNavigate(e, itme.id);
-                                    }}
-                                >
-                                    <figure>
-                                        <img
-                                            src={itme.image}
-                                            alt='이미지'
-                                            style={{
-                                                maxWidth: '100%'
-                                            }}
-                                        />
-                                    </figure>
-                                    <p>{itme.title}</p>
-                                    <p>{itme.content}</p>
-                                    <LikeWrap onClick={(e) => onHandleLike(e, itme)}>
-                                        {JSON.parse(itme.like) ? <Like src={likeIt} /> : <Like src={soso} />}
-                                    </LikeWrap>
-                                </CardList>
-                            );
-                        })}
-                    </Container>
-                    <button
-                        style={{
-                            position: 'fixed',
-                            right: '4rem',
-                            bottom: '4rem',
-                            borderRadius: '50%',
-                            height: '5rem',
-                            width: '5rem'
-                        }}
-                        onClick={() => {
-                            window.scrollTo({
-                                top: 0,
-                                left: 0,
-                                behavior: 'smooth'
-                            });
-                        }}
-                    >
-                        TOP
-                    </button>
-                </main>
-            )}
+                    TOP
+                </TopBtn>
+            </main>
         </>
     );
 };
 
 export default HomePage;
+const TopBtn = styled.button`
+    background-color: #e14d2a;
+    position: fixed;
+    right: 2.5rem;
+    bottom: 4rem;
+    border-radius: 50%;
+    height: 4rem;
+    width: 4rem;
+    cursor: pointer;
+    &:hover {
+        transform: scale(1.05);
+    }
+`;
+
+const CardTextWrap = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    height: 100%;
+`;
+const CardContent = styled.p`
+    width: 90%;
+    padding: 0 20px;
+    position: absolute;
+    bottom: 60px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 30px;
+`;
+const CardTitle = styled.p`
+    width: 90%;
+    font-size: 50px;
+`;
+const CardImgWrap = styled.figure`
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0.5;
+`;
 const LikeWrap = styled.figure`
     width: 50px;
     height: 50px;
@@ -158,7 +176,7 @@ const LikeWrap = styled.figure`
     cursor: pointer;
     &:hover {
         transform: scale(1.2);
-        transition: 1.2s;
+        transition: all 0.3s ease-in-out;
     }
 `;
 
@@ -172,7 +190,13 @@ const Container = styled.ul`
 `;
 
 const CardList = styled.li`
+    min-width: 200px;
     position: relative;
+    border: 3px solid #e14d2a;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     min-height: 400px;
     &:nth-child(10n + 1),
@@ -185,6 +209,9 @@ const CardList = styled.li`
         grid-row: auto/ span 2;
     }
     cursor: pointer;
+    &:hover {
+        transform: scale(1.05);
+    }
 `;
 const Like = styled.img`
     width: 100%;

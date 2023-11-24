@@ -1,7 +1,10 @@
-import { signInWithEmailAndPassword } from 'firebase/auth';
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import { useDispatch } from 'react-redux';
 import { auth } from '../shared/firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { login } from '../redux/reducers/stateReducer';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
 const Header = styled.header`
     width: 100%;
@@ -11,6 +14,7 @@ const Header = styled.header`
     padding: 20px;
     font-family: 'EF_jejudoldam';
     color: ${(props) => props.theme.mainColor};
+    cursor: pointer;
 `;
 
 const Container = styled.form`
@@ -82,6 +86,8 @@ const GoogleLoginBtn = styled(LoginBtn)`
 `;
 
 const Login = () => {
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -95,18 +101,20 @@ const Login = () => {
 
     const signIn = async (e) => {
         e.preventDefault();
-        
-        try{
-            const userCredentials = await signInWithEmailAndPassword(auth, email, password);
-            console.log(userCredentials);
-        } catch(e) {
+
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            dispatch(login());
+        } catch (e) {
             console.log(e);
         }
 
+        navigate('/');
     };
+
     return (
         <>
-            <Header>Try Eat</Header>
+            <Header onClick={() => navigate('/')}>Try Eat</Header>
             <Container onSubmit={signIn}>
                 <IdContainer>
                     <IdLabelContainer>
