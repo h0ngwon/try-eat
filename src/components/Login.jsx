@@ -108,6 +108,8 @@ const Login = () => {
         } catch (e) {
             console.log(e);
         }
+
+        navigate('/');
     };
 
     return (
