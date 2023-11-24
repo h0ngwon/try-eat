@@ -48,7 +48,7 @@ const PostEdit = ({ navigate }) => {
         navigate('/mypage');
     };
     // 업로드 버튼
-    // 이미지 업로드시에 데이터가 쌓이는 것이 아니라 교체된다..?
+    // 이미지 업로드시에 데이터가 쌓이는 것이 아니라 교체되는건가..?
     const uploadHandler = async () => {
         const uploadCheck = window.confirm('등록하시겠습니까?');
         if (uploadCheck) {
@@ -64,12 +64,13 @@ const PostEdit = ({ navigate }) => {
         }
     };
 
+    // 등록하기 전에 이미지 업로드했다가 삭제
     const imageDeleteBtn = () => {
         const deleteCheck = window.confirm('삭제하시겠습니까?');
         if (deleteCheck) {
             setImageFile(null);
-            const imageDeleteBtnRef = useRef();
-            imageDeleteBtnRef.current.remove();
+        } else {
+            return;
         }
     };
 
@@ -92,7 +93,7 @@ const PostEdit = ({ navigate }) => {
         fetchData();
     }, []);
 
-    // 데이터 추가하기
+    //
     const addPost = async (event) => {
         event.preventDefault();
         const newPost = { title: title, content: content };
@@ -220,6 +221,7 @@ const ImgUploadButton = styled.label`
     height: 40px;
     background-color: white;
     border: 2px solid black;
+    cursor: pointer;
     &:hover {
         transform: scale(1.1);
         transition: all 0.2s;
@@ -232,6 +234,8 @@ const ImgDeleteButton = styled.button`
     background-color: white;
     border: 2px solid black;
     margin-left: 10px;
+    cursor: pointer;
+
     &:hover {
         transform: scale(1.1);
         transition: all 0.3s;
