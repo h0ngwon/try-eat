@@ -1,16 +1,14 @@
+/* eslint-disable import/no-named-as-default */
 import React, { useEffect, useState } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import likeIt from '../assets/찜하기.png';
 import { db } from '../shared/firebase';
 import {
-    addDoc,
     collection,
     doc,
-    getDoc,
     getDocs,
     orderBy,
     query,
-    serverTimestamp,
     updateDoc
 } from 'firebase/firestore';
 import { useNavigate } from 'react-router';

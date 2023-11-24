@@ -4,7 +4,7 @@ import { auth } from '../shared/firebase';
 import { signInWithEmailAndPassword, GoogleAuthProvider, GithubAuthProvider, signInWithPopup } from 'firebase/auth';
 import { login } from '../redux/reducers/stateReducer';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGoogle, faGithub } from '@fortawesome/free-brands-svg-icons';
 
@@ -148,7 +148,7 @@ const Login = () => {
             });
         dispatch(login());
         navigate('/');
-    }
+    };
 
     return (
         <>
@@ -177,11 +177,19 @@ const Login = () => {
                 <LoginBtn>로그인</LoginBtn>
             </Container>
             <SocialBtnsContainer>
-                <GoogleLoginBtn onClick={() => {socialLogin(auth, googleProvider)}}>
+                <GoogleLoginBtn
+                    onClick={() => {
+                        socialLogin(auth, googleProvider);
+                    }}
+                >
                     <GoogleLogo icon={faGoogle} spin />
                     구글로 시작하기
                 </GoogleLoginBtn>
-                <GithubLoginBtn onClick={() => {socialLogin(auth, githubProvider)}}>
+                <GithubLoginBtn
+                    onClick={() => {
+                        socialLogin(auth, githubProvider);
+                    }}
+                >
                     <GithubLogo icon={faGithub} spin spinReverse />
                     Github으로 시작하기
                 </GithubLoginBtn>

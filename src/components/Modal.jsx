@@ -1,3 +1,4 @@
+/* eslint-disable import/no-named-as-default */
 import React, { useState } from 'react';
 import styled from 'styled-components';
 // import { onAuthStateChanged } from 'firebase/auth';
