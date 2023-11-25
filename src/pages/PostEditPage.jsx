@@ -1,9 +1,8 @@
-import React from 'react';
+import { onAuthStateChanged } from 'firebase/auth';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PostEdit from '../components/PostEdit';
-import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../shared/firebase';
-import { useEffect } from 'react';
 
 const PostEditPage = () => {
     const navigate = useNavigate();
