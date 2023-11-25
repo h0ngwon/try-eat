@@ -1,8 +1,10 @@
-import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, orderBy, query } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { db } from '../shared/firebase';
+import { auth } from '../shared/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 
 export default function MyPage() {
     //회원정보
