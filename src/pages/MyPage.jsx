@@ -2,7 +2,6 @@ import { collection, doc, getDoc, getDocs, orderBy, query, where } from 'firebas
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import styled from 'styled-components';
-import defaultImage from '../assets/default.jpeg';
 import { auth, db } from '../shared/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 
