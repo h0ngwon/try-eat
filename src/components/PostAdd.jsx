@@ -90,7 +90,7 @@ const PostAdd = ({ navigate }) => {
                 setImageFile('');
                 setTitle('');
                 setContent('');
-                // navigate('/detailpage/:id');
+                navigate(`/detailpage/${postToAdd.id}`);
             } catch (error) {
                 console.error(error);
             }
