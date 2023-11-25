@@ -9,6 +9,7 @@ import { storage } from '../shared/firebase';
 import { getDownloadURL } from 'firebase/storage';
 import { uploadString } from 'firebase/storage';
 import { updateProfile } from '../shared/firebase';
+import { uploadBytes } from 'firebase/storage';
 
 function Modal() {
     const navigate = useNavigate();
@@ -37,8 +38,11 @@ function Modal() {
         const fetchData = async () => {
             const docRef = doc(db, 'userInfo', auth.currentUser.displayName);
             const docSnap = await getDoc(docRef);
-
-            setComment(docSnap.data().comment);
+            if (comment) {
+                return setComment(docSnap.data().comment);
+            } else {
+                return;
+            }
         };
 
         fetchData();
@@ -70,12 +74,18 @@ function Modal() {
     console.log('12315648979789', auth.currentUser);
 
     const updateUserData = async () => {
+        // 닉네임 수정
         const user = await auth.currentUser;
         await updateProfile(user, { displayName: name, photoURL: fileImage });
+        // 코멘트 수정 아직 오류남
+        // const todoRef = doc(db, 'userInfo', auth.currentUser.displayName);
+        // await updateDoc(todoRef, { comment: comment });
 
-        const todoRef = doc(db, 'userInfo', auth.currentUser.displayName);
-        await updateDoc(todoRef, { comment: comment });
+        // // 이미지 수정
+        // const imageRef = ref(storage, `${auth.currentUser.uid}/${fileImage.profile}`);
+        // await uploadBytes(imageRef, fileImage);
     };
+
     console.log('코멘트다', comment);
     // const updateUserData = async () => {
     //     // 1. Firebase Authentication 업데이트
