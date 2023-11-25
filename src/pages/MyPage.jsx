@@ -1,11 +1,10 @@
-import { collection, doc, getDoc, getDocs, orderBy, query } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, orderBy, query, where } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import styled from 'styled-components';
 import { db } from '../shared/firebase';
 import { auth } from '../shared/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
-
 
 export default function MyPage() {
     //회원정보
@@ -22,7 +21,7 @@ export default function MyPage() {
     useEffect(() => {
         const fetchData = async () => {
             // collection 이름이 post인 collection의 모든 document를 가져옴
-            const q = query(collection(db, 'Post'), where('nickname', '==', displayName));
+            const q = query(collection(db, 'Post'), where('nickname', '==', displayName), orderBy('timestamp', 'desc'));
             const querySnapshot = await getDocs(q);
             const fbdata = querySnapshot.docs.map((doc) => doc.data());
             setPosts(fbdata);
@@ -31,7 +30,6 @@ export default function MyPage() {
     }, []);
 
     console.log('현재유저', auth.currentUser);
-    const user = auth.currentUser;
     // 로그인한 사용자 이름과 사진 가져오기
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
