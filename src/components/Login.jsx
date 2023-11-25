@@ -1,12 +1,12 @@
+import { faGithub, faGoogle } from '@fortawesome/free-brands-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { GithubAuthProvider, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { auth } from '../shared/firebase';
-import { signInWithEmailAndPassword, GoogleAuthProvider, GithubAuthProvider, signInWithPopup } from 'firebase/auth';
-import { login } from '../redux/reducers/stateReducer';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGoogle, faGithub } from '@fortawesome/free-brands-svg-icons';
+import { styled } from 'styled-components';
+import { login } from '../redux/reducers/stateReducer';
+import { auth } from '../shared/firebase';
 
 const Header = styled.header`
     width: 100%;
@@ -126,29 +126,24 @@ const Login = () => {
         e.preventDefault();
 
         try {
-            await signInWithEmailAndPassword(auth, email, password);
-            dispatch(login());
-        } catch (e) {
-            console.log(e);
-        }
-
-        navigate('/');
+            await signInWithEmailAndPassword(auth, email, password).then(() => {
+                dispatch(login());
+                navigate('/');
+            });
+        } catch (e) {}
     };
 
     const socialLogin = async (auth, Provider) => {
         await signInWithPopup(auth, Provider)
             .then((res) => {
-                const user = res.user.displayName;
-                console.log(user);
+                dispatch(login());
+                navigate('/');
             })
             .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                console.log(errorCode, errorMessage);
-            });
-        dispatch(login());
-        navigate('/');
-    }
+                alert('로그인할 수 없습니다 : ');
+            })
+            .then();
+    };
 
     return (
         <>
@@ -177,11 +172,19 @@ const Login = () => {
                 <LoginBtn>로그인</LoginBtn>
             </Container>
             <SocialBtnsContainer>
-                <GoogleLoginBtn onClick={() => {socialLogin(auth, googleProvider)}}>
+                <GoogleLoginBtn
+                    onClick={() => {
+                        socialLogin(auth, googleProvider);
+                    }}
+                >
                     <GoogleLogo icon={faGoogle} spin />
                     구글로 시작하기
                 </GoogleLoginBtn>
-                <GithubLoginBtn onClick={() => {socialLogin(auth, githubProvider)}}>
+                <GithubLoginBtn
+                    onClick={() => {
+                        socialLogin(auth, githubProvider);
+                    }}
+                >
                     <GithubLogo icon={faGithub} spin spinReverse />
                     Github으로 시작하기
                 </GithubLoginBtn>

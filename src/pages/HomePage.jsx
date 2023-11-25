@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import styled, { css } from 'styled-components';
+import { useNavigate } from 'react-router';
+import styled from 'styled-components';
+import soso from '../assets/안찜하기.png';
 import likeIt from '../assets/찜하기.png';
 import { db } from '../shared/firebase';
 import {
@@ -14,28 +16,29 @@ import {
     query,
     updateDoc
 } from 'firebase/firestore';
-import { useNavigate } from 'react-router';
-import soso from '../assets/안찜하기.png';
-import { getAuth } from '@firebase/auth';
 import { auth } from '../shared/firebase';
 //auto scroll 자동으로 스크롤을 내려줌
 
 const HomePage = () => {
-    const [fbDB, setFbDB] = useState([]);
+    //post의 likebox
+    const [post, setPost] = useState([]);
+
     useEffect(() => {
         const fetchCard = async () => {
             //최신순정렬
             const q = query(collection(db, 'Post'), orderBy('timestamp', 'desc'));
             const docSnap = await getDocs(q);
-            const fbdata = docSnap.docs.map((doc) => doc.data());
-            setFbDB(fbdata);
+            const postData = docSnap.docs.map((doc) => doc.data());
+            setPost(postData);
         };
         fetchCard();
     }, []);
+
     const navigate = useNavigate();
     const onHandleNavigate = (id) => {
         navigate(`/detailpage/${id}`);
     };
+
     //로그인한 유저의 정보 Authentication
     const currentUser = auth.currentUser;
     console.log('currentUser', currentUser);
@@ -47,7 +50,6 @@ const HomePage = () => {
 
     useEffect(() => {
         if (currentUser) {
-            console.log('여이따');
             const fetchLikeList = async () => {
                 const userRef = doc(db, 'userInfo', currentUser.displayName);
                 const userInfo = await getDoc(userRef);
@@ -63,9 +65,10 @@ const HomePage = () => {
     const onHandleLike = (e, item) => {
         e.stopPropagation(); //버블링 방지
         //비로그인시 방지
+
         if (auth.currentUser === null) return;
 
-        const likListRef = doc(db, 'userInfo', currentUser.displayName);
+        const userLikListRef = doc(db, 'userInfo', currentUser.displayName);
         let updateData = {};
         let updateLikeState = [];
         if (!currentUserInfo.likeList) {
@@ -77,13 +80,13 @@ const HomePage = () => {
             };
             updateLikeState = [item.id];
         } else if (currentUserInfo.likeList.includes(item.id)) {
+            console.log('rm item', item.id);
+
             updateData = {
                 ...currentUserInfo,
                 likeList: arrayRemove(item.id) //배열에 제거해주는 함수
             };
             updateLikeState = currentUserInfo.likeList.filter((like) => {
-                console.log('rm item', item.id);
-                console.log('rm like', like);
                 return like === item.id ? '' : like;
             });
         } else {
@@ -94,21 +97,18 @@ const HomePage = () => {
                 likeList: arrayUnion(item.id) || [] //배열에 추가해주는 함수
             };
             updateLikeState = [...currentUserInfo.likeList, item.id];
-            // currentUserInfo.likeList.push(item.id);
-            // updateLikeState =
-            // console.log(currentUserInfo.likeList, updateLikeState);
         }
         const updateUserInfo = { ...currentUserInfo, likeList: [...updateLikeState] };
 
-        // const updateUserInfo = { ...currentUserInfo, likeList: [...currentUserInfo.likeList] };
-        console.log('==================================');
-
-        console.log('state', updateLikeState);
         setCurrentUserInfo(updateUserInfo);
-        // console.log('bbbbbbbbbbbbbbb', currentUserInfo.likeList);
-        console.log(likListRef, updateData);
-        updateDoc(likListRef, updateData);
+        updateDoc(userLikListRef, updateData);
 
+        // const postLikeBoxRef = doc(db,'Post',)
+        // console.log('==================================');
+        // console.log('state', updateLikeState);
+        // console.log(userLikListRef, updateData);
+
+        // const articleLikeListRef =
         // console.log(item.like);
         // const updateLike = async () => {
         //     await updateDoc(doc(db, 'article', `${item.id}`), { like: !item.like });
@@ -141,7 +141,7 @@ const HomePage = () => {
                 </button>
 
                 <Container>
-                    {fbDB.map((itme) => {
+                    {post.map((itme) => {
                         return (
                             <CardList
                                 key={itme.id}
@@ -167,7 +167,7 @@ const HomePage = () => {
                                 </CardTextWrap>
                                 <LikeWrap onClick={(e) => onHandleLike(e, itme)}>
                                     <Like src={likeIt} />
-                                    {/* {JSON.parse(itme.like) ? <Like src={likeIt} /> : <Like src={soso} />} */}
+                                    {/* {itme.likebox ? <Like src={likeIt} /> : <Like src={soso} />} */}
                                 </LikeWrap>
                             </CardList>
                         );

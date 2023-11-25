@@ -1,10 +1,9 @@
-import React, { useEffect, useRef } from 'react';
-import { useState } from 'react';
+import { uuidv4 } from '@firebase/util';
+import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import React, { useRef, useState } from 'react';
 import { styled } from 'styled-components';
 import { auth, db, storage } from '../shared/firebase';
-import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
-import { uuidv4 } from '@firebase/util';
 
 // 등록하기 클릭 후 상세페이지로 자동이동
 // 취소하기 클릭 후 마이페이지로 자동이동
@@ -25,6 +24,7 @@ const PostEdit = ({ navigate }) => {
     const fileInput = useRef();
     const user = auth.currentUser;
     const displayName = user.displayName;
+    const photoURL = user.photoURL;
 
     const postToAdd = {
         id: uuidv4(),
@@ -32,7 +32,9 @@ const PostEdit = ({ navigate }) => {
         content,
         timestamp: serverTimestamp(),
         image: imageFile,
-        nickname: displayName
+        nickname: displayName,
+        photoURL,
+        likeBox: []
     };
 
     const onSubmit = (e) => {
@@ -83,7 +85,7 @@ const PostEdit = ({ navigate }) => {
             }
 
             try {
-                await setDoc(doc(db, 'post', postToAdd.id), postToAdd);
+                await setDoc(doc(db, 'Post', postToAdd.id), postToAdd);
 
                 const imageRef = ref(storage, `${postToAdd.id}/Post-image`);
                 await uploadBytes(imageRef, imageUrl);
