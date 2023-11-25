@@ -50,8 +50,9 @@ const Nav = () => {
     const isLogin = useSelector((state) => state.stateReducer.isLogin);
 
     const signout = async (e) => {
-        dispatch(logout());
-        await signOut(auth);
+        await signOut(auth).then(() => {
+            dispatch(logout());
+        });
     };
 
     return (
