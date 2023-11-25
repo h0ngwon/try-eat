@@ -6,6 +6,9 @@ import { auth, db, onAuthStateChanged } from '../shared/firebase';
 import { useNavigate } from 'react-router-dom';
 import { ref } from 'firebase/storage';
 import { storage } from '../shared/firebase';
+import { getDownloadURL } from 'firebase/storage';
+import { uploadString } from 'firebase/storage';
+import { updateProfile } from '../shared/firebase';
 
 function Modal() {
     const navigate = useNavigate();
@@ -34,14 +37,12 @@ function Modal() {
         const fetchData = async () => {
             const docRef = doc(db, 'userInfo', auth.currentUser.displayName);
             const docSnap = await getDoc(docRef);
-            const userComment = docSnap.data().comment;
 
-            setComment(userComment);
+            setComment(docSnap.data().comment);
         };
+
         fetchData();
     }, []);
-
-    console.log('로그인된 유저 값이다!!!', userList);
 
     // 로그인 한 후 로그인 사용자 정보를 가져오기
     // displayname 기준으로 firestore, storage의 데이터 가져오기
@@ -65,6 +66,51 @@ function Modal() {
         // console.log(comment);
     };
 
+    // 바뀐부분에 대해 감지를 하는가?
+    console.log('12315648979789', auth.currentUser);
+
+    const updateUserData = async () => {
+        const user = await auth.currentUser;
+        await updateProfile(user, { displayName: name, photoURL: fileImage });
+
+        const todoRef = doc(db, 'userInfo', auth.currentUser.displayName);
+        await updateDoc(todoRef, { comment: comment });
+    };
+    console.log('코멘트다', comment);
+    // const updateUserData = async () => {
+    //     // 1. Firebase Authentication 업데이트
+    //     const user = auth.currentUser;
+    //     await updateProfile(user, {
+    //         displayName: name,
+    //         photoURL: fileImage ? fileImage.name : user.photoURL
+    //     });
+
+    //     // 2. Firestore 업데이트
+    //     const docRef = doc(db, 'userInfo', auth.currentUser.displayName);
+    //     await updateDoc(docRef, {
+    //         comment: comment
+    //     });
+
+    //     // 3. Storage 업데이트 (프로필 이미지가 변경된 경우에만)
+    //     if (fileImage) {
+    //         const storageRef = ref(storage, `users/${auth.currentUser.uid}/profile.jpg`);
+    //         await uploadString(storageRef, fileImage, 'data_url');
+    //         const downloadURL = await getDownloadURL(storageRef);
+
+    //         // Firestore에도 프로필 이미지 URL 업데이트
+    //         await updateDoc(docRef, {
+    //             avatar: downloadURL
+    //         });
+    //     }
+
+    //     // 업데이트가 완료되면 다시 데이터를 불러옵니다.
+    //     const updatedDocSnap = await getDoc(docRef);
+    //     setComment(updatedDocSnap.data().comment);
+
+    // 그 외에 필요한 작업을 수행할 수 있습니다.
+    // 예: 화면을 갱신하거나 사용자에게 알림을 표시합니다.
+    // };
+
     // 무엇을 수정할것인가? -> userList
     // 그렇다면 userList에 변경할 기존의 값이 있어야 함.
     //  변경해야 할 값은 무엇인가? --> firebase에서 받아온 값.
@@ -85,6 +131,7 @@ function Modal() {
         <Container
             onSubmit={(event) => {
                 event.preventDefault();
+                updateUserData();
             }}
         >
             <Box1>
