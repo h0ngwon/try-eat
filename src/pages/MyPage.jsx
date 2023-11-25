@@ -24,7 +24,10 @@ export default function MyPage() {
             const q = query(collection(db, 'Post'), where('nickname', '==', displayName));
             const querySnapshot = await getDocs(q);
             const fbdata = querySnapshot.docs.map((doc) => doc.data());
-            setPosts(fbdata);
+            const sortedData = fbdata.sort((a, b) => {
+                return b.timestamp - a.timestamp;
+            });
+            setPosts(sortedData);
         };
         fetchData();
     }, []);
