@@ -22,7 +22,7 @@ const PostEdit = ({ navigate }) => {
     const [imageUrl, setImageUrl] = useState(null);
     const [inputImg, setInputImg] = useState('');
     const [clickPost, setClickPost] = useState('');
-    const param = useParams();
+    const { id } = useParams();
     const fileInput = useRef();
     const user = auth.currentUser;
     const displayName = user.displayName;
@@ -68,13 +68,8 @@ const PostEdit = ({ navigate }) => {
 
     useEffect(() => {
         const editPostData = async () => {
-            const editPostRef = doc(db, 'Post', param.id);
+            const editPostRef = doc(db, 'Post', id);
             const clickPost = await getDoc(editPostRef);
-            // if (docSnap.exists()) {
-            //     console.log('Document data:', docSnap.data());
-            // } else {
-            //     console.log('No such document!');
-            // }
             setClickPost(clickPost.data());
         };
         editPostData();
@@ -143,56 +138,47 @@ const PostEdit = ({ navigate }) => {
         <div>
             <Container>
                 <FormWrap onSubmit={onSubmit}>
-                    {clickPost
-                        .filter((post) => {
-                            return post.id === param.id;
-                        })
-                        .map((post) => {
-                            <>
-                                <InputTitle
-                                    key={post.id}
-                                    value={title}
-                                    type='text'
-                                    onChange={titleChangeHandler}
-                                    placeholder={post.title}
-                                    maxLength={15}
-                                />
-                                <div
-                                    style={{
-                                        width: '100vw',
-                                        borderTop: '1px solid black',
-                                        marginBottom: '50px'
-                                    }}
-                                ></div>
-                                <ButtonWrap>
-                                    <ImageInput
-                                        id='inputFile'
-                                        type='file'
-                                        ref={fileInput}
-                                        accept='image/*'
-                                        value={inputImg}
-                                        style={{ display: 'none' }}
-                                        onChange={(e) => imageChangeHandler(e)}
-                                    />
-                                    <ImgUploadButton htmlFor='inputFile'>O</ImgUploadButton>
-                                    <ImgDeleteButton onClick={imageDeleteBtn}>X</ImgDeleteButton>
-                                </ButtonWrap>
-                                <ImageWrap>
-                                    {/* <ImageButton onClick={uploadHandler}>업로드</ImageButton> */}
-                                    <Img src={post.image} />
-                                    {!imageFile && <Span>이미지를 업로드해주세요</Span>}
-                                </ImageWrap>
+                    <InputTitle
+                        key={clickPost.id}
+                        value={title}
+                        type='text'
+                        onChange={titleChangeHandler}
+                        placeholder={clickPost.title}
+                        maxLength={15}
+                    />
+                    <div
+                        style={{
+                            width: '100vw',
+                            borderTop: '1px solid black',
+                            marginBottom: '50px'
+                        }}
+                    ></div>
+                    <ButtonWrap>
+                        <ImageInput
+                            id='inputFile'
+                            type='file'
+                            ref={fileInput}
+                            accept='image/*'
+                            value={inputImg}
+                            style={{ display: 'none' }}
+                            onChange={(e) => imageChangeHandler(e)}
+                        />
+                        <ImgUploadButton htmlFor='inputFile'>O</ImgUploadButton>
+                        <ImgDeleteButton onClick={imageDeleteBtn}>X</ImgDeleteButton>
+                    </ButtonWrap>
+                    <ImageWrap>
+                        {/* <ImageButton onClick={uploadHandler}>업로드</ImageButton> */}
+                        <Img src={clickPost.image} />
+                        {!imageFile && <Span>이미지를 업로드해주세요</Span>}
+                    </ImageWrap>
 
-                                <InputContent
-                                    value={content}
-                                    type='text'
-                                    onChange={contentChangeHandler}
-                                    placeholder={post.content}
-                                    maxLength={300}
-                                />
-                            </>;
-                        })}
-
+                    <InputContent
+                        value={content}
+                        type='text'
+                        onChange={contentChangeHandler}
+                        placeholder={clickPost.content}
+                        maxLength={300}
+                    />
                     <ButtonWrap>
                         <Button onClick={uploadHandler}>수정완료</Button>
                         <Button onClick={cancelBtn}>취소하기</Button>

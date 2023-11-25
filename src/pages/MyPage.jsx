@@ -115,7 +115,7 @@ export default function MyPage() {
                                     <div>♥️</div>
                                     <Button
                                         onClick={() => {
-                                            navigate(`/Edit/${post.id}`);
+                                            navigate(`/edit/${post.id}`);
                                         }}
                                     >
                                         수정
