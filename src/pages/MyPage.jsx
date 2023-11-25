@@ -1,9 +1,9 @@
-import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+import { collection, doc, getDocs, orderBy, query, where } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import styled from 'styled-components';
 import defaultImage from '../assets/default.jpeg';
-import { db } from '../shared/firebase';
+import { auth, db } from '../shared/firebase';
 
 export default function MyPage() {
     //회원정보
@@ -14,19 +14,19 @@ export default function MyPage() {
 
     const [posts, setPosts] = useState([]);
     const navigate = useNavigate();
+    const user = auth.currentUser;
+    const displayName = user.displayName;
 
     useEffect(() => {
         const fetchData = async () => {
             // collection 이름이 post인 collection의 모든 document를 가져옴
-            const q = query(collection(db, 'post'), orderBy('timestamp', 'desc'));
+            const q = query(collection(db, 'Post'), where('nickname', '==', displayName));
             const querySnapshot = await getDocs(q);
             const fbdata = querySnapshot.docs.map((doc) => doc.data());
             setPosts(fbdata);
         };
-
         fetchData();
-    }, []);
-    console.log(posts);
+    }, [displayName]);
 
     //로그인한 회원 정보 가져오기
     // useEffect(() => {
@@ -72,7 +72,7 @@ export default function MyPage() {
                 <UserEdit>
                     {/* 로그인한 user의 displayname, 소개글 불러오기 */}
                     {/* 비동기 처리하면 됨 */}
-                    <Ment>박희원님, 반갑습니다!</Ment>
+                    <Ment>{displayName}님, 반갑습니다!</Ment>
                     <EditBtn
                         onClick={() => {
                             navigate(`/modal`);
@@ -84,14 +84,6 @@ export default function MyPage() {
             </ProfileEdit>
             <MyPost>나의 게시물</MyPost>
             <PostContainer>
-                {/* 게시물 수정페이지 임시버튼 */}
-                <Button
-                    onClick={() => {
-                        navigate(`/Edit`);
-                    }}
-                >
-                    수정
-                </Button>
                 {/* PostList.jsx 컴포넌트 생성 */}
                 <PostList>
                     {/* 로그인한 회원 아이디 비교해서 필터링 */}
@@ -111,13 +103,13 @@ export default function MyPage() {
                                     />
                                 </div>
                                 <PostTitle>{post.title}</PostTitle>
-                                <PostComment>{post.comment}</PostComment>
+                                <PostComment>{post.content}</PostComment>
                                 <Buttons>
                                     {/* user에 따라 좋아요 눌린 값 가져오기 */}
                                     <div>♥️</div>
                                     <Button
                                         onClick={() => {
-                                            navigate(`/editDetail`);
+                                            navigate(`/Edit/${post.id}`);
                                         }}
                                     >
                                         수정
@@ -218,7 +210,7 @@ const MyPost = styled.h2`
     display: block;
     padding-top: 50px;
     padding-bottom: 70px;
-    padding-left: 100px;
+    padding-left: 120px;
     font-family: GmarketSansMedium;
     font-size: 25px;
     font-weight: 500;
@@ -227,7 +219,6 @@ const MyPost = styled.h2`
 
 const PostList = styled.ul`
     display: flex;
-
     justify-content: center;
     flex-wrap: wrap;
     gap: 100px;
@@ -238,7 +229,6 @@ const Post = styled.div`
     /* border: 1px solid darkgray; */
     width: 400px;
     height: 600px;
-    margin-bottom: 120px;
 `;
 
 const Buttons = styled.div`
@@ -250,32 +240,38 @@ const Buttons = styled.div`
 const Button = styled.button`
     background-color: #e14d2a;
     color: white;
-    width: 60px;
+    width: 80px;
     padding: 10px;
-    border-radius: 15px;
+    border-radius: 30px;
     border: 0px;
-    margin-bottom: 30px;
+    /* margin-bottom: 30px; */
+    font-size: 15px;
     font-family: GmarketSansLight;
     cursor: pointer;
     &:hover {
         transform: scale(1.1);
+        transition: all 0.3s;
     }
 `;
 
 const PostImage = styled.img`
     width: 400px;
     height: 400px;
-    border: 1px solid darkgray;
+    border: none;
+    border-radius: 30px;
     margin-bottom: 20px;
     object-fit: cover;
+    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
     cursor: pointer;
     &:hover {
-        transform: scale(1.1);
+        transform: scale(1.05);
+        transition: all 0.5s;
     }
 `;
 
 const PostTitle = styled.p`
     height: 100px;
+    font-size: 23px;
     font-family: GmarketSansMedium;
 `;
 

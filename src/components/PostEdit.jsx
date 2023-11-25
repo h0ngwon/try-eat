@@ -1,9 +1,10 @@
 import { uuidv4 } from '@firebase/util';
 import { doc, getDoc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 import { auth, db, storage } from '../shared/firebase';
+import { useParams } from 'react-router-dom';
 
 // 수정완료 클릭 후 마이페이지로 자동이동
 // 취소하기 클릭 후 마이페이지로 자동이동
@@ -20,7 +21,8 @@ const PostEdit = ({ navigate }) => {
     const [imageFile, setImageFile] = useState(null);
     const [imageUrl, setImageUrl] = useState(null);
     const [inputImg, setInputImg] = useState('');
-
+    const [clickPost, setClickPost] = useState('');
+    const param = useParams();
     const fileInput = useRef();
     const user = auth.currentUser;
     const displayName = user.displayName;
@@ -61,16 +63,19 @@ const PostEdit = ({ navigate }) => {
         });
     };
 
-    const editPostData = async () => {
-        const docRef = doc(db, 'Post', postToAdd.id);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-            console.log('Document data:', docSnap.data());
-        } else {
-            console.log('No such document!');
-        }
-    };
+    useEffect(() => {
+        const editPostData = async () => {
+            const editPostRef = doc(db, 'Post', param.id);
+            const clickPost = await getDoc(editPostRef);
+            // if (docSnap.exists()) {
+            //     console.log('Document data:', docSnap.data());
+            // } else {
+            //     console.log('No such document!');
+            // }
+            setClickPost(clickPost.data());
+        };
+        editPostData();
+    }, []);
 
     // 수정완료 버튼
     const uploadHandler = async () => {
@@ -91,7 +96,6 @@ const PostEdit = ({ navigate }) => {
 
             try {
                 // await setDoc(doc(db, 'Post', postToAdd.id), postToAdd);
-
                 const washingtonRef = doc(db, 'Post', postToAdd.id);
                 await updateDoc(
                     washingtonRef,
@@ -136,46 +140,56 @@ const PostEdit = ({ navigate }) => {
         <div>
             <Container>
                 <FormWrap onSubmit={onSubmit}>
-                    <InputTitle
-                        value={title}
-                        type='text'
-                        onChange={titleChangeHandler}
-                        placeholder='제목을 입력해주세요(최대 15자)'
-                        maxLength={15}
-                    />
-                    <div
-                        style={{
-                            width: '100vw',
-                            borderTop: '1px solid black',
-                            marginBottom: '50px'
-                        }}
-                    ></div>
-                    <ButtonWrap>
-                        <ImageInput
-                            id='inputFile'
-                            type='file'
-                            ref={fileInput}
-                            accept='image/*'
-                            value={inputImg}
-                            style={{ display: 'none' }}
-                            onChange={(e) => imageChangeHandler(e)}
-                        />
-                        <ImgUploadButton htmlFor='inputFile'>O</ImgUploadButton>
-                        <ImgDeleteButton onClick={imageDeleteBtn}>X</ImgDeleteButton>
-                    </ButtonWrap>
-                    <ImageWrap>
-                        {/* <ImageButton onClick={uploadHandler}>업로드</ImageButton> */}
-                        <Img src={imageFile} />
-                        {!imageFile && <Span>이미지를 업로드해주세요</Span>}
-                    </ImageWrap>
+                    {clickPost
+                        .filter((post) => {
+                            return post.id === param.id;
+                        })
+                        .map((post) => {
+                            <>
+                                <InputTitle
+                                    key={post.id}
+                                    value={title}
+                                    type='text'
+                                    onChange={titleChangeHandler}
+                                    placeholder={post.title}
+                                    maxLength={15}
+                                />
+                                <div
+                                    style={{
+                                        width: '100vw',
+                                        borderTop: '1px solid black',
+                                        marginBottom: '50px'
+                                    }}
+                                ></div>
+                                <ButtonWrap>
+                                    <ImageInput
+                                        id='inputFile'
+                                        type='file'
+                                        ref={fileInput}
+                                        accept='image/*'
+                                        value={inputImg}
+                                        style={{ display: 'none' }}
+                                        onChange={(e) => imageChangeHandler(e)}
+                                    />
+                                    <ImgUploadButton htmlFor='inputFile'>O</ImgUploadButton>
+                                    <ImgDeleteButton onClick={imageDeleteBtn}>X</ImgDeleteButton>
+                                </ButtonWrap>
+                                <ImageWrap>
+                                    {/* <ImageButton onClick={uploadHandler}>업로드</ImageButton> */}
+                                    <Img src={post.image} />
+                                    {!imageFile && <Span>이미지를 업로드해주세요</Span>}
+                                </ImageWrap>
 
-                    <InputContent
-                        value={content}
-                        type='text'
-                        onChange={contentChangeHandler}
-                        placeholder='설명을 입력해주세요(최대 300자)'
-                        maxLength={300}
-                    />
+                                <InputContent
+                                    value={content}
+                                    type='text'
+                                    onChange={contentChangeHandler}
+                                    placeholder={post.content}
+                                    maxLength={300}
+                                />
+                            </>;
+                        })}
+
                     <ButtonWrap>
                         <Button onClick={uploadHandler}>수정완료</Button>
                         <Button onClick={cancelBtn}>취소하기</Button>

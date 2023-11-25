@@ -36,7 +36,7 @@ const HomePage = () => {
     //////id를 doc의 아이디로 쓰자!@
     const onHandleLike = (e, item) => {
         e.stopPropagation(); //버블링 방지
-        console.log(item.like);
+        // console.log(item.like);
         const updateLike = async () => {
             await updateDoc(doc(db, 'Post', `${item.id}`), { like: !item.like });
         };
