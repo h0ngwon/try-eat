@@ -126,28 +126,23 @@ const Login = () => {
         e.preventDefault();
 
         try {
-            await signInWithEmailAndPassword(auth, email, password);
-            dispatch(login());
-        } catch (e) {
-            console.log(e);
-        }
-
-        navigate('/');
+            await signInWithEmailAndPassword(auth, email, password).then(() => {
+                dispatch(login());
+                navigate('/');
+            });
+        } catch (e) {}
     };
 
     const socialLogin = async (auth, Provider) => {
         await signInWithPopup(auth, Provider)
             .then((res) => {
-                const user = res.user.displayName;
-                console.log(user);
+                dispatch(login());
+                navigate('/');
             })
             .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                console.log(errorCode, errorMessage);
-            });
-        dispatch(login());
-        navigate('/');
+                alert('로그인할 수 없습니다 : ');
+            })
+            .then();
     };
 
     return (
