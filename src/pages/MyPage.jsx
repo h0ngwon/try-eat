@@ -1,22 +1,23 @@
-import { collection, doc, getDocs, orderBy, query, where } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, orderBy, query, where } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import styled from 'styled-components';
 import defaultImage from '../assets/default.jpeg';
 import { auth, db } from '../shared/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 
 export default function MyPage() {
     //회원정보
-    // const [userInfo, setUserInfo] = useState([]);
-    // const [nickname, setNikcname] = useState('');
-    // const [comment, setComment] = useState('');
-    // const [avatar, setAvatar] = useState();
-
+    // const [userInfo, setUserInfo] = useState('');
+    const [nickname, setNikcname] = useState('');
+    const [userPhoto, setUserPhoto] = useState('');
+    const [comment, setCommnet] = useState('');
     const [posts, setPosts] = useState([]);
     const navigate = useNavigate();
     const user = auth.currentUser;
     const displayName = user.displayName;
 
+    // getDocs 모든 문서를 가져오기
     useEffect(() => {
         const fetchData = async () => {
             // collection 이름이 post인 collection의 모든 document를 가져옴
@@ -26,28 +27,33 @@ export default function MyPage() {
             setPosts(fbdata);
         };
         fetchData();
-    }, [displayName]);
+    }, []);
 
-    //로그인한 회원 정보 가져오기
-    // useEffect(() => {
-    //     // 새로고침 되었을때도 값 유지
-    //     firebase.auth().onAuthStateChanged(function () {
-    //         const userId = firebase.auth().currentUser.uid;
-    //         const query = firebase.database().ref(${userid});
-    //         const loadData = async () => {
-    //             try {
-    //                 await query.once('value').then(function (snapshot) {
-    //                     setTel(snapshot.val().tel);
-    //                     setName(snapshot.val().name);
-    //                     setPwd(snapshot.val().password);
-    //                 });
-    //             } catch (error) {
-    //                 console.log(error);
-    //             }
-    //         };
-    //         loadData();
-    //     });
-    // }, []);
+    console.log('현재유저', auth.currentUser);
+    // 로그인한 사용자 이름과 사진 가져오기
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const displayName = user.displayName;
+                const photoUrl = user.photoURL;
+                setNikcname(displayName);
+                setUserPhoto(photoUrl);
+            } else {
+                navigate('/');
+            }
+        });
+        return () => unsubscribe();
+    }, []);
+    // 로그인한 사용자 소개글 가져오기
+    useEffect(() => {
+        const fetchData = async () => {
+            const docRef = doc(db, 'userInfo', auth.currentUser.displayName);
+            const docSnap = await getDoc(docRef);
+
+            setCommnet(docSnap.data().comment);
+        };
+        fetchData();
+    }, []);
 
     // post 삭제 기능
     const deletePost = (post) => {
@@ -61,18 +67,20 @@ export default function MyPage() {
         <>
             <Header>
                 <LogoContainer onClick={() => navigate('/')}>Try Eat</LogoContainer>
-                {/* 로고 만들어서 home으로 이동하기 */}
+
                 <Title>마이페이지</Title>
             </Header>
             <ProfileEdit>
                 <MyPhoto>
                     {/* 로그인한 user의 photo 불러오기 */}
-                    <img src={defaultImage} />
+                    {/* 사용자가 이미지 안 넣으면 기본이미지 나오게 */}
+                    <img src={userPhoto} />
                 </MyPhoto>
                 <UserEdit>
                     {/* 로그인한 user의 displayname, 소개글 불러오기 */}
                     {/* 비동기 처리하면 됨 */}
-                    <Ment>{displayName}님, 반갑습니다!</Ment>
+                    <Ment>{nickname}님, 반갑습니다!</Ment>
+                    <Comment>{comment}</Comment>
                     <EditBtn
                         onClick={() => {
                             navigate(`/modal`);
@@ -93,7 +101,6 @@ export default function MyPage() {
                             <Post key={post.timestamp}>
                                 <div>
                                     {/* 이미지 누르면 상세페이지로 이동 구현 */}
-                                    {/* post이미지 60개 객체 나오는 거 해결하기 */}
                                     <PostImage
                                         onClick={() => {
                                             navigate(`/detailpage/${post.id}`);
@@ -152,6 +159,8 @@ const Title = styled.span`
     margin: 0;
     padding: 20px;
 `;
+
+const Comment = styled.div``;
 
 const ProfileEdit = styled.section`
     display: flex;
