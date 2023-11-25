@@ -33,7 +33,6 @@ const HomePage = () => {
         };
         fetchCard();
     }, []);
-
     const navigate = useNavigate();
     const onHandleNavigate = (id) => {
         navigate(`/detailpage/${id}`);
