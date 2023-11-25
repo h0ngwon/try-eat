@@ -22,9 +22,9 @@ const HomePage = () => {
             const fbdata = docSnap.docs.map((doc) => doc.data());
             setFbDB(fbdata);
         };
+
         fetchData();
     }, []);
-
     const navigate = useNavigate();
     const onHandleNavigate = (e, id) => {
         console.log('target', e.target);
