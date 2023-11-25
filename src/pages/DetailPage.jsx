@@ -2,26 +2,20 @@ import { doc, getDoc } from '@firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import styled from 'styled-components';
+import { auth } from '../shared/firebase';
 import { db } from '../shared/firebase';
 
 function DetailPage() {
     const param = useParams();
-    //홈에서 넘어올때 navigate에 정보를 담아서 보낸다
-    //ariticle문서에서 param을 통해 mapß
-    //여기서 id값을 찾는 쿼리를 보낸다. => 한개만 받으려면?query에서 getDocs가아닌 getDoc만 하고싶은데./,....
-    //Expected type 'DocumentReference', but it was: a custom Query object 이게
-    const [a, setA] = useState('');
-    console.log(a);
+    const [post, setPost] = useState('');
+    console.log(post);
 
     useEffect(() => {
         // const selectedPost
         const getArticle = async () => {
-            const articleRef = doc(db, 'article', param.id);
-            // const q = query(articleRef);
-            // const q = query(articleRef, where('id', '==', param.id));
-            const article = await getDoc(articleRef);
-            // const article = querySnapshot.docs.map((item) => item.data())[0];
-            setA(article.data());
+            const postRef = doc(db, 'Post', param.id);
+            const post = await getDoc(postRef);
+            setPost(post.data());
         };
         getArticle();
     }, []);
@@ -30,7 +24,7 @@ function DetailPage() {
         <>
             <Container>
                 <Wrap>
-                    <Title>{a.title}</Title>
+                    <Title>{post.title}</Title>
                     <div
                         style={{
                             width: '100vw',
@@ -39,19 +33,16 @@ function DetailPage() {
                     ></div>
                     <ProfileWrap>
                         <Profilephoto>
-                            <Img
-                                src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQefmUiYhLM1ZMdSLeZFIjEy_w-4FT18sVxROf8yaaPgnlVLwKJt0D7sEmhSgxBfgDUQMs&usqp=CAU'
-                                alt='프로필사진'
-                            />
+                            <Img src={post.photoURL} />
                         </Profilephoto>
-                        <p>{a.displayName}</p>
+                        <p>{post.nickname}</p>
                     </ProfileWrap>
 
                     <ImageWrap>
-                        <Img src={a.image} />
+                        <Img src={post.image} />
                     </ImageWrap>
 
-                    <Content>{a.content} </Content>
+                    <Content>{post.content} </Content>
                 </Wrap>
             </Container>
         </>

@@ -1,53 +1,122 @@
-import { collection, doc, getDocs, orderBy, query, updateDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import styled from 'styled-components';
 import soso from '../assets/안찜하기.png';
 import likeIt from '../assets/찜하기.png';
 import { db } from '../shared/firebase';
+import {
+    addDoc,
+    arrayRemove,
+    arrayUnion,
+    collection,
+    doc,
+    getDoc,
+    getDocs,
+    orderBy,
+    query,
+    updateDoc
+} from 'firebase/firestore';
 import { auth } from '../shared/firebase';
-import { addDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 //auto scroll 자동으로 스크롤을 내려줌
 
 const HomePage = () => {
-    const [fbDB, setFbDB] = useState([]);
-    const [heart, setHeart] = useState();
-    const [isLoading, setIsLoading] = useState(false);
-    console.log(fbDB);
+    //post의 likebox
+    const [post, setPost] = useState([]);
+
     useEffect(() => {
-        setIsLoading(true);
-
-        const fetchData = async () => {
+        const fetchCard = async () => {
             //최신순정렬
-            const q = query(collection(db, 'article'), orderBy('timestamp', 'desc'));
+            const q = query(collection(db, 'Post'), orderBy('timestamp', 'desc'));
             const docSnap = await getDocs(q);
-            const fbdata = docSnap.docs.map((doc) => doc.data());
-            setFbDB(fbdata);
+            const postData = docSnap.docs.map((doc) => doc.data());
+            setPost(postData);
         };
-
-        fetchData();
+        fetchCard();
     }, []);
-    console.log('12311223', auth.currentUser);
     const navigate = useNavigate();
-    const onHandleNavigate = (e, id) => {
-        console.log('target', e.target);
-        console.log('current', e.currentTarget);
-        // if (e.target !== e.currentTarget) {
+    const onHandleNavigate = (id) => {
         navigate(`/detailpage/${id}`);
-        // }
     };
-    //////id를 doc의 아이디로 쓰자!@
+
+    //로그인한 유저의 정보 Authentication
+    const currentUser = auth.currentUser;
+    console.log('currentUser', currentUser);
+    //닉네임으로 userInfo 에서 닉네임으로 likelist가져오기
+
+    //현재 로그인한 유저의 userInfo  FireStore
+    const [currentUserInfo, setCurrentUserInfo] = useState({});
+    console.log('userinfo', currentUserInfo);
+
+    useEffect(() => {
+        if (currentUser) {
+            const fetchLikeList = async () => {
+                const userRef = doc(db, 'userInfo', currentUser.displayName);
+                const userInfo = await getDoc(userRef);
+                setCurrentUserInfo(userInfo.data());
+            };
+            fetchLikeList();
+        }
+        console.log('커런트찾음!');
+    }, [currentUser]); //최초 읽을때 auth.
+
+    //닉네임으로 userInfo에 likeList 넣기, 업데이트하기
+
     const onHandleLike = (e, item) => {
         e.stopPropagation(); //버블링 방지
-        console.log(item.like);
-        const updateLike = async () => {
-            await updateDoc(doc(db, 'article', `${item.id}`), { like: !item.like });
-        };
-        const likechage = fbDB.map((obj) => {
-            return obj.id === item.id ? { ...obj, like: !obj.like } : obj;
-        });
-        setFbDB(likechage);
-        updateLike();
+        //비로그인시 방지
+
+        if (auth.currentUser === null) return;
+
+        const userLikListRef = doc(db, 'userInfo', currentUser.displayName);
+        let updateData = {};
+        let updateLikeState = [];
+        if (!currentUserInfo.likeList) {
+            console.log('none');
+
+            updateData = {
+                ...currentUserInfo,
+                likeList: [item.id]
+            };
+            updateLikeState = [item.id];
+        } else if (currentUserInfo.likeList.includes(item.id)) {
+            console.log('rm item', item.id);
+
+            updateData = {
+                ...currentUserInfo,
+                likeList: arrayRemove(item.id) //배열에 제거해주는 함수
+            };
+            updateLikeState = currentUserInfo.likeList.filter((like) => {
+                return like === item.id ? '' : like;
+            });
+        } else {
+            console.log('add', item.id);
+
+            updateData = {
+                ...currentUserInfo,
+                likeList: arrayUnion(item.id) || [] //배열에 추가해주는 함수
+            };
+            updateLikeState = [...currentUserInfo.likeList, item.id];
+        }
+        const updateUserInfo = { ...currentUserInfo, likeList: [...updateLikeState] };
+
+        setCurrentUserInfo(updateUserInfo);
+        updateDoc(userLikListRef, updateData);
+
+        // const postLikeBoxRef = doc(db,'Post',)
+        // console.log('==================================');
+        // console.log('state', updateLikeState);
+        // console.log(userLikListRef, updateData);
+
+        // const articleLikeListRef =
+        // console.log(item.like);
+        // const updateLike = async () => {
+        //     await updateDoc(doc(db, 'article', `${item.id}`), { like: !item.like });
+        // };
+        // const likechage = fbDB.map((obj) => {
+        //     return obj.id === item.id ? { ...obj, like: !obj.like } : obj;
+        // });
+        // setFbDB(likechage);
+        // updateLike();
     };
 
     return (
@@ -69,14 +138,15 @@ const HomePage = () => {
                 >
                     글쓰기
                 </button>
+
                 <Container>
-                    {fbDB.map((itme) => {
+                    {post.map((itme) => {
                         return (
                             <CardList
                                 key={itme.id}
                                 $img={itme.image}
                                 onClick={(e) => {
-                                    onHandleNavigate(e, itme.id);
+                                    onHandleNavigate(itme.id);
                                 }}
                             >
                                 <CardImgWrap>
@@ -95,7 +165,8 @@ const HomePage = () => {
                                     <CardContent>{itme.content}</CardContent>
                                 </CardTextWrap>
                                 <LikeWrap onClick={(e) => onHandleLike(e, itme)}>
-                                    {JSON.parse(itme.like) ? <Like src={likeIt} /> : <Like src={soso} />}
+                                    <Like src={likeIt} />
+                                    {/* {itme.likebox ? <Like src={likeIt} /> : <Like src={soso} />} */}
                                 </LikeWrap>
                             </CardList>
                         );
