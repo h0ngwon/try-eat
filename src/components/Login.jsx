@@ -137,8 +137,10 @@ const Login = () => {
         await signInWithPopup(auth, Provider)
             .then((res) => {
                 const data = {
+                    nickname: auth.currentUser.displayName,
                     
                 }
+                setDoc(doc(db, 'userInfo', auth.currentUser.displayName), data);
                 dispatch(login());
                 navigate('/');
             })
