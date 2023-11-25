@@ -1,5 +1,5 @@
 import { uuidv4 } from '@firebase/util';
-import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { doc, getDoc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import React, { useRef, useState } from 'react';
 import { styled } from 'styled-components';
@@ -61,9 +61,17 @@ const PostEdit = ({ navigate }) => {
         });
     };
 
-    const cancelBtn = () => {
-        navigate('/mypage');
+    const editPostData = async () => {
+        const docRef = doc(db, 'Post', postToAdd.id);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            console.log('Document data:', docSnap.data());
+        } else {
+            console.log('No such document!');
+        }
     };
+
     // 수정완료 버튼
     const uploadHandler = async () => {
         const uploadCheck = window.confirm('수정하시겠습니까?');
@@ -82,7 +90,16 @@ const PostEdit = ({ navigate }) => {
             }
 
             try {
-                await setDoc(doc(db, 'Post', postToAdd.id), postToAdd);
+                // await setDoc(doc(db, 'Post', postToAdd.id), postToAdd);
+
+                const washingtonRef = doc(db, 'Post', postToAdd.id);
+                await updateDoc(
+                    washingtonRef,
+                    {
+                        capital: true
+                    },
+                    postToAdd
+                );
 
                 const imageRef = ref(storage, `${postToAdd.id}/Post-image`);
                 await uploadBytes(imageRef, imageUrl);
@@ -109,6 +126,10 @@ const PostEdit = ({ navigate }) => {
         } else {
             return;
         }
+    };
+
+    const cancelBtn = () => {
+        navigate('/mypage');
     };
 
     return (
