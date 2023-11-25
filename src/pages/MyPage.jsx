@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import styled from 'styled-components';
 import { db } from '../shared/firebase';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { useNavigate } from 'react-router';
 
 export default function MyPage() {
