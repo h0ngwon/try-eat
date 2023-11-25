@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import likeIt from '../assets/찜하기.png';
 import { db } from '../shared/firebase';
-import { uuidv4 } from '@firebase/util';
 import {
     addDoc,
     arrayRemove,
@@ -22,25 +21,22 @@ import { auth } from '../shared/firebase';
 //auto scroll 자동으로 스크롤을 내려줌
 
 const HomePage = () => {
-    console.log(auth.currentUser);
     const [fbDB, setFbDB] = useState([]);
     useEffect(() => {
         const fetchCard = async () => {
             //최신순정렬
-            const q = query(collection(db, 'article'), orderBy('timestamp', 'desc'));
+            const q = query(collection(db, 'Post'), orderBy('timestamp', 'desc'));
             const docSnap = await getDocs(q);
             const fbdata = docSnap.docs.map((doc) => doc.data());
             setFbDB(fbdata);
         };
         fetchCard();
     }, []);
-
     const navigate = useNavigate();
     const onHandleNavigate = (id) => {
         navigate(`/detailpage/${id}`);
     };
     //로그인한 유저의 정보 Authentication
-
     const currentUser = auth.currentUser;
     console.log('currentUser', currentUser);
     //닉네임으로 userInfo 에서 닉네임으로 likelist가져오기
@@ -51,6 +47,7 @@ const HomePage = () => {
 
     useEffect(() => {
         if (currentUser) {
+            console.log('여이따');
             const fetchLikeList = async () => {
                 const userRef = doc(db, 'userInfo', currentUser.displayName);
                 const userInfo = await getDoc(userRef);
@@ -65,6 +62,7 @@ const HomePage = () => {
 
     const onHandleLike = (e, item) => {
         e.stopPropagation(); //버블링 방지
+        //비로그인시 방지
         if (auth.currentUser === null) return;
 
         const likListRef = doc(db, 'userInfo', currentUser.displayName);
@@ -81,7 +79,7 @@ const HomePage = () => {
         } else if (currentUserInfo.likeList.includes(item.id)) {
             updateData = {
                 ...currentUserInfo,
-                likeList: arrayRemove[item.id] //배열에 제거해주는 함수
+                likeList: arrayRemove(item.id) //배열에 제거해주는 함수
             };
             updateLikeState = currentUserInfo.likeList.filter((like) => {
                 console.log('rm item', item.id);
@@ -96,7 +94,7 @@ const HomePage = () => {
                 likeList: arrayUnion(item.id) || [] //배열에 추가해주는 함수
             };
             updateLikeState = [...currentUserInfo.likeList, item.id];
-            currentUserInfo.likeList.push(item.id);
+            // currentUserInfo.likeList.push(item.id);
             // updateLikeState =
             // console.log(currentUserInfo.likeList, updateLikeState);
         }
@@ -168,7 +166,8 @@ const HomePage = () => {
                                     <CardContent>{itme.content}</CardContent>
                                 </CardTextWrap>
                                 <LikeWrap onClick={(e) => onHandleLike(e, itme)}>
-                                    {JSON.parse(itme.like) ? <Like src={likeIt} /> : <Like src={soso} />}
+                                    <Like src={likeIt} />
+                                    {/* {JSON.parse(itme.like) ? <Like src={likeIt} /> : <Like src={soso} />} */}
                                 </LikeWrap>
                             </CardList>
                         );
