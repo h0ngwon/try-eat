@@ -1,8 +1,8 @@
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth, db, doc, setDoc, storage } from '../shared/firebase';
-import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 
 const Header = styled.header`
     width: 100%;
@@ -130,29 +130,32 @@ const RegisterBtn = styled(IdDuplicateBtn)`
 `;
 
 const Register = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [nickname, setNickname] = useState('');
+    const [form, setForm] = useState({
+        email: '',
+        password: '',
+        confirmPassword: '',
+        nickname: '',
+        image: ''
+    });
+
     const [comment, setComment] = useState('');
     const [imageUpload, setImageUpload] = useState('');
-    const [image, setImage] = useState('');
     const fileRef = useRef();
 
     const emailHandler = (e) => {
-        setEmail(e.target.value);
+        setForm({ ...form, email: e.target.value });
     };
 
     const passwordHandler = (e) => {
-        setPassword(e.target.value);
+        setForm({ ...form, password: e.target.value });
     };
 
     const confirmPasswordHandler = (e) => {
-        setConfirmPassword(e.target.value);
+        setForm({ ...form, confirmPassword: e.target.value });
     };
 
     const nicknameHandler = (e) => {
-        setNickname(e.target.value);
+        setForm({ ...form, nickname: e.target.value });
     };
 
     const commentHandler = (e) => {
@@ -168,19 +171,32 @@ const Register = () => {
         if (!imageUpload) return;
         uploadBytes(imageRef, imageUpload).then((snapshot) => {
             getDownloadURL(snapshot.ref).then((url) => {
-                setImage(url);
+                setForm({ ...form, image: url });
             });
         });
     }, [imageUpload]);
 
+    const isSamePassword = () => {
+        if (form.confirmPassword === form.password) {
+            return true;
+        }
+        return false;
+    };
+
     const submitHandler = async (e) => {
         e.preventDefault();
-        await createUserWithEmailAndPassword(auth, email, confirmPassword);
-        await setDoc(doc(db, 'userInfo', nickname), { comment });
+
+        if (!isSamePassword()) {
+            alert('Password Mismatch');
+            return;
+        }
+
+        await createUserWithEmailAndPassword(auth, form.email, form.confirmPassword);
+        setDoc(doc(db, 'userInfo', form.nickname), { comment });
         try {
-            await updateProfile(auth.currentUser, {
-                displayName: nickname,
-                photoURL: image
+            updateProfile(auth.currentUser, {
+                displayName: form.nickname,
+                photoURL: form.image
             });
         } catch (error) {
             console.error(error);
@@ -195,7 +211,14 @@ const Register = () => {
                     <IdLabelContainer>
                         <IdLabel>이메일</IdLabel>
                     </IdLabelContainer>
-                    <IdInput type='email' maxLength={30} required placeholder='이메일 입력' onChange={emailHandler} />
+                    <IdInput
+                        type='email'
+                        maxLength={30}
+                        required
+                        placeholder='이메일 입력'
+                        value={form.email}
+                        onChange={emailHandler}
+                    />
                     <IdDuplicateBtn>중복확인</IdDuplicateBtn>
                 </IdContainer>
 
@@ -209,6 +232,7 @@ const Register = () => {
                         maxLength={20}
                         placeholder='6글자 이상 입력'
                         required
+                        value={form.password}
                         onChange={passwordHandler}
                     />
                 </PasswordContainer>
@@ -223,6 +247,7 @@ const Register = () => {
                         maxLength={20}
                         placeholder='비밀번호 입력'
                         required
+                        value={form.confirmPassword}
                         onChange={confirmPasswordHandler}
                     />
                 </PasswordConfirmContainer>
@@ -237,6 +262,7 @@ const Register = () => {
                         maxLength={10}
                         placeholder='3글자 이상 입력'
                         required
+                        value={form.nickname}
                         onChange={nicknameHandler}
                     />
                     <NicknameBtn>중복확인</NicknameBtn>
@@ -251,6 +277,7 @@ const Register = () => {
                         maxLength={15}
                         placeholder='최대 15글자 입력'
                         required
+                        value={form.comment}
                         onChange={commentHandler}
                     />
                 </CommentContainer>
@@ -260,7 +287,7 @@ const Register = () => {
                         <ProfileLabel>프로필</ProfileLabel>
                     </ProfileLabelContainer>
                     <ProfileImageContainer>
-                        {image ? <ProfileImage src={image} /> : '이미지를 업로드해 주세요'}
+                        {form.image ? <ProfileImage src={form.image} /> : '이미지를 업로드해 주세요'}
                     </ProfileImageContainer>
                     <ProfileInputLabel>
                         <ProfileInputDiv htmlFor='file'>업로드</ProfileInputDiv>
@@ -271,7 +298,6 @@ const Register = () => {
                             accept='image/*'
                             onChange={previewImageHandler}
                             ref={fileRef}
-                            required
                         />
                     </ProfileInputLabel>
                 </ProfileContainer>

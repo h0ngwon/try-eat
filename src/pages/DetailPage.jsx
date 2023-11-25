@@ -1,13 +1,13 @@
-import { collection, doc, getDoc, getDocs, query, where } from '@firebase/firestore';
+import { doc, getDoc } from '@firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
-import { db } from '../shared/firebase';
 import styled from 'styled-components';
+import { db } from '../shared/firebase';
 
 function DetailPage() {
     const param = useParams();
     //홈에서 넘어올때 navigate에 정보를 담아서 보낸다
-    //ariticle문서에서 param을 통해 map
+    //ariticle문서에서 param을 통해 mapß
     //여기서 id값을 찾는 쿼리를 보낸다. => 한개만 받으려면?query에서 getDocs가아닌 getDoc만 하고싶은데./,....
     //Expected type 'DocumentReference', but it was: a custom Query object 이게
     const [a, setA] = useState('');

@@ -1,21 +1,12 @@
+import { collection, doc, getDocs, orderBy, query, updateDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
-import styled, { css } from 'styled-components';
+import { useNavigate } from 'react-router';
+import styled from 'styled-components';
+import soso from '../assets/안찜하기.png';
 import likeIt from '../assets/찜하기.png';
 import { db } from '../shared/firebase';
 import { auth } from '../shared/firebase';
-import {
-    addDoc,
-    collection,
-    doc,
-    getDoc,
-    getDocs,
-    orderBy,
-    query,
-    serverTimestamp,
-    updateDoc
-} from 'firebase/firestore';
-import { useNavigate } from 'react-router';
-import soso from '../assets/안찜하기.png';
+import { addDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 //auto scroll 자동으로 스크롤을 내려줌
 
 const HomePage = () => {
@@ -33,6 +24,7 @@ const HomePage = () => {
             const fbdata = docSnap.docs.map((doc) => doc.data());
             setFbDB(fbdata);
         };
+
         fetchData();
     }, []);
     console.log('12311223', auth.currentUser);

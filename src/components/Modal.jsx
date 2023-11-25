@@ -1,25 +1,23 @@
-import { getDoc, doc } from 'firebase/firestore';
+import { getDoc, doc, updateDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import dummy from '../shared/sampleUserinfo.json';
 import styled from 'styled-components';
 import { auth, db, onAuthStateChanged } from '../shared/firebase';
 import { useNavigate } from 'react-router-dom';
-import { getDownloadURL, ref } from 'firebase/storage';
+import { ref } from 'firebase/storage';
 import { storage } from '../shared/firebase';
 
 function Modal() {
     const navigate = useNavigate();
-    const user = dummy[0];
-    const [userList, setUserList] = useState(dummy);
+    // const user = dummy[0];
+
     const [name, setName] = useState();
     const [comment, setComment] = useState();
-    // 로그인 한 후 로그인 사용자 정보를 가져오기
-    // displayname 기준으로 firestore, storage의 데이터 가져오기
-    // --> 현재 로그인된 사람의 displayName과
-    // 가져온거 수정해서 다시 저장하기.
+    const [fileImage, setFileImage] = useState();
+    const [userList, setUserList] = useState();
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
+        const fetchUser = onAuthStateChanged(auth, (user) => {
             if (user) {
                 const displayName = user.displayName;
                 const photoUrl = user.photoURL;
@@ -29,22 +27,29 @@ function Modal() {
                 navigate('/');
             }
         });
-
-        return () => unsubscribe();
+        return () => fetchUser();
     }, []);
 
     useEffect(() => {
         const fetchData = async () => {
             const docRef = doc(db, 'userInfo', auth.currentUser.displayName);
             const docSnap = await getDoc(docRef);
-            setComment(docSnap.data().comment);
-        };
+            const userComment = docSnap.data().comment;
 
+            setComment(userComment);
+        };
         fetchData();
     }, []);
 
+    console.log('로그인된 유저 값이다!!!', userList);
+
+    // 로그인 한 후 로그인 사용자 정보를 가져오기
+    // displayname 기준으로 firestore, storage의 데이터 가져오기
+    // --> 현재 로그인된 사람의 displayName과
+    // 가져온거 수정해서 다시 저장하기.
+
     //    파일 업로드
-    const [fileImage, setFileImage] = useState(user.avatar);
+
     const saveFileImage = (e) => {
         setFileImage(URL.createObjectURL(e.target.files[0]));
         // console.log(e.target.files[0]);
@@ -60,14 +65,19 @@ function Modal() {
         // console.log(comment);
     };
 
-    // 수정 버튼 함수
-    const onEditDone = () => {
-        const newUser = { ...user, nickname: name, comment: comment, avatar: fileImage };
-        const newUserList = userList.map((item) => {
-            return item.id === user.id ? newUser : item;
-        });
-        setUserList(newUserList);
-    };
+    // 무엇을 수정할것인가? -> userList
+    // 그렇다면 userList에 변경할 기존의 값이 있어야 함.
+    //  변경해야 할 값은 무엇인가? --> firebase에서 받아온 값.
+    // 그럼 userList에 firebase에서 받아온 nickname, comment, fileImage 를 어떻게 넣어놓을 것인가?
+
+    // // 수정 버튼 함수
+    // const onEditDone = () => {
+    //     const newUser = { ...user, nickname: name, comment: comment, avatar: fileImage };
+    //     const newUserList = userList.map((item) => {
+    //         return item.id === user.id ? newUser : item;
+    //     });
+    //     setUserList(newUserList);
+    // };
 
     // 중복확인 기능 구현필요!!!!!!!!!!!!!!!!
 
@@ -96,7 +106,7 @@ function Modal() {
             </Box2>
 
             <Box3>
-                <Button2 onClick={onEditDone}> 프로필 수정 완료 </Button2>
+                <Button2> 프로필 수정 완료 </Button2>
             </Box3>
         </Container>
     );
