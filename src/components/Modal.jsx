@@ -13,7 +13,6 @@ function Modal() {
     const [userList, setUserList] = useState(dummy);
     const [name, setName] = useState();
     const [comment, setComment] = useState();
-    console.log('sfjklksajdf;alskjf', auth.currentUser);
     // 로그인 한 후 로그인 사용자 정보를 가져오기
     // displayname 기준으로 firestore, storage의 데이터 가져오기
     // --> 현재 로그인된 사람의 displayName과
