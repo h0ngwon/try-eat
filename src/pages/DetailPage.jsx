@@ -3,8 +3,10 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { db } from '../shared/firebase';
 import styled from 'styled-components';
-
+import { auth } from '../shared/firebase';
 function DetailPage() {
+    console.log(auth.currentUser);
+
     const param = useParams();
     //홈에서 넘어올때 navigate에 정보를 담아서 보낸다
     //ariticle문서에서 param을 통해 map
