@@ -1,6 +1,8 @@
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { auth, db, doc, setDoc, storage } from '../shared/firebase';
 
@@ -101,7 +103,6 @@ const ProfileImage = styled.img`
     width: 340px;
     height: 240px;
     object-fit: cover;
-    border-radius: 24px;
 `;
 
 const ProfileInputLabel = styled(IdLabel)``;
@@ -120,29 +121,56 @@ const ProfileInputDiv = styled.div`
 const ProfileInput = styled.input`
     display: none;
 `;
-const RegisterBtn = styled(IdDuplicateBtn)`
+
+const RegisterBtn = styled.input`
     width: 50%;
     margin: 30px;
+    font-size: 30px;
+    padding: 20px;
+    border: none;
+    border-radius: 24px;
+    background-color: ${(props) => props.theme.mainColor};
+    color: #fff;
+    cursor: pointer;
 
     &:hover {
         background-color: ${(props) => props.theme.hoverColor};
     }
+
+    &:disabled {
+        cursor: not-allowed;
+    }
+`;
+
+const Validation = styled.span`
+    color: ${(props) => props.theme.mainColor};
+    font-size: 20px;
+    font-weight: bold;
 `;
 
 const Register = () => {
+    const navigate = useNavigate();
     const [form, setForm] = useState({
         email: '',
         password: '',
         confirmPassword: '',
         nickname: '',
+        comment: '',
         image: ''
     });
-
-    const [comment, setComment] = useState('');
     const [imageUpload, setImageUpload] = useState('');
-    const fileRef = useRef();
+
+    const [isValidEmail, setIsValidEmail] = useState(true);
+    const [isSamePassword, setIsSamePassword] = useState(true);
+    const [isValidNickname, setIsValidNickname] = useState(false);
+    const [isAbleToRegister, setIsAbleToRegister] = useState(false);
+
+    const eamilRegex = /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
 
     const emailHandler = (e) => {
+        if (eamilRegex.test(e.target.value)) setIsValidEmail(true);
+        if (!eamilRegex.test(e.target.value)) setIsValidEmail(false);
+
         setForm({ ...form, email: e.target.value });
     };
 
@@ -151,6 +179,9 @@ const Register = () => {
     };
 
     const confirmPasswordHandler = (e) => {
+        if (form.password === e.target.value) setIsSamePassword(true);
+        if (form.password !== e.target.value) setIsSamePassword(false);
+
         setForm({ ...form, confirmPassword: e.target.value });
     };
 
@@ -159,7 +190,7 @@ const Register = () => {
     };
 
     const commentHandler = (e) => {
-        setComment(e.target.value);
+        setForm({ ...form, comment: e.target.value });
     };
 
     const previewImageHandler = (e) => {
@@ -176,37 +207,64 @@ const Register = () => {
         });
     }, [imageUpload]);
 
-    const isSamePassword = () => {
-        if (form.confirmPassword === form.password) {
-            return true;
+    const formHandler = () => {
+        const isValidAll = isValidEmail && isSamePassword && isValidNickname;
+        if (isValidAll) setIsAbleToRegister(true);
+        if (!isValidAll) setIsAbleToRegister(false);
+    };
+
+    const emailCheck = async (email) => {
+        const userRef = collection(db, 'userInfo');
+        const q = query(userRef, where('email', '==', email));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.docs.length > 0) alert('이미 존재하는 이메일입니다.');
+        if (querySnapshot.docs.length === 0) alert('사용 가능한 이메일입니다.');
+    };
+
+    const nicknameCheck = async (nickname) => {
+        const userRef = collection(db, 'userInfo');
+        const q = query(userRef, where('nickname', '==', nickname));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.docs.length > 0) {
+            alert('이미 존재하는 닉네임입니다.');
+            setIsValidNickname(false);
         }
-        return false;
+        if (querySnapshot.docs.length === 0) {
+            alert('사용 가능한 닉네임입니다.');
+            setIsValidNickname(true);
+        }
     };
 
     const submitHandler = async (e) => {
         e.preventDefault();
 
-        if (!isSamePassword()) {
-            alert('Password Mismatch');
-            return;
-        }
+        const data = {
+            email: form.email,
+            nickname: form.nickname,
+            comment: form.comment
+        };
 
-        await createUserWithEmailAndPassword(auth, form.email, form.confirmPassword);
-        setDoc(doc(db, 'userInfo', form.nickname), { comment });
         try {
+            await createUserWithEmailAndPassword(auth, form.email, form.confirmPassword);
+            setDoc(doc(db, 'userInfo', form.nickname), data);
             updateProfile(auth.currentUser, {
                 displayName: form.nickname,
                 photoURL: form.image
             });
         } catch (error) {
-            console.error(error);
+            alert('이미 존재하는 이메일이거나 닉네임을 입력하셨습니다.');
         }
+
+        alert('회원가입이 완료되었습니다.');
+        navigate('/');
     };
 
     return (
         <>
             <Header>회원가입</Header>
-            <Container onSubmit={submitHandler}>
+            <Container onSubmit={submitHandler} onChange={formHandler}>
                 <IdContainer>
                     <IdLabelContainer>
                         <IdLabel>이메일</IdLabel>
@@ -218,9 +276,14 @@ const Register = () => {
                         placeholder='이메일 입력'
                         value={form.email}
                         onChange={emailHandler}
+                        autoFocus
                     />
-                    <IdDuplicateBtn>중복확인</IdDuplicateBtn>
+                    <IdDuplicateBtn type='button' onClick={() => emailCheck(form.email)}>
+                        중복확인
+                    </IdDuplicateBtn>
                 </IdContainer>
+
+                {isValidEmail ? '' : <Validation>이메일 형식이 아닙니다</Validation>}
 
                 <PasswordContainer>
                     <PasswordLabelContainer>
@@ -252,6 +315,8 @@ const Register = () => {
                     />
                 </PasswordConfirmContainer>
 
+                {isSamePassword ? '' : <Validation>같은 비밀번호를 입력해주세요</Validation>}
+
                 <NicknameContainer>
                     <NicknameLabelContainer>
                         <NicknameLabel>닉네임</NicknameLabel>
@@ -265,7 +330,9 @@ const Register = () => {
                         value={form.nickname}
                         onChange={nicknameHandler}
                     />
-                    <NicknameBtn>중복확인</NicknameBtn>
+                    <NicknameBtn type='button' onClick={() => nicknameCheck(form.nickname)}>
+                        중복확인
+                    </NicknameBtn>
                 </NicknameContainer>
 
                 <CommentContainer>
@@ -287,7 +354,11 @@ const Register = () => {
                         <ProfileLabel>프로필</ProfileLabel>
                     </ProfileLabelContainer>
                     <ProfileImageContainer>
-                        {form.image ? <ProfileImage src={form.image} /> : '이미지를 업로드해 주세요'}
+                        {form.image ? (
+                            <ProfileImage src={form.image} />
+                        ) : (
+                            <Validation>이미지를 업로드 해주세요.</Validation>
+                        )}
                     </ProfileImageContainer>
                     <ProfileInputLabel>
                         <ProfileInputDiv htmlFor='file'>업로드</ProfileInputDiv>
@@ -297,11 +368,10 @@ const Register = () => {
                             name='file'
                             accept='image/*'
                             onChange={previewImageHandler}
-                            ref={fileRef}
                         />
                     </ProfileInputLabel>
                 </ProfileContainer>
-                <RegisterBtn>Let's Do Eat!</RegisterBtn>
+                <RegisterBtn type='submit' value={"Let's Do Eat!"} disabled={!isAbleToRegister}></RegisterBtn>
             </Container>
         </>
     );
