@@ -1,42 +1,37 @@
 import { uuidv4 } from '@firebase/util';
-import { doc, getDoc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
+import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { styled } from 'styled-components';
 import { auth, db, storage } from '../shared/firebase';
-import { useParams } from 'react-router-dom';
 
-// 수정완료 클릭 후 마이페이지로 자동이동
+// 등록하기 클릭 후 상세페이지로 자동이동
 // 취소하기 클릭 후 마이페이지로 자동이동
-// 글쓰기를 클릭해서 접근하면 이미지와 내용이 비어있고 버튼이 '등록하기'
-// 마이페이지 게시물 수정으로 접근하면 이미지와 내용이 들어있고 버튼이 '수정완료'
+// 글쓰기를 클릭해서 접근한 페이지로 내용이 비어있고 버튼이 '등록하기'
 
 // 유효성검사
 // 로그인 하지 않은 상태로 게시물 등록하면 '로그인이 필요합니다' 모달창
 // 등록완료 버튼 클릭 시 ‘이대로 등록하시겠습니까?’ 모달창
 
-const PostEdit = ({ navigate }) => {
+const PostAdd = ({ navigate }) => {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [imageFile, setImageFile] = useState(null);
     const [imageUrl, setImageUrl] = useState(null);
     const [inputImg, setInputImg] = useState('');
-    const [clickPost, setClickPost] = useState('');
-    const param = useParams();
+
     const fileInput = useRef();
     const user = auth.currentUser;
     const displayName = user.displayName;
-    const photoURL = user.photoURL;
 
     const postToAdd = {
         id: uuidv4(),
         title,
         content,
+        user: user.uid,
         timestamp: serverTimestamp(),
         image: imageFile,
-        nickname: displayName,
-        photoURL,
-        likeBox: []
+        nickname: displayName
     };
 
     const onSubmit = (e) => {
@@ -66,23 +61,12 @@ const PostEdit = ({ navigate }) => {
         });
     };
 
-    useEffect(() => {
-        const editPostData = async () => {
-            const editPostRef = doc(db, 'Post', param.id);
-            const clickPost = await getDoc(editPostRef);
-            // if (docSnap.exists()) {
-            //     console.log('Document data:', docSnap.data());
-            // } else {
-            //     console.log('No such document!');
-            // }
-            setClickPost(clickPost.data());
-        };
-        editPostData();
-    }, []);
-
-    // 수정완료 버튼
+    const cancelBtn = () => {
+        navigate('/mypage');
+    };
+    // 업로드 버튼
     const uploadHandler = async () => {
-        const uploadCheck = window.confirm('수정하시겠습니까?');
+        const uploadCheck = window.confirm('등록하시겠습니까?');
         if (uploadCheck) {
             if (title === '') {
                 alert('제목을 입력해주세요');
@@ -98,15 +82,7 @@ const PostEdit = ({ navigate }) => {
             }
 
             try {
-                // await setDoc(doc(db, 'Post', postToAdd.id), postToAdd);
-                const washingtonRef = doc(db, 'Post', postToAdd.id);
-                await updateDoc(
-                    washingtonRef,
-                    {
-                        capital: true
-                    },
-                    postToAdd
-                );
+                await setDoc(doc(db, 'Post', postToAdd.id), postToAdd);
 
                 const imageRef = ref(storage, `${postToAdd.id}/Post-image`);
                 await uploadBytes(imageRef, imageUrl);
@@ -135,66 +111,52 @@ const PostEdit = ({ navigate }) => {
         }
     };
 
-    const cancelBtn = () => {
-        navigate('/mypage');
-    };
-
     return (
         <div>
             <Container>
                 <FormWrap onSubmit={onSubmit}>
-                    {clickPost
-                        .filter((post) => {
-                            return post.id === param.id;
-                        })
-                        .map((post) => {
-                            <>
-                                <InputTitle
-                                    key={post.id}
-                                    value={title}
-                                    type='text'
-                                    onChange={titleChangeHandler}
-                                    placeholder={post.title}
-                                    maxLength={15}
-                                />
-                                <div
-                                    style={{
-                                        width: '100vw',
-                                        borderTop: '1px solid black',
-                                        marginBottom: '50px'
-                                    }}
-                                ></div>
-                                <ButtonWrap>
-                                    <ImageInput
-                                        id='inputFile'
-                                        type='file'
-                                        ref={fileInput}
-                                        accept='image/*'
-                                        value={inputImg}
-                                        style={{ display: 'none' }}
-                                        onChange={(e) => imageChangeHandler(e)}
-                                    />
-                                    <ImgUploadButton htmlFor='inputFile'>O</ImgUploadButton>
-                                    <ImgDeleteButton onClick={imageDeleteBtn}>X</ImgDeleteButton>
-                                </ButtonWrap>
-                                <ImageWrap>
-                                    {/* <ImageButton onClick={uploadHandler}>업로드</ImageButton> */}
-                                    <Img src={post.image} />
-                                    {!imageFile && <Span>이미지를 업로드해주세요</Span>}
-                                </ImageWrap>
-
-                                <InputContent
-                                    value={content}
-                                    type='text'
-                                    onChange={contentChangeHandler}
-                                    placeholder={post.content}
-                                    maxLength={300}
-                                />
-                            </>;
-                        })}
-
+                    <InputTitle
+                        value={title}
+                        type='text'
+                        onChange={titleChangeHandler}
+                        placeholder='제목을 입력해주세요(최대 15자)'
+                        maxLength={15}
+                    />
+                    <div
+                        style={{
+                            width: '100vw',
+                            borderTop: '1px solid black',
+                            marginBottom: '50px'
+                        }}
+                    ></div>
                     <ButtonWrap>
-                        <Button onClick={uploadHandler}>수정완료</Button>
+                        <ImageInput
+                            id='inputFile'
+                            type='file'
+                            ref={fileInput}
+                            accept='image/*'
+                            value={inputImg}
+                            style={{ display: 'none' }}
+                            onChange={(e) => imageChangeHandler(e)}
+                        />
+                        <ImgUploadButton htmlFor='inputFile'>O</ImgUploadButton>
+                        <ImgDeleteButton onClick={imageDeleteBtn}>X</ImgDeleteButton>
+                    </ButtonWrap>
+                    <ImageWrap>
+                        {/* <ImageButton onClick={uploadHandler}>업로드</ImageButton> */}
+                        <Img src={imageFile} />
+                        {!imageFile && <Span>이미지를 업로드해주세요</Span>}
+                    </ImageWrap>
+
+                    <InputContent
+                        value={content}
+                        type='text'
+                        onChange={contentChangeHandler}
+                        placeholder='설명을 입력해주세요(최대 300자)'
+                        maxLength={300}
+                    />
+                    <ButtonWrap>
+                        <Button onClick={uploadHandler}>등록하기</Button>
                         <Button onClick={cancelBtn}>취소하기</Button>
                     </ButtonWrap>
                 </FormWrap>
@@ -300,7 +262,7 @@ const InputContent = styled.textarea`
     height: 200px;
     padding: 20px;
     margin: 50px auto 0 auto;
-    font-size: 20px;
+    font-size: 25px;
     font-family: GmarketSansMedium;
     resize: none;
     background: none;
@@ -325,7 +287,6 @@ const Button = styled.button`
     color: white;
     border: none;
     border-radius: 100px;
-    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
     margin: 30px 0 0 30px;
     cursor: pointer;
     &:hover {
@@ -333,4 +294,4 @@ const Button = styled.button`
         transition: all 0.3s;
     }
 `;
-export default PostEdit;
+export default PostAdd;
