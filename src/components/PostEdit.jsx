@@ -1,10 +1,9 @@
-import React, { useEffect, useRef } from 'react';
-import { useState } from 'react';
+import { uuidv4 } from '@firebase/util';
+import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import React, { useRef, useState } from 'react';
 import { styled } from 'styled-components';
 import { auth, db, storage } from '../shared/firebase';
-import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
-import { uuidv4 } from '@firebase/util';
 
 // 등록하기 클릭 후 상세페이지로 자동이동
 // 취소하기 클릭 후 마이페이지로 자동이동

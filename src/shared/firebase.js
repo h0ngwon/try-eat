@@ -9,12 +9,12 @@ import { updateProfile } from 'firebase/auth';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: 'AIzaSyAuR3yllYRqqU-O7aDA00z2DDHUf6fZK_Y',
-    authDomain: 'fir-test2-9cc58.firebaseapp.com',
-    projectId: 'fir-test2-9cc58',
-    storageBucket: 'fir-test2-9cc58.appspot.com',
-    messagingSenderId: '516454141672',
-    appId: '1:516454141672:web:15b894afa37e2f3cc2835d'
+    apiKey: process.env.REACT_APP_API_KEY,
+    authDomain: process.env.REACT_APP_AUTH_DOMAIN,
+    projectId: process.env.REACT_APP_PROJECT_ID,
+    storageBucket: process.env.REACT_APP_STORAGE_BUCKET,
+    messagingSenderId: process.env.REACT_APP_MESSAGE_ID,
+    appId: process.env.REACT_APP_APP_ID,
 };
 
 // Initialize Firebase
