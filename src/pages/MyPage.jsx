@@ -84,6 +84,14 @@ export default function MyPage() {
             </ProfileEdit>
             <MyPost>나의 게시물</MyPost>
             <PostContainer>
+                {/* 게시물 수정페이지 임시버튼 */}
+                <Button
+                    onClick={() => {
+                        navigate(`/Edit`);
+                    }}
+                >
+                    수정
+                </Button>
                 {/* PostList.jsx 컴포넌트 생성 */}
                 <PostList>
                     {/* 로그인한 회원 아이디 비교해서 필터링 */}
@@ -148,6 +156,7 @@ const Title = styled.span`
     margin: 30px 30px;
     font-size: 30px;
     font-weight: 500;
+    font-family: GmarketSansMedium;
     margin: 0;
     padding: 20px;
 `;
@@ -180,6 +189,7 @@ const Ment = styled.div`
     display: block;
     font-size: 23px;
     font-weight: 500;
+    font-family: GmarketSansMedium;
 `;
 
 const EditBtn = styled.button`
@@ -189,9 +199,12 @@ const EditBtn = styled.button`
     width: 120px;
     border-radius: 15px;
     border: 0px;
+    font-family: GmarketSansLight;
+    font-size: 16px;
     cursor: pointer;
     &:hover {
         transform: scale(1.1);
+        transition: all 0.2s;
     }
 `;
 
@@ -206,6 +219,7 @@ const MyPost = styled.h2`
     padding-top: 50px;
     padding-bottom: 70px;
     padding-left: 100px;
+    font-family: GmarketSansMedium;
     font-size: 25px;
     font-weight: 500;
     border-top: 2px solid lightgrey;
@@ -241,6 +255,7 @@ const Button = styled.button`
     border-radius: 15px;
     border: 0px;
     margin-bottom: 30px;
+    font-family: GmarketSansLight;
     cursor: pointer;
     &:hover {
         transform: scale(1.1);
@@ -261,10 +276,12 @@ const PostImage = styled.img`
 
 const PostTitle = styled.p`
     height: 100px;
+    font-family: GmarketSansMedium;
 `;
 
 const PostComment = styled.p`
     height: 150px;
+    font-family: GmarketSansLight;
 `;
 
 const LogoContainer = styled.span`
@@ -272,7 +289,7 @@ const LogoContainer = styled.span`
     font-size: 36px;
     color: #e14d2a;
     font-family: 'EF_jejudoldam';
-    margin: 0;
     padding: 20px;
-    margin-right: 600px;
+    margin: 0 500px 0 100px;
+    cursor: pointer;
 `;

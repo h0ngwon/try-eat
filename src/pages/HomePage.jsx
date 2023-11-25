@@ -17,7 +17,7 @@ const HomePage = () => {
 
         const fetchData = async () => {
             //최신순정렬
-            const q = query(collection(db, 'article'), orderBy('timestamp', 'desc'));
+            const q = query(collection(db, 'Post'), orderBy('timestamp', 'desc'));
             const docSnap = await getDocs(q);
             const fbdata = docSnap.docs.map((doc) => doc.data());
             setFbDB(fbdata);
@@ -38,7 +38,7 @@ const HomePage = () => {
         e.stopPropagation(); //버블링 방지
         console.log(item.like);
         const updateLike = async () => {
-            await updateDoc(doc(db, 'article', `${item.id}`), { like: !item.like });
+            await updateDoc(doc(db, 'Post', `${item.id}`), { like: !item.like });
         };
         const likechage = fbDB.map((obj) => {
             return obj.id === item.id ? { ...obj, like: !obj.like } : obj;
@@ -56,16 +56,6 @@ const HomePage = () => {
                     justifyContent: 'center'
                 }}
             >
-                <button
-                    style={{
-                        marginTop: '100px'
-                    }}
-                    onClick={() => {
-                        navigate('/editDetail');
-                    }}
-                >
-                    글쓰기
-                </button>
                 <Container>
                     {fbDB.map((itme) => {
                         return (
@@ -87,13 +77,14 @@ const HomePage = () => {
                                         }}
                                     />
                                 </CardImgWrap>
+                                <ImgCover></ImgCover>
                                 <CardTextWrap>
                                     <CardTitle>{itme.title}</CardTitle>
                                     <CardContent>{itme.content}</CardContent>
                                 </CardTextWrap>
-                                <LikeWrap onClick={(e) => onHandleLike(e, itme)}>
+                                {/* <LikeWrap onClick={(e) => onHandleLike(e, itme)}>
                                     {JSON.parse(itme.like) ? <Like src={likeIt} /> : <Like src={soso} />}
-                                </LikeWrap>
+                                </LikeWrap> */}
                             </CardList>
                         );
                     })}
@@ -107,7 +98,7 @@ const HomePage = () => {
                         });
                     }}
                 >
-                    TOP
+                    ↑
                 </TopBtn>
             </main>
         </>
@@ -121,11 +112,15 @@ const TopBtn = styled.button`
     right: 2.5rem;
     bottom: 4rem;
     border-radius: 50%;
-    height: 4rem;
-    width: 4rem;
+    border-style: none;
+    color: white;
+    font-size: 20px;
+    height: 3.5rem;
+    width: 3.5rem;
     cursor: pointer;
     &:hover {
-        transform: scale(1.05);
+        transform: scale(1.1);
+        transition: all 0.2s;
     }
 `;
 
@@ -138,24 +133,43 @@ const CardTextWrap = styled.div`
     height: 100%;
 `;
 const CardContent = styled.p`
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-end;
     width: 90%;
-    padding: 0 20px;
+    height: 85%;
     position: absolute;
-    bottom: 60px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-size: 30px;
+    font-size: 17px;
+    font-family: GmarketSansLight;
+    color: white;
+    text-shadow: 0px 0px 2px rgba(0, 0, 0, 0.5);
 `;
 const CardTitle = styled.p`
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-end;
     width: 90%;
-    font-size: 50px;
+    height: 70%;
+    font-size: 42px;
+    color: white;
+    text-shadow: 0px 0px 5px rgba(0, 0, 0, 0.7);
+    font-family: GmarketSansMedium;
 `;
 const CardImgWrap = styled.figure`
     position: absolute;
     width: 100%;
     height: 100%;
-    opacity: 0.5;
+    /* opacity: 0.8; */
+`;
+
+const ImgCover = styled.figure`
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.8));
 `;
 const LikeWrap = styled.figure`
     width: 50px;
@@ -172,7 +186,7 @@ const LikeWrap = styled.figure`
 
 const Container = styled.ul`
     width: 80%;
-    margin: 50px;
+    margin: 150px 50px 50px 50px;
     padding: 50px;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -182,11 +196,13 @@ const Container = styled.ul`
 const CardList = styled.li`
     min-width: 200px;
     position: relative;
-    border: 3px solid #e14d2a;
+    border-style: none;
+    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
     border-radius: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
 
     min-height: 400px;
     &:nth-child(10n + 1),
@@ -201,6 +217,7 @@ const CardList = styled.li`
     cursor: pointer;
     &:hover {
         transform: scale(1.05);
+        transition: all 0.5s;
     }
 `;
 const Like = styled.img`

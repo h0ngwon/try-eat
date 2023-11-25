@@ -10,18 +10,17 @@ function DetailPage() {
     //ariticle문서에서 param을 통해 mapß
     //여기서 id값을 찾는 쿼리를 보낸다. => 한개만 받으려면?query에서 getDocs가아닌 getDoc만 하고싶은데./,....
     //Expected type 'DocumentReference', but it was: a custom Query object 이게
-    const [a, setA] = useState('');
-    console.log(a);
+    const [article, setArticle] = useState('');
 
     useEffect(() => {
         // const selectedPost
         const getArticle = async () => {
-            const articleRef = doc(db, 'article', param.id);
+            const articleRef = doc(db, 'Post', param.id);
             // const q = query(articleRef);
             // const q = query(articleRef, where('id', '==', param.id));
             const article = await getDoc(articleRef);
             // const article = querySnapshot.docs.map((item) => item.data())[0];
-            setA(article.data());
+            setArticle(article.data());
         };
         getArticle();
     }, []);
@@ -30,7 +29,7 @@ function DetailPage() {
         <>
             <Container>
                 <Wrap>
-                    <Title>{a.title}</Title>
+                    <Title>{article.title}</Title>
                     <div
                         style={{
                             width: '100vw',
@@ -44,14 +43,14 @@ function DetailPage() {
                                 alt='프로필사진'
                             />
                         </Profilephoto>
-                        <p>{a.displayName}</p>
+                        <p>{article.nickname}</p>
                     </ProfileWrap>
 
                     <ImageWrap>
-                        <Img src={a.image} />
+                        <Img src={article.image} />
                     </ImageWrap>
 
-                    <Content>{a.content} </Content>
+                    <Content>{article.content} </Content>
                 </Wrap>
             </Container>
         </>
@@ -124,7 +123,7 @@ const Content = styled.div`
     height: 200px;
     padding: 20px;
     margin: 50px auto 0 auto;
-    font-size: 20px;
+    font-size: 25px;
     font-family: GmarketSansMedium;
     resize: none;
     background: none;

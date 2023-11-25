@@ -38,6 +38,7 @@ const TabListItem = styled.li`
     cursor: pointer;
     padding: 10px;
     border-radius: 24px;
+    font-family: GmarketSansLight;
     &:hover {
         background-color: ${(props) => props.theme.hoverColor};
     }
