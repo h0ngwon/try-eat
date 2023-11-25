@@ -26,6 +26,7 @@ const PostEdit = ({ navigate }) => {
     const fileInput = useRef();
     const user = auth.currentUser;
     const displayName = user.displayName;
+    const photoURL = user.photoURL;
 
     const postToAdd = {
         id: uuidv4(),
@@ -33,7 +34,9 @@ const PostEdit = ({ navigate }) => {
         content,
         timestamp: serverTimestamp(),
         image: imageFile,
-        nickname: displayName
+        nickname: displayName,
+        photoURL,
+        likeBox: []
     };
 
     const onSubmit = (e) => {
