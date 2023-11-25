@@ -21,10 +21,13 @@ export default function MyPage() {
     useEffect(() => {
         const fetchData = async () => {
             // collection 이름이 post인 collection의 모든 document를 가져옴
-            const q = query(collection(db, 'Post'), where('nickname', '==', displayName), orderBy('timestamp', 'desc'));
+            const q = query(collection(db, 'Post'), where('nickname', '==', displayName));
             const querySnapshot = await getDocs(q);
             const fbdata = querySnapshot.docs.map((doc) => doc.data());
-            setPosts(fbdata);
+            const sortedData = fbdata.sort((a, b) => {
+                return b.timestamp - a.timestamp;
+            });
+            setPosts(sortedData);
         };
         fetchData();
     }, []);
