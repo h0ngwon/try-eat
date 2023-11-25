@@ -63,8 +63,8 @@ const HomePage = () => {
 
     const onHandleLike = (e, item) => {
         e.stopPropagation(); //버블링 방지
-        //비로그인시 방지
 
+        //비로그인시 방지
         if (auth.currentUser === null) return;
 
         const userLikListRef = doc(db, 'userInfo', currentUser.displayName);
