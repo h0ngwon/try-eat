@@ -1,11 +1,10 @@
-import { collection, getDocs, orderBy, query, getDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, orderBy, query, getDoc, doc, where } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import styled from 'styled-components';
 import { db } from '../shared/firebase';
 import { auth } from '../shared/firebase';
 import { onAuthStateChanged } from '@firebase/auth';
-
 
 export default function MyPage() {
     //회원정보
@@ -31,7 +30,7 @@ export default function MyPage() {
     }, []);
 
     console.log('현재유저', auth.currentUser);
-    const user = auth.currentUser;
+
     // 로그인한 사용자 이름과 사진 가져오기
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -138,6 +137,7 @@ export default function MyPage() {
                     })}
                 </PostList>
             </PostContainer>
+            <LikeList>좋아요</LikeList>
         </>
     );
 }
@@ -299,4 +299,16 @@ const LogoContainer = styled.span`
     padding: 20px;
     margin: 0 500px 0 100px;
     cursor: pointer;
+`;
+
+const LikeList = styled.h2`
+    display: block;
+    padding-top: 50px;
+    padding-bottom: 70px;
+    padding-left: 120px;
+    font-family: GmarketSansMedium;
+    font-size: 25px;
+    font-weight: 500;
+    border-top: 2px solid lightgrey;
+    margin-top: 50px;
 `;
