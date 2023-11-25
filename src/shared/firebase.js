@@ -9,12 +9,12 @@ import { updateProfile } from 'firebase/auth';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyAitIVUmb2UlT4AoxvPfwMtw0ZuloGyWxo",
-    authDomain: "pleasebe-1cfe1.firebaseapp.com",
-    projectId: "pleasebe-1cfe1",
-    storageBucket: "pleasebe-1cfe1.appspot.com",
-    messagingSenderId: "805807962626",
-    appId: "1:805807962626:web:9184537cd6b06e506d451b"
+    apiKey: 'AIzaSyAuR3yllYRqqU-O7aDA00z2DDHUf6fZK_Y',
+    authDomain: 'fir-test2-9cc58.firebaseapp.com',
+    projectId: 'fir-test2-9cc58',
+    storageBucket: 'fir-test2-9cc58.appspot.com',
+    messagingSenderId: '516454141672',
+    appId: '1:516454141672:web:15b894afa37e2f3cc2835d'
 };
 
 // Initialize Firebase
