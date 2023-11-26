@@ -48,6 +48,12 @@ const Nav = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const isLogin = useSelector((state) => state.stateReducer.isLogin);
+
+    useEffect(() => {
+        auth.onAuthStateChanged((user) => {
+            if (user) dispatch(login());
+        });
+    });
     
     const signout = async (e) => {
         await signOut(auth).then(() => {

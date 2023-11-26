@@ -127,9 +127,6 @@ const Login = () => {
 
         try {
             await signInWithEmailAndPassword(auth, email, password).then(() => {
-                auth.onAuthStateChanged((user) => {
-                    if(user) dispatch(login());
-                })
                 navigate('/');
             });
         } catch (e) {}
