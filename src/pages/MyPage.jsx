@@ -11,24 +11,30 @@ export default function MyPage() {
     const [comment, setCommnet] = useState('');
     const [myPosts, setMyPosts] = useState([]);
     const [likeList, setLikeList] = useState([]);
+    const [likePosts, setLikePosts] = useState([]);
+    const [allPost, setAllPost] = useState();
 
     const navigate = useNavigate();
     const user = auth.currentUser;
-    const displayName = user.displayName;
 
     useEffect(() => {
         const fetchData = async () => {
-            const q = query(collection(db, 'Post'), where('nickname', '==', displayName));
-
-            const querySnapshot = await getDocs(q);
-            const fbdata = querySnapshot.docs.map((doc) => doc.data());
-            const sortedData = fbdata.sort((a, b) => {
-                return b.timestamp - a.timestamp;
-            });
-            setMyPosts(sortedData);
+            try {
+                onAuthStateChanged(auth, async (user) => {
+                    const q = query(collection(db, 'Post'), where('nickname', '==', user.displayName));
+                    const querySnapshot = await getDocs(q);
+                    const fbdata = querySnapshot.docs.map((doc) => doc.data());
+                    const sortedData = fbdata.sort((a, b) => {
+                        return b.timestamp - a.timestamp;
+                    });
+                    setMyPosts(sortedData);
+                });
+            } catch (e) {
+                console.log(e);
+            }
         };
         fetchData();
-    }, []);
+    }, [myPosts]);
 
     // 로그인한 사용자 이름과 사진 가져오기
     useEffect(() => {
@@ -42,20 +48,22 @@ export default function MyPage() {
                 navigate('/');
             }
         });
-        return () => unsubscribe();
+        unsubscribe();
     }, []);
+
     // 로그인한 사용자 userInfo 가져오기
     useEffect(() => {
         const fetchData = async () => {
-            const docRef = doc(db, 'userInfo', auth.currentUser.displayName);
-            const docSnap = await getDoc(docRef);
+            onAuthStateChanged(auth, async (user) => {
+                const docRef = doc(db, 'userInfo', user.displayName);
+                const docSnap = await getDoc(docRef);
 
-            setCommnet(docSnap.data().comment);
+                setCommnet(docSnap.data().comment);
+            });
         };
         fetchData();
     }, []);
 
-    const [allPost, setAllPost] = useState();
     useEffect(() => {
         const fetchAll = async () => {
             const allPost = await getDocs(collection(db, 'Post'));
@@ -63,9 +71,20 @@ export default function MyPage() {
             setAllPost(Posts);
         };
         fetchAll();
+    }, [allPost]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            onAuthStateChanged(auth, async (user) => {
+                const docRef = doc(db, 'userInfo', user.displayName);
+                const docSnap = await getDoc(docRef);
+                console.log('==========', docSnap.data().likeList);
+                setLikeList(docSnap.data().likeList);
+            });
+        };
+        fetchData();
     }, []);
 
-    const [likePosts, setLikePosts] = useState([]);
     useEffect(() => {
         const a = likeList.map((data) => {
             return allPost.find((item) => {
@@ -74,15 +93,6 @@ export default function MyPage() {
         });
         setLikePosts(a);
     }, [likeList]);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            const docRef = doc(db, 'userInfo', auth.currentUser.displayName);
-            const docSnap = await getDoc(docRef);
-            setLikeList(docSnap.data().likeList);
-        };
-        fetchData();
-    }, []);
 
     const deletePost = async (post) => {
         const deleteCheck = window.confirm('삭제하시겠습니까?');
