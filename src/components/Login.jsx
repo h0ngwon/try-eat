@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { styled } from 'styled-components';
 import { login } from '../redux/reducers/stateReducer';
-import { auth } from '../shared/firebase';
+import { auth, db, doc, setDoc } from '../shared/firebase';
 
 const Header = styled.header`
     width: 100%;
@@ -127,7 +127,6 @@ const Login = () => {
 
         try {
             await signInWithEmailAndPassword(auth, email, password).then(() => {
-                dispatch(login());
                 navigate('/');
             });
         } catch (e) {}
@@ -136,13 +135,17 @@ const Login = () => {
     const socialLogin = async (auth, Provider) => {
         await signInWithPopup(auth, Provider)
             .then((res) => {
+                const data = {
+                    nickname: auth.currentUser.displayName,
+                    email: auth.currentUser.email
+                }
+                setDoc(doc(db, 'userInfo', auth.currentUser.displayName), data);
                 dispatch(login());
                 navigate('/');
             })
             .catch((error) => {
                 alert('로그인할 수 없습니다 : ');
-            })
-            .then();
+            });
     };
 
     return (

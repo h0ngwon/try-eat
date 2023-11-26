@@ -5,7 +5,6 @@ import soso from '../assets/안찜하기.png';
 import likeIt from '../assets/찜하기.png';
 import { db } from '../shared/firebase';
 import {
-    addDoc,
     arrayRemove,
     arrayUnion,
     collection,
@@ -17,6 +16,7 @@ import {
     updateDoc
 } from 'firebase/firestore';
 import { auth } from '../shared/firebase';
+import Like from '../components/Like';
 //auto scroll 자동으로 스크롤을 내려줌
 
 const HomePage = () => {
@@ -48,18 +48,23 @@ const HomePage = () => {
     console.log('userinfo', currentUserInfo);
 
     useEffect(() => {
-        if (currentUser) {
-            const fetchLikeList = async () => {
-                const userRef = doc(db, 'userInfo', currentUser.displayName);
-                const userInfo = await getDoc(userRef);
+        if (!currentUser) return;
+
+        const fetchLikeList = async () => {
+            //여기에러
+            const userRef = doc(db, 'userInfo', currentUser.displayName);
+            const userInfo = await getDoc(userRef);
+            if (userInfo.exists() && userInfo.data()) {
+                console.log('fetch!!!!!!!!', userInfo.data);
+
                 setCurrentUserInfo(userInfo.data());
-            };
-            fetchLikeList();
-        }
+            }
+            console.log('fetch!!!!!!!!', userInfo);
+        };
+
+        fetchLikeList();
         console.log('커런트찾음!');
     }, [currentUser]); //최초 읽을때 auth.
-
-    //닉네임으로 userInfo에 likeList 넣기, 업데이트하기
 
     const onHandleLike = (e, item) => {
         e.stopPropagation(); //버블링 방지
@@ -101,22 +106,6 @@ const HomePage = () => {
 
         setCurrentUserInfo(updateUserInfo);
         updateDoc(userLikListRef, updateData);
-
-        // const postLikeBoxRef = doc(db,'Post',)
-        // console.log('==================================');
-        // console.log('state', updateLikeState);
-        // console.log(userLikListRef, updateData);
-
-        // const articleLikeListRef =
-        // console.log(item.like);
-        // const updateLike = async () => {
-        //     await updateDoc(doc(db, 'article', `${item.id}`), { like: !item.like });
-        // };
-        // const likechage = fbDB.map((obj) => {
-        //     return obj.id === item.id ? { ...obj, like: !obj.like } : obj;
-        // });
-        // setFbDB(likechage);
-        // updateLike();
     };
 
     return (
@@ -128,29 +117,19 @@ const HomePage = () => {
                     justifyContent: 'center'
                 }}
             >
-                <button
-                    style={{
-                        marginTop: '100px'
-                    }}
-                    onClick={() => {
-                        navigate('/editDetail');
-                    }}
-                >
-                    글쓰기
-                </button>
                 <Container>
-                    {post.map((itme) => {
+                    {post.map((item) => {
                         return (
                             <CardList
-                                key={itme.id}
-                                $img={itme.image}
+                                key={item.id}
+                                $img={item.image}
                                 onClick={(e) => {
-                                    onHandleNavigate(itme.id);
+                                    onHandleNavigate(item.id);
                                 }}
                             >
                                 <CardImgWrap>
                                     <img
-                                        src={itme.image}
+                                        src={item.image}
                                         alt='이미지'
                                         style={{
                                             width: '100%',
@@ -161,12 +140,11 @@ const HomePage = () => {
                                 </CardImgWrap>
                                 <ImgCover></ImgCover>
                                 <CardTextWrap>
-                                    <CardTitle>{itme.title}</CardTitle>
-                                    <CardContent>{itme.content}</CardContent>
+                                    <CardTitle>{item.title}</CardTitle>
+                                    <CardContent>{item.content}</CardContent>
                                 </CardTextWrap>
-                                <LikeWrap onClick={(e) => onHandleLike(e, itme)}>
-                                    <Like src={likeIt} />
-                                    {/* {itme.likebox ? <Like src={likeIt} /> : <Like src={soso} />} */}
+                                <LikeWrap onClick={(e) => onHandleLike(e, item)}>
+                                    <Like currentUserInfo={currentUserInfo} item={item} />
                                 </LikeWrap>
                             </CardList>
                         );
@@ -302,8 +280,4 @@ const CardList = styled.li`
         transform: scale(1.05);
         transition: all 0.5s;
     }
-`;
-const Like = styled.img`
-    width: 100%;
-    object-fit: cover;
 `;

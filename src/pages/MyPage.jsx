@@ -1,6 +1,6 @@
 import { collection, doc, getDoc, getDocs, orderBy, query, where } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { db } from '../shared/firebase';
 import { auth } from '../shared/firebase';
@@ -17,6 +17,21 @@ export default function MyPage() {
     const user = auth.currentUser;
     const displayName = user.displayName;
 
+    let likeList = ['a', 'b', 'c'];
+
+    let post = [
+        { id: 'a', ab: 1, cd: 3 },
+        { id: 'f', ab: 1, cd: 3 },
+        { id: 'e', ab: 1, cd: 3 },
+        { id: 'd', ab: 1, cd: 3 },
+        { id: 'b', ab: 1, cd: 3 },
+        { id: 'c', ab: 1, cd: 3 }
+    ];
+    const bbb = likeList.map((item) => {
+        return post.find((a) => a.id.includes(item));
+    });
+    console.log(bbb);
+
     // getDocs 모든 문서를 가져오기
     useEffect(() => {
         const fetchData = async () => {
@@ -24,7 +39,10 @@ export default function MyPage() {
             const q = query(collection(db, 'Post'), where('nickname', '==', displayName));
             const querySnapshot = await getDocs(q);
             const fbdata = querySnapshot.docs.map((doc) => doc.data());
-            setPosts(fbdata);
+            const sortedData = fbdata.sort((a, b) => {
+                return b.timestamp - a.timestamp;
+            });
+            setPosts(sortedData);
         };
         fetchData();
     }, []);
