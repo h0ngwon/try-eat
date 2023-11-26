@@ -166,7 +166,7 @@ export default function MyPage() {
                     })}
                 </PostList>
             </PostContainer>
-            <Like>좋아요</Like>
+            <Like>좋아요 목록</Like>
             <LikePostContainer>
                 <LikeList>
                     <LikePost>
@@ -180,7 +180,6 @@ export default function MyPage() {
                                         src={item.image}
                                         alt='이미지'
                                     />
-
                                     <LikedTitle>{item.title}</LikedTitle>
                                     <LikedContent>{item.content}</LikedContent>
                                     <LikedNickname>작성자 : {item.nickname}</LikedNickname>
@@ -212,7 +211,9 @@ const Title = styled.span`
     padding: 20px;
 `;
 
-const Comment = styled.div``;
+const Comment = styled.div`
+    height: 20px;
+`;
 
 const ProfileEdit = styled.section`
     display: flex;
