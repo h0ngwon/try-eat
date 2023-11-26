@@ -8,7 +8,6 @@ import { storage } from '../shared/firebase';
 import { getDownloadURL } from 'firebase/storage';
 import { updateProfile } from '../shared/firebase';
 import { uploadBytes } from 'firebase/storage';
-import { async } from 'q';
 
 function Profile() {
     const navigate = useNavigate();
@@ -17,6 +16,7 @@ function Profile() {
     const [comment, setComment] = useState();
     const [fileImage, setFileImage] = useState();
     const [previewImage, setPreviewImage] = useState();
+    const [validationName, setValidationName] = useState(false);
 
     const keyName = useMemo(() => {
         return auth.currentUser.displayName;
@@ -46,11 +46,6 @@ function Profile() {
         fetchData();
     }, []);
 
-    // 로그인 한 후 로그인 사용자 정보를 가져오기
-    // displayname 기준으로 firestore, storage의 데이터 가져오기
-    // --> 현재 로그인된 사람의 displayName과
-    // 가져온거 수정해서 다시 저장하기.
-
     //    파일 업로드
     const saveFileImage = (e) => {
         setFileImage(e.target.files[0]);
@@ -68,28 +63,46 @@ function Profile() {
 
     // 수정 코드
     const updateUserDataHandler = async () => {
-        // // 코멘트 수정 -> displayName이 변경되면 오류남
-        // const userRef = doc(db, 'userInfo', auth.currentUser.displayName);
-        // await updateDoc(userRef, { comment: comment });
-        // 닉네임 수정
-        const user = auth.currentUser;
-        await updateProfile(user, { displayName: name });
-        // ---> 바로 photoURL에 집어 넣는게 아닌 storage업로드한 파일을 다시 다운 받아와서 phothURL에 집어 넣을 것.
-        // 이미지 업로드
-        if (fileImage) {
-            const storageRef = ref(storage, `${auth.currentUser.uid}/profile`);
-            await uploadBytes(storageRef, fileImage);
-            // const downloadRef = ref(storage, `${auth.currentUser.uid}`);
-            const downloadURL = await getDownloadURL(storageRef);
-            console.log('다운로드된 이미지다', downloadURL);
-            await updateProfile(user, { photoURL: downloadURL });
-
-            // 불러오는 값 photoULR로
-            // const downloadURL = await getDownloadURL(storageRef);
+        try {
+            // 닉네임 수정
+            const user = auth.currentUser;
+            await updateProfile(user, { displayName: name });
+            // 이미지 업로드
+            if (fileImage) {
+                const storageRef = ref(storage, `${auth.currentUser.uid}/profile`);
+                await uploadBytes(storageRef, fileImage);
+                const downloadURL = await getDownloadURL(storageRef);
+                console.log('다운로드된 이미지다', downloadURL);
+                await updateProfile(user, { photoURL: downloadURL });
+            }
+            await updateFireStore(keyName);
+            alert('수정되었습니다.');
+            navigate('/mypage');
+        } catch (e) {
+            alert('오류가 발생했습니다. 다시 시도하여 주세요');
+            navigate('/mypage');
         }
-        updateFireStore(keyName);
+    };
 
-        console.log('수정완료');
+    // 닉네임 중복확인
+    const vaildNicknameClickHandler = async (nickname) => {
+        if (nickname === '') {
+            alert('닉네임을 입력하세요');
+            return;
+        }
+        const userRef = collection(db, 'userInfo');
+        const q = query(userRef, where('nickname', '==', nickname));
+        const querySnap = await getDocs(q);
+
+        if (querySnap.docs.length === 0) {
+            alert('사용가능한 아이디 입니다.');
+            setValidationName(true);
+        }
+        if (querySnap.docs.length > 0) {
+            alert('이미 존재하는 아이디입니다.');
+            setValidationName(false);
+        }
+        console.log('이름이다', querySnap.docs.length);
     };
 
     const updateFireStore = async (keyName) => {
@@ -111,28 +124,12 @@ function Profile() {
                 nickname: name
             });
         });
-
         await Promise.all(updatePromises);
     };
+
     console.log('유저다.', auth.currentUser);
     console.log('파일이미지다', fileImage);
     console.log('코멘트다', comment);
-
-    // 무엇을 수정할것인가? -> userList
-    // 그렇다면 userList에 변경할 기존의 값이 있어야 함.
-    //  변경해야 할 값은 무엇인가? --> firebase에서 받아온 값.
-    // 그럼 userList에 firebase에서 받아온 nickname, comment, fileImage 를 어떻게 넣어놓을 것인가?
-
-    // // 수정 버튼 함수
-    // const onEditDone = () => {
-    //     const newUser = { ...user, nickname: name, comment: comment, avatar: fileImage };
-    //     const newUserList = userList.map((item) => {
-    //         return item.id === user.id ? newUser : item;
-    //     });
-    //     setUserList(newUserList);
-    // };
-
-    // 중복확인 기능 구현필요!!!!!!!!!!!!!!!!
 
     return (
         <Container
@@ -144,7 +141,9 @@ function Profile() {
             <Box1>
                 <StP>닉네임 </StP>
                 <StInput value={name} onChange={nickNameChangeHandler} />
-                <Button1> 중복확인 </Button1>
+                <Button1 onClick={() => vaildNicknameClickHandler(name)} type='button'>
+                    중복확인
+                </Button1>
             </Box1>
             <Box1>
                 <StP>소개</StP>
@@ -154,7 +153,9 @@ function Profile() {
                 <StP>프로필</StP>
                 <StImage alt='이미지를 넣어주세요' src={previewImage} accept='image/*' />
                 <form>
-                    <Button3 htmlFor='profileImg'>등록하기</Button3>
+                    <Button3 htmlFor='profileImg' type='button'>
+                        등록하기
+                    </Button3>
                     <StImg type='file' id='profileImg' accept='image/*' onChange={saveFileImage} />
                 </form>
             </Box2>
