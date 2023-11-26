@@ -5,7 +5,6 @@ import styled from 'styled-components';
 import { auth, db } from '../shared/firebase';
 import { useDispatch, useSelector } from 'react-redux';
 import { done, load } from '../redux/modules/loadingReducer';
-import Like from '../components/Like';
 import Loading from '../components/ui/Loading';
 
 export default function MyPage() {
@@ -285,7 +284,7 @@ const PostContainer = styled.section`
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 80vw;
+    width: 100vw;
     height: 100%;
     margin: 0 auto 100px auto;
 `;
@@ -302,13 +301,11 @@ const MyPost = styled.h2`
 `;
 
 const PostList = styled.ul`
-    width: 80vw;
-    display: flex;
-    justify-content: space-between;
-    /* display: grid;
+    display: grid;
     grid-template-columns: repeat(3, 1fr);
-    justify-items: start; */
+    /* justify-items: start; */
     gap: 80px;
+    margin: 0;
 `;
 const Post = styled.div`
     display: flex;
@@ -392,7 +389,6 @@ const LikeWrap = styled.h2`
 const LikePostContainer = styled.section`
     display: flex;
     justify-content: center;
-    /* align-items: center; */
     width: 100vw;
     height: 100%;
     margin: 0 auto 100px auto;

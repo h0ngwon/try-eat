@@ -1,19 +1,10 @@
 import { uuidv4 } from '@firebase/util';
-import { doc, getDoc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import React, { useEffect, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 import { auth, db, storage } from '../shared/firebase';
 import { useParams } from 'react-router-dom';
-
-// 수정완료 클릭 후 마이페이지로 자동이동
-// 취소하기 클릭 후 마이페이지로 자동이동
-// 글쓰기를 클릭해서 접근하면 이미지와 내용이 비어있고 버튼이 '등록하기'
-// 마이페이지 게시물 수정으로 접근하면 이미지와 내용이 들어있고 버튼이 '수정완료'
-
-// 유효성검사
-// 로그인 하지 않은 상태로 게시물 등록하면 '로그인이 필요합니다' 모달창
-// 등록완료 버튼 클릭 시 ‘이대로 등록하시겠습니까?’ 모달창
 
 const PostEdit = ({ navigate }) => {
     const [editTitle, setEditTitle] = useState('');
@@ -248,10 +239,11 @@ const InputContent = styled.textarea`
     display: flex;
     justify-content: center;
     width: 760px;
-    height: 200px;
+    height: 300px;
     padding: 20px;
     margin: 50px auto 0 auto;
     font-size: 20px;
+    line-height: 35px;
     font-family: GmarketSansMedium;
     resize: none;
     background: none;
