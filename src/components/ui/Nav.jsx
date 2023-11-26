@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import styled from 'styled-components';
-import { login, logout } from '../../redux/reducers/stateReducer';
+import { login, logout } from '../../redux/modules/stateReducer';
 import { auth } from '../../shared/firebase';
 
 const Navbar = styled.nav`
@@ -54,7 +54,7 @@ const Nav = () => {
             if (user) dispatch(login());
         });
     });
-    
+
     const signout = async (e) => {
         await signOut(auth).then(() => {
             dispatch(logout());

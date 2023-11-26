@@ -11,9 +11,9 @@ export default function MyPage() {
     const [nickname, setNikcname] = useState('');
     const [userPhoto, setUserPhoto] = useState('');
     const [comment, setCommnet] = useState('');
-    const [posts, setPosts] = useState([]);
+    const [myPosts, setMyPosts] = useState([]);
     const [likeList, setLikeList] = useState([]);
-    const [likedPosts, setLikedPosts] = useState([]);
+    console.log('likeList====================', likeList);
 
     const navigate = useNavigate();
     const user = auth.currentUser;
@@ -30,7 +30,7 @@ export default function MyPage() {
             const sortedData = fbdata.sort((a, b) => {
                 return b.timestamp - a.timestamp;
             });
-            setPosts(sortedData);
+            setMyPosts(sortedData);
         };
         fetchData();
     }, []);
@@ -61,20 +61,32 @@ export default function MyPage() {
         };
         fetchData();
     }, []);
+    const [allPost, setAllPost] = useState();
+    console.log('all===================', allPost);
+    useEffect(() => {
+        const fetchAll = async () => {
+            const allPost = await getDocs(collection(db, 'Post'));
+            console.log(allPost.docs);
+            const Posts = allPost.docs.map((doc) => doc.data());
+            setAllPost(Posts);
+        };
+        fetchAll();
+    }, []);
 
-    // post 삭제 기능
-    const deletePost = async (post) => {
-        const deleteCheck = window.confirm('삭제하시겠습니까?');
-        if (deleteCheck) {
-            await deleteDoc(doc(db, 'Post', `${post.id}`));
-            const deleted = posts.filter((data) => {
-                return data.id !== post.id;
+    const [likePosts, setLikePosts] = useState([]);
+    console.log('likePosts=================', likePosts);
+    useEffect(() => {
+        const a = likeList.map((data) => {
+            console.log(data);
+            return allPost.find((item) => {
+                console.log('item======', item.id);
+                console.log('data======', data);
+                return item.id.includes(data);
             });
-            setPosts(deleted);
-        } else {
-            return;
-        }
-    };
+        });
+        setLikePosts(a);
+    }, [likeList]);
+
     // likeList 가져오기
     useEffect(() => {
         const fetchData = async () => {
@@ -85,25 +97,21 @@ export default function MyPage() {
         fetchData();
     }, []);
 
-    // Post 데이터 다 가져오기
-    useEffect(() => {
-        const fetchData = async () => {
-            const q = query(collection(db, 'Post'));
-            const docSnap = await getDocs(q);
-            const likedData = docSnap.docs.map((doc) => doc.data());
-            setLikedPosts(likedData);
-        };
-        fetchData();
-    }, []);
+    // post 삭제 기능
+    const deletePost = async (post) => {
+        const deleteCheck = window.confirm('삭제하시겠습니까?');
+        if (deleteCheck) {
+            await deleteDoc(doc(db, 'Post', post.id));
+            const deleted = myPosts.filter((data) => {
+                return data.id !== post.id;
+            });
+            setMyPosts(deleted);
+        } else {
+            return;
+        }
+    };
 
-    const [likePosts, setLikePosts] = useState([]);
-    useEffect(() => {
-        const likePosts = likeList.map((data) => {
-            return likedPosts.find((item) => item.id.includes(data));
-        });
-        setLikePosts(likePosts);
-    }, []);
-
+    // console.log('ㅇㅇㅇ', likedPosts);
     return (
         <>
             <Header>
@@ -136,7 +144,7 @@ export default function MyPage() {
                 {/* PostList.jsx 컴포넌트 생성 */}
                 <PostList>
                     {/* 로그인한 회원 아이디 비교해서 필터링 */}
-                    {posts.map((post) => {
+                    {myPosts.map((post) => {
                         return (
                             // Post.jsx 컴포넌트 생성
                             <Post key={post.timestamp}>
@@ -162,13 +170,7 @@ export default function MyPage() {
                                         수정
                                     </Button>
                                     {/* 삭제 기능 리덕스로 구현해보기 */}
-                                    <Button
-                                        onClick={() => {
-                                            deletePost(post);
-                                        }}
-                                    >
-                                        삭제
-                                    </Button>
+                                    <Button onClick={() => deletePost(post)}>삭제</Button>
                                 </Buttons>
                             </Post>
                         );

@@ -5,6 +5,7 @@ import { db } from '../shared/firebase';
 import DetailPost from '../components/DetailPost';
 
 function DetailPage() {
+    window.scrollTo(0, 0);
     const param = useParams();
     const [post, setPost] = useState('');
     console.log(post);
