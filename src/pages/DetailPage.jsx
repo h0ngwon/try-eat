@@ -3,9 +3,10 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import styled from 'styled-components';
 import { db } from '../shared/firebase';
-import DetailMain from '../components/DetailMain';
+import DetailPost from '../components/DetailPost';
 
 function DetailPage() {
+    window.scrollTo(0, 0);
     const param = useParams();
     const [post, setPost] = useState('');
     console.log(post);
@@ -23,7 +24,7 @@ function DetailPage() {
     return (
         <>
             <Container>
-                <DetailMain post={post} />
+                <DetailPost post={post} />
             </Container>
         </>
     );

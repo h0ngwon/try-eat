@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import styled from 'styled-components';
-import soso from '../assets/안찜하기.png';
-import likeIt from '../assets/찜하기.png';
 import { db } from '../shared/firebase';
 import {
     arrayRemove,
