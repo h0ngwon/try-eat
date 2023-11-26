@@ -62,11 +62,11 @@ export default function MyPage() {
     const deletePost = async (post) => {
         console.log(post.id);
 
-        await deleteDoc(db, 'Post', `${post.id}`);
-        // const deleted = posts.filter((data) => {
-        //     return data.id !== post.id;
-        // });
-        // setPosts(deleted);
+        await deleteDoc(doc(db, 'Post', `${post.id}`));
+        const deleted = posts.filter((data) => {
+            return data.id !== post.id;
+        });
+        setPosts(deleted);
     };
 
     return (
