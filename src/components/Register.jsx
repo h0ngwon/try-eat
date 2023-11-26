@@ -199,6 +199,7 @@ const Register = () => {
 
     useEffect(() => {
         const imageRef = ref(storage, `${auth.currentUser?.uid}/profile`);
+        console.log('파일명', auth.currentUser.uid);
         if (!imageUpload) return;
         uploadBytes(imageRef, imageUpload).then((snapshot) => {
             getDownloadURL(snapshot.ref).then((url) => {
