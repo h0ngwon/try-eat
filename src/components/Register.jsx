@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { auth, db, doc, setDoc, storage } from '../shared/firebase';
+import {v4 as uuid} from 'uuid';
 
 const Header = styled.header`
     width: 100%;
@@ -149,6 +150,7 @@ const Validation = styled.span`
 `;
 
 const Register = () => {
+    const photoId = uuid();
     const navigate = useNavigate();
     const [form, setForm] = useState({
         email: '',
@@ -198,7 +200,7 @@ const Register = () => {
     };
 
     useEffect(() => {
-        const imageRef = ref(storage, `${auth.currentUser?.uid}/profile`);
+        const imageRef = ref(storage, `${photoId}/profile`);
         if (!imageUpload) return;
         uploadBytes(imageRef, imageUpload).then((snapshot) => {
             getDownloadURL(snapshot.ref).then((url) => {
@@ -214,7 +216,7 @@ const Register = () => {
     };
 
     const emailCheck = async (email) => {
-        if(email.trim() === '') {
+        if (email.trim() === '') {
             alert('이메일을 입력하세요');
             return;
         }
@@ -234,8 +236,8 @@ const Register = () => {
     };
 
     const nicknameCheck = async (nickname) => {
-        if(nickname.trim() === '') {
-            alert('닉네임을 입력하세요')
+        if (nickname.trim() === '') {
+            alert('닉네임을 입력하세요');
             return;
         }
 
@@ -265,12 +267,13 @@ const Register = () => {
         };
 
         try {
-            await createUserWithEmailAndPassword(auth, form.email, form.confirmPassword);
-            setDoc(doc(db, 'userInfo', form.nickname), data);
-            console.log("from register : ", auth.currentUser)
-            updateProfile(auth.currentUser, {
-                displayName: form.nickname,
-                photoURL: form.image
+            await createUserWithEmailAndPassword(auth, form.email, form.confirmPassword).then(() => {
+                setDoc(doc(db, 'userInfo', form.nickname), data);
+                console.log('from register : ', auth.currentUser);
+                updateProfile(auth.currentUser, {
+                    displayName: form.nickname,
+                    photoURL: form.image
+                });
             });
         } catch (error) {
             alert('이미 존재하는 이메일이거나 닉네임을 입력하셨습니다.');
