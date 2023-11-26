@@ -34,8 +34,9 @@ const PostEdit = ({ navigate }) => {
         content: editContent,
         timestamp: serverTimestamp(),
         nickname: displayName,
-        image: photoURL,
-        likeBox: []
+        image: imageFile,
+        likeBox: [],
+        photoURL
     };
 
     const onSubmit = (e) => {
@@ -54,11 +55,11 @@ const PostEdit = ({ navigate }) => {
         const editPostData = async () => {
             const editPostRef = doc(db, 'Post', id);
             const clickPost = await getDoc(editPostRef);
-            setClickPost(clickPost.data());
-
-            if (clickPost.data().image) {
-                setImageFile(clickPost.data().image);
-            }
+            const clickData = clickPost.data();
+            setClickPost(clickData);
+            setEditTitle(clickData.title);
+            setEditContent(clickData.content);
+            setImageFile(clickData.image);
         };
         editPostData();
     }, []);
@@ -79,19 +80,6 @@ const PostEdit = ({ navigate }) => {
     const uploadHandler = async () => {
         const uploadCheck = window.confirm('수정하시겠습니까?');
         if (uploadCheck) {
-            // if (editTitle === '') {
-            //     alert('제목이 수정되지 않았습니다');
-            //     return;
-            // }
-            // if (!inputImg && !imageUrl) {
-            //     alert('이미지가 수정되지 않았습니다');
-            //     return;
-            // }
-            // if (editContent === '') {
-            //     alert('설명이 수정되지 않았습니다');
-            //     return;
-            // }
-
             try {
                 const imageRef = ref(storage, `${displayName}${id}`);
                 await uploadBytes(imageRef, imageFile || imageUrl);
@@ -112,8 +100,6 @@ const PostEdit = ({ navigate }) => {
             return;
         }
     };
-    console.log('이건가', editTitle);
-    console.log('이건가22', editContent);
 
     // 등록하기 전에 이미지 업로드했다가 삭제
     const imageDeleteBtn = () => {
@@ -139,7 +125,7 @@ const PostEdit = ({ navigate }) => {
                         key={clickPost.id}
                         type='text'
                         onChange={titleChangeHandler}
-                        defaultValue={clickPost.title}
+                        value={editTitle}
                         maxLength={15}
                     />
                     <div
@@ -163,15 +149,9 @@ const PostEdit = ({ navigate }) => {
                         <ImgDeleteButton onClick={imageDeleteBtn}>X</ImgDeleteButton>
                     </ButtonWrap>
                     <ImageWrap>
-                        {/* <ImageButton onClick={uploadHandler}>업로드</ImageButton> */}
                         <Img src={imageFile} />
                     </ImageWrap>
-                    <InputContent
-                        defaultValue={clickPost.content}
-                        type='text'
-                        onChange={contentChangeHandler}
-                        maxLength={300}
-                    />
+                    <InputContent value={editContent} type='text' onChange={contentChangeHandler} maxLength={300} />
                     <ButtonWrap>
                         <Button onClick={uploadHandler}>수정완료</Button>
                         <Button onClick={cancelBtn}>취소하기</Button>

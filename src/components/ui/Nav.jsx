@@ -1,9 +1,9 @@
 import { signOut } from 'firebase/auth';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import styled from 'styled-components';
-import { logout } from '../../redux/reducers/stateReducer';
+import { login, logout } from '../../redux/reducers/stateReducer';
 import { auth } from '../../shared/firebase';
 
 const Navbar = styled.nav`
@@ -49,6 +49,12 @@ const Nav = () => {
     const navigate = useNavigate();
     const isLogin = useSelector((state) => state.stateReducer.isLogin);
 
+    useEffect(() => {
+        auth.onAuthStateChanged((user) => {
+            if (user) dispatch(login());
+        });
+    });
+    
     const signout = async (e) => {
         await signOut(auth).then(() => {
             dispatch(logout());
