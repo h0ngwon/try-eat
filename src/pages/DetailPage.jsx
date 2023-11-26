@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import styled from 'styled-components';
 import { db } from '../shared/firebase';
-import DetailPost from '../components/DetailPost';
+import DetailMain from '../components/DetailMain';
 
 function DetailPage() {
     const param = useParams();
@@ -22,9 +22,18 @@ function DetailPage() {
 
     return (
         <>
-            <DetailPost post={post} />
+            <Container>
+                <DetailMain post={post} />
+            </Container>
         </>
     );
 }
 
 export default DetailPage;
+
+const Container = styled.div`
+    display: flex;
+    justify-content: center;
+    width: 100vw;
+    height: 200vh;
+`;
