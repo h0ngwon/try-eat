@@ -1,5 +1,5 @@
-import { getDoc, doc, updateDoc } from 'firebase/firestore';
-import React, { useEffect, useState } from 'react';
+import { getDoc, doc, updateDoc, setDoc, deleteDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { auth, db, onAuthStateChanged } from '../shared/firebase';
 import { useNavigate } from 'react-router-dom';
@@ -8,15 +8,19 @@ import { storage } from '../shared/firebase';
 import { getDownloadURL } from 'firebase/storage';
 import { updateProfile } from '../shared/firebase';
 import { uploadBytes } from 'firebase/storage';
+import { async } from 'q';
 
 function Profile() {
     const navigate = useNavigate();
-    const myPageNavi = useNavigate();
 
     const [name, setName] = useState();
     const [comment, setComment] = useState();
     const [fileImage, setFileImage] = useState();
     const [previewImage, setPreviewImage] = useState();
+
+    const keyName = useMemo(() => {
+        return auth.currentUser.displayName;
+    }, []);
 
     useEffect(() => {
         const fetchUser = onAuthStateChanged(auth, (user) => {
@@ -64,9 +68,9 @@ function Profile() {
 
     // 수정 코드
     const updateUserDataHandler = async () => {
-        // 코멘트 수정 -> displayName이 변경되면 오류남
-        const userRef = doc(db, 'userInfo', auth.currentUser.displayName);
-        await updateDoc(userRef, { comment: comment });
+        // // 코멘트 수정 -> displayName이 변경되면 오류남
+        // const userRef = doc(db, 'userInfo', auth.currentUser.displayName);
+        // await updateDoc(userRef, { comment: comment });
         // 닉네임 수정
         const user = auth.currentUser;
         await updateProfile(user, { displayName: name });
@@ -83,8 +87,33 @@ function Profile() {
             // 불러오는 값 photoULR로
             // const downloadURL = await getDownloadURL(storageRef);
         }
+        updateFireStore(keyName);
+
+        console.log('수정완료');
     };
 
+    const updateFireStore = async (keyName) => {
+        console.log('들어옴');
+        const getUserInfo = (await getDoc(doc(db, 'userInfo', keyName))).data();
+        const newUserInfo = { ...getUserInfo, comment: comment, nickname: name };
+        await setDoc(doc(db, 'userInfo', name), newUserInfo);
+        await deleteDoc(doc(db, 'userInfo', keyName));
+
+        const postQ = query(collection(db, 'Post'), where('nickname', '==', keyName));
+        const querySnapshot = await getDocs(postQ);
+
+        const updatePromises = querySnapshot.docs.map(async (x) => {
+            const a = x.data();
+            console.log('a===========', a);
+            const docRef = doc(db, 'Post', a.id);
+            return updateDoc(docRef, {
+                ...a,
+                nickname: name
+            });
+        });
+
+        await Promise.all(updatePromises);
+    };
     console.log('유저다.', auth.currentUser);
     console.log('파일이미지다', fileImage);
     console.log('코멘트다', comment);
