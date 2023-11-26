@@ -3,40 +3,31 @@ import styled from 'styled-components';
 
 function DetailPost({ post }) {
     return (
-        <Container>
-            <main>
-                <Title>{post.title}</Title>
-                <div
-                    style={{
-                        width: '100vw',
-                        borderTop: '1px solid black'
-                    }}
-                ></div>
-                <ProfileWrap>
-                    <Profilephoto>
-                        <Img src={post.photoURL} />
-                    </Profilephoto>
-                    <p>{post.nickname}</p>
-                </ProfileWrap>
+        <main>
+            <Title>{post.title}</Title>
+            <div
+                style={{
+                    width: '100vw',
+                    borderTop: '1px solid black'
+                }}
+            ></div>
+            <ProfileWrap>
+                <Profilephoto>
+                    <Img src={post.photoURL} />
+                </Profilephoto>
+                <p>{post.nickname}</p>
+            </ProfileWrap>
 
-                <ImageWrap>
-                    <Img src={post.image} />
-                </ImageWrap>
+            <ImageWrap>
+                <Img src={post.image} />
+            </ImageWrap>
 
-                <Content>{post.content} </Content>
-            </main>
-        </Container>
+            <Content>{post.content} </Content>
+        </main>
     );
 }
 
 export default DetailPost;
-const Container = styled.div`
-    display: flex;
-    justify-content: center;
-    width: 100vw;
-    height: 200vh;
-`;
-
 const Profilephoto = styled.figure`
     width: 50px;
     height: 50px;
@@ -55,7 +46,7 @@ const Title = styled.div`
     height: 120px;
     font-size: 50px;
     font-family: GmarketSansMedium;
-    margin: 150px auto 30px auto;
+    /* margin: 150px auto 30px auto; */
     padding: 20px;
     border: none;
     outline: none;

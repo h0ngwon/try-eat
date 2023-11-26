@@ -6,6 +6,7 @@ import { db } from '../shared/firebase';
 import DetailPost from '../components/DetailPost';
 
 function DetailPage() {
+    window.scrollTo(0, 0);
     const param = useParams();
     const [post, setPost] = useState('');
     console.log(post);
@@ -22,9 +23,18 @@ function DetailPage() {
 
     return (
         <>
-            <DetailPost post={post} />
+            <Container>
+                <DetailPost post={post} />
+            </Container>
         </>
     );
 }
 
 export default DetailPage;
+
+const Container = styled.div`
+    display: flex;
+    justify-content: center;
+    width: 100vw;
+    height: 200vh;
+`;

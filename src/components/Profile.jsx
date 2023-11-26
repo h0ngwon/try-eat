@@ -6,18 +6,16 @@ import { useNavigate } from 'react-router-dom';
 import { ref } from 'firebase/storage';
 import { storage } from '../shared/firebase';
 import { getDownloadURL } from 'firebase/storage';
-import { uploadString } from 'firebase/storage';
 import { updateProfile } from '../shared/firebase';
 import { uploadBytes } from 'firebase/storage';
 
-function Modal() {
+function Profile() {
     const navigate = useNavigate();
     const myPageNavi = useNavigate();
 
     const [name, setName] = useState();
     const [comment, setComment] = useState();
     const [fileImage, setFileImage] = useState();
-    const [userList, setUserList] = useState();
     const [previewImage, setPreviewImage] = useState();
 
     useEffect(() => {
@@ -228,4 +226,4 @@ const StImage = styled.img`
     border-radius: 10px;
     object-fit: cover;
 `;
-export default Modal;
+export default Profile;

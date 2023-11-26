@@ -47,17 +47,13 @@ const HomePage = () => {
 
     useEffect(() => {
         if (!currentUser) return;
-        console.log('useEffect ===========', currentUser);
 
         const fetchLikeList = async () => {
             //여기에러
             const userRef = doc(db, 'userInfo', currentUser.displayName);
-            console.log('userRef ===== ', userRef);
             const userInfo = await getDoc(userRef);
-            console.log('userInfo ===== ', userInfo);
-
             if (userInfo.exists() && userInfo.data()) {
-                console.log('data', userInfo.data);
+                console.log('fetch!!!!!!!!', userInfo.data);
 
                 setCurrentUserInfo(userInfo.data());
             }

@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { auth, db, doc, setDoc, storage } from '../shared/firebase';
-import { v4 as uuid } from 'uuid';
+import {v4 as uuid} from 'uuid';
 
 const Header = styled.header`
     width: 100%;
@@ -263,8 +263,7 @@ const Register = () => {
         const data = {
             email: form.email,
             nickname: form.nickname,
-            comment: form.comment,
-            likeList: []
+            comment: form.comment
         };
 
         try {

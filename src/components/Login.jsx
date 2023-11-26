@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { styled } from 'styled-components';
-import { login } from '../redux/reducers/stateReducer';
+import { login } from '../redux/modules/stateReducer';
 import { auth, db, doc, setDoc } from '../shared/firebase';
 
 const Header = styled.header`
@@ -138,7 +138,7 @@ const Login = () => {
                 const data = {
                     nickname: auth.currentUser.displayName,
                     email: auth.currentUser.email
-                }
+                };
                 setDoc(doc(db, 'userInfo', auth.currentUser.displayName), data);
                 dispatch(login());
                 navigate('/');
