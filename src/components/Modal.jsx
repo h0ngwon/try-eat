@@ -1,6 +1,5 @@
 import { getDoc, doc, updateDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
-import dummy from '../shared/sampleUserinfo.json';
 import styled from 'styled-components';
 import { auth, db, onAuthStateChanged } from '../shared/firebase';
 import { useNavigate } from 'react-router-dom';
@@ -14,7 +13,6 @@ import { uploadBytes } from 'firebase/storage';
 function Modal() {
     const navigate = useNavigate();
     const myPageNavi = useNavigate();
-    // const user = dummy[0];
 
     const [name, setName] = useState();
     const [comment, setComment] = useState();
@@ -60,11 +58,9 @@ function Modal() {
     // 이름, 소개 onChange
     const nickNameChangeHandler = (e) => {
         setName(e.target.value);
-        // console.log(name);
     };
     const commentChangeHandler = (e) => {
         setComment(e.target.value);
-        // console.log(comment);
     };
 
     const updateUserDataHandler = async () => {
@@ -79,10 +75,15 @@ function Modal() {
         if (fileImage) {
             const storageRef = ref(storage, `${auth.currentUser.uid}/profile`);
             await uploadBytes(storageRef, fileImage);
+            const downloadRef = ref(storage, `${auth.currentUser.uid}`);
+            const downloadURL = await getDownloadURL(downloadRef);
+            console.log('다운로드된 이미지다', downloadURL);
 
+            // 불러오는 값 photoULR로
             // const downloadURL = await getDownloadURL(storageRef);
         }
     };
+
     console.log('유저다.', auth.currentUser);
     console.log('파일이미지다', fileImage);
     console.log('코멘트다', comment);
