@@ -1,4 +1,4 @@
-import { getDoc, doc, updateDoc } from 'firebase/firestore';
+import { getDoc, doc, updateDoc, where, getDocs, query, collection } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { auth, db, onAuthStateChanged } from '../shared/firebase';
@@ -17,6 +17,7 @@ function Profile() {
     const [comment, setComment] = useState();
     const [fileImage, setFileImage] = useState();
     const [previewImage, setPreviewImage] = useState();
+    const [validationName, setValidationName] = useState(false);
 
     useEffect(() => {
         const fetchUser = onAuthStateChanged(auth, (user) => {
@@ -64,35 +65,55 @@ function Profile() {
 
     // 수정 코드
     const updateUserDataHandler = async () => {
-        // 코멘트 수정 -> displayName이 변경되면 오류남
-        const userRef = doc(db, 'userInfo', auth.currentUser.displayName);
-        await updateDoc(userRef, { comment: comment });
-        // 닉네임 수정
-        const user = auth.currentUser;
-        await updateProfile(user, { displayName: name });
-        // ---> 바로 photoURL에 집어 넣는게 아닌 storage업로드한 파일을 다시 다운 받아와서 phothURL에 집어 넣을 것.
-        // 이미지 업로드
-        if (fileImage) {
-            const storageRef = ref(storage, `${auth.currentUser.uid}/profile`);
-            await uploadBytes(storageRef, fileImage);
-            // const downloadRef = ref(storage, `${auth.currentUser.uid}`);
-            const downloadURL = await getDownloadURL(storageRef);
-            console.log('다운로드된 이미지다', downloadURL);
-            await updateProfile(user, { photoURL: downloadURL });
-
-            // 불러오는 값 photoULR로
-            // const downloadURL = await getDownloadURL(storageRef);
+        try {
+            const userRef = doc(db, 'userInfo', auth.currentUser.displayName);
+            await updateDoc(userRef, { comment: comment });
+            // 닉네임 수정
+            const user = auth.currentUser;
+            await updateProfile(user, { displayName: name });
+            // ---> 바로 photoURL에 집어 넣는게 아닌 storage업로드한 파일을 다시 다운 받아와서 phothURL에 집어 넣을 것.
+            // 이미지 업로드
+            if (fileImage) {
+                const storageRef = ref(storage, `${auth.currentUser.uid}/profile`);
+                await uploadBytes(storageRef, fileImage);
+                // const downloadRef = ref(storage, `${auth.currentUser.uid}`);
+                const downloadURL = await getDownloadURL(storageRef);
+                console.log('다운로드된 이미지다', downloadURL);
+                await updateProfile(user, { photoURL: downloadURL });
+            }
+            alert('수정되었습니다.');
+            myPageNavi('/mypage');
+        } catch (e) {
+            alert('오류가 발생했습니다. 다시 시도하여 주세요');
+            myPageNavi('/mypage');
         }
     };
+
+    // 닉네임 중복확인
+    const vaildNicknameClickHandler = async (nickname) => {
+        if (nickname === '') {
+            alert('닉네임을 입력하세요');
+            return;
+        }
+        const userRef = collection(db, 'userInfo');
+        const q = query(userRef, where('nickname', '==', nickname));
+        const querySnap = await getDocs(q);
+
+        if (querySnap.docs.length > 0) {
+            alert('사용가능한 아이디 입니다.');
+            setValidationName(true);
+        }
+        if (querySnap.docs.length < 1) {
+            alert('이미 존재하는 아이디입니다.');
+            setValidationName(false);
+        }
+    };
+
+    // 닉네임을 userInfo에서 가져온다.
 
     console.log('유저다.', auth.currentUser);
     console.log('파일이미지다', fileImage);
     console.log('코멘트다', comment);
-
-    // 무엇을 수정할것인가? -> userList
-    // 그렇다면 userList에 변경할 기존의 값이 있어야 함.
-    //  변경해야 할 값은 무엇인가? --> firebase에서 받아온 값.
-    // 그럼 userList에 firebase에서 받아온 nickname, comment, fileImage 를 어떻게 넣어놓을 것인가?
 
     // // 수정 버튼 함수
     // const onEditDone = () => {
@@ -102,6 +123,9 @@ function Profile() {
     //     });
     //     setUserList(newUserList);
     // };
+
+    // 기존의 닉네임을 변수에 하나 담아서 쿼리로 유저인포에
+    // 기존것을 겟독으로 가져와서 업데이트를 하고 기존 게시물 중 닉네임이랑 일치하는 것을 쿼리로 전부 가져와서 업데이트를 한다.
 
     // 중복확인 기능 구현필요!!!!!!!!!!!!!!!!
 
@@ -115,7 +139,10 @@ function Profile() {
             <Box1>
                 <StP>닉네임 </StP>
                 <StInput value={name} onChange={nickNameChangeHandler} />
-                <Button1> 중복확인 </Button1>
+                <Button1 onClick={() => vaildNicknameClickHandler(name)} type='button'>
+                    {' '}
+                    중복확인{' '}
+                </Button1>
             </Box1>
             <Box1>
                 <StP>소개</StP>
@@ -125,7 +152,9 @@ function Profile() {
                 <StP>프로필</StP>
                 <StImage alt='이미지를 넣어주세요' src={previewImage} accept='image/*' />
                 <form>
-                    <Button3 htmlFor='profileImg'>등록하기</Button3>
+                    <Button3 htmlFor='profileImg' type='button'>
+                        등록하기
+                    </Button3>
                     <StImg type='file' id='profileImg' accept='image/*' onChange={saveFileImage} />
                 </form>
             </Box2>
