@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs, orderBy, query, where } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, updateDoc, where } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -16,21 +16,6 @@ export default function MyPage() {
     const navigate = useNavigate();
     const user = auth.currentUser;
     const displayName = user.displayName;
-
-    let likeList = ['a', 'b', 'c'];
-
-    let post = [
-        { id: 'a', ab: 1, cd: 3 },
-        { id: 'f', ab: 1, cd: 3 },
-        { id: 'e', ab: 1, cd: 3 },
-        { id: 'd', ab: 1, cd: 3 },
-        { id: 'b', ab: 1, cd: 3 },
-        { id: 'c', ab: 1, cd: 3 }
-    ];
-    const bbb = likeList.map((item) => {
-        return post.find((a) => a.id.includes(item));
-    });
-    console.log(bbb);
 
     // getDocs 모든 문서를 가져오기
     useEffect(() => {
@@ -74,7 +59,10 @@ export default function MyPage() {
     }, []);
 
     // post 삭제 기능
-    const deletePost = (post) => {
+    const deletePost = async (post) => {
+        console.log(post.id);
+
+        await deleteDoc(doc(db, 'Post', `${post.id}`));
         const deleted = posts.filter((data) => {
             return data.id !== post.id;
         });
@@ -142,7 +130,7 @@ export default function MyPage() {
                                     {/* 삭제 기능 리덕스로 구현해보기 */}
                                     <Button
                                         onClick={() => {
-                                            alert('삭제하시겠습니까?');
+                                            // alert('삭제하시겠습니까?');
                                             deletePost(post);
                                         }}
                                     >
