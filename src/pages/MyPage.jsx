@@ -92,7 +92,7 @@ export default function MyPage() {
             });
         });
         setLikePosts(a);
-    }, [likeList]);
+    }, []);
 
     const deletePost = async (post) => {
         const deleteCheck = window.confirm('삭제하시겠습니까?');
@@ -118,7 +118,7 @@ export default function MyPage() {
                     <img src={userPhoto} />
                 </MyPhoto>
                 <UserEdit>
-                    <Ment>{nickname}님, 반갑습니다!</Ment>
+                    <Ment>{user.nickname}님, 반갑습니다!</Ment>
                     <Comment>{comment}</Comment>
                     <EditBtn
                         onClick={() => {
@@ -292,9 +292,9 @@ const PostList = styled.ul`
     width: 80vw;
     display: flex;
     justify-content: space-between;
-    /* display: grid;
+    display: grid;
     grid-template-columns: repeat(3, 1fr);
-    justify-items: start; */
+    justify-items: start;
     gap: 80px;
 `;
 const Post = styled.div`
