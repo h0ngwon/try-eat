@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs, orderBy, query, where } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, where } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -73,9 +73,10 @@ export default function MyPage() {
     }, []);
 
     // post 삭제 기능
-    const deletePost = (post) => {
+    const deletePost = async (post) => {
         const deleteCheck = window.confirm('삭제하시겠습니까?');
         if (deleteCheck) {
+            await deleteDoc(doc(db, 'Post', `${post.id}`));
             const deleted = posts.filter((data) => {
                 return data.id !== post.id;
             });
