@@ -183,17 +183,21 @@ export default function MyPage() {
 const Container = styled.div`
     width: 100vw;
     height: 100%;
+    margin-bottom: 300px;
 `;
 const Header = styled.div`
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-items: center;
     border-bottom: 2px solid lightgrey;
     height: 120px;
-    width: 80vw;
 `;
 
 const Title = styled.span`
+    display: flex;
+    justify-content: center;
+    width: 50vw;
+    margin: 30px 30px;
     display: flex;
     justify-content: center;
     font-size: 30px;
@@ -339,11 +343,11 @@ const PostComment = styled.p`
 `;
 
 const LogoContainer = styled.span`
+    margin-left: 180px;
     font-size: 36px;
     color: #e14d2a;
     font-family: 'EF_jejudoldam';
-    display: flex;
-    justify-content: flex-start;
+    justify-content:flex-start
     cursor: pointer;
 `;
 
