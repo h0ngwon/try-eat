@@ -1,9 +1,8 @@
-import { collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, where } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { auth, db } from '../shared/firebase';
-import { onAuthStateChanged } from 'firebase/auth';
 
 export default function MyPage() {
     const [nickname, setNikcname] = useState('');
@@ -15,20 +14,17 @@ export default function MyPage() {
     const [allPost, setAllPost] = useState();
 
     const navigate = useNavigate();
-    const user = auth.currentUser;
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                onAuthStateChanged(auth, async (user) => {
-                    const q = query(collection(db, 'Post'), where('nickname', '==', user.displayName));
-                    const querySnapshot = await getDocs(q);
-                    const fbdata = querySnapshot.docs.map((doc) => doc.data());
-                    const sortedData = fbdata.sort((a, b) => {
-                        return b.timestamp - a.timestamp;
-                    });
-                    setMyPosts(sortedData);
+                const q = query(collection(db, 'Post'), where('nickname', '==', auth.currentUser.displayName));
+                const querySnapshot = await getDocs(q);
+                const fbdata = querySnapshot.docs.map((doc) => doc.data());
+                const sortedData = fbdata.sort((a, b) => {
+                    return b.timestamp - a.timestamp;
                 });
+                setMyPosts(sortedData);
             } catch (e) {
                 console.log(e);
             }
@@ -38,27 +34,30 @@ export default function MyPage() {
 
     // 로그인한 사용자 이름과 사진 가져오기
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user) {
-                const displayName = user.displayName;
-                const photoUrl = user.photoURL;
-                setNikcname(displayName);
-                setUserPhoto(photoUrl);
-            } else {
-                navigate('/');
-            }
-        });
+        const unsubscribe = () => {
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    const displayName = auth.currentUser.displayName;
+                    const photoUrl = auth.currentUser.photoURL;
+                    setNikcname(displayName);
+                    setUserPhoto(photoUrl);
+                } else {
+                    navigate('/');
+                }
+            });
+        };
         unsubscribe();
     }, []);
 
     // 로그인한 사용자 userInfo 가져오기
     useEffect(() => {
         const fetchData = async () => {
-            onAuthStateChanged(auth, async (user) => {
-                const docRef = doc(db, 'userInfo', user.displayName);
-                const docSnap = await getDoc(docRef);
-
-                setCommnet(docSnap.data().comment);
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    const docRef = doc(db, 'userInfo', auth.currentUser.displayName);
+                    const docSnap = await getDoc(docRef);
+                    setCommnet(docSnap.data().comment);
+                }
             });
         };
         fetchData();
@@ -75,11 +74,13 @@ export default function MyPage() {
 
     useEffect(() => {
         const fetchData = async () => {
-            onAuthStateChanged(auth, async (user) => {
-                const docRef = doc(db, 'userInfo', user.displayName);
-                const docSnap = await getDoc(docRef);
-                console.log('==========', docSnap.data().likeList);
-                setLikeList(docSnap.data().likeList);
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    const docRef = doc(db, 'userInfo', auth.currentUser.displayName);
+                    const docSnap = await getDoc(docRef);
+                    console.log('==========', docSnap.data().likeList);
+                    setLikeList(docSnap.data().likeList);
+                }
             });
         };
         fetchData();
