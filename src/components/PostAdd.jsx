@@ -33,6 +33,7 @@ const PostAdd = ({ navigate }) => {
         timestamp: serverTimestamp(),
         image: imageFile,
         nickname: displayName,
+        likeBox: [],
         photoURL
     };
 
@@ -86,13 +87,13 @@ const PostAdd = ({ navigate }) => {
             try {
                 await setDoc(doc(db, 'Post', postToAdd.id), postToAdd);
 
-                const imageRef = ref(storage, `${postToAdd.id}/Post-image`);
+                const imageRef = ref(storage, `${displayName}/Post-image`);
                 await uploadBytes(imageRef, imageUrl);
                 await getDownloadURL(imageRef);
                 setImageFile('');
                 setTitle('');
                 setContent('');
-                // navigate('/detailpage/:id');
+                navigate(`/detailpage/${postToAdd.id}`);
             } catch (error) {
                 console.error(error);
             }
@@ -105,9 +106,9 @@ const PostAdd = ({ navigate }) => {
     const imageDeleteBtn = () => {
         const deleteCheck = window.confirm('삭제하시겠습니까?');
         if (deleteCheck) {
-            setImageFile('');
+            setImageFile(null);
+            setInputImg(null);
             fileInput.current.value = '';
-            setInputImg('');
         } else {
             return;
         }
@@ -261,11 +262,12 @@ const InputContent = styled.textarea`
     display: flex;
     justify-content: center;
     width: 760px;
-    height: 200px;
+    height: 300px;
     padding: 20px;
     margin: 50px auto 0 auto;
     font-size: 25px;
     font-family: GmarketSansMedium;
+    line-height: 35px;
     resize: none;
     background: none;
     border-width: 0 0 2px;

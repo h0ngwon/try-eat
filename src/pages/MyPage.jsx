@@ -1,9 +1,8 @@
-import { collection, deleteDoc, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, where } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { db } from '../shared/firebase';
-import { auth } from '../shared/firebase';
+import { auth, db } from '../shared/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 
 export default function MyPage() {
@@ -80,25 +79,28 @@ export default function MyPage() {
         const fetchData = async () => {
             const docRef = doc(db, 'userInfo', auth.currentUser.displayName);
             const docSnap = await getDoc(docRef);
-
             setLikeList(docSnap.data().likeList);
         };
         fetchData();
     }, []);
 
     const deletePost = async (post) => {
-        await deleteDoc(doc(db, 'Post', post.id));
-        const deleted = myPosts.filter((data) => {
-            return data.id !== post.id;
-        });
-        setMyPosts(deleted);
+        const deleteCheck = window.confirm('삭제하시겠습니까?');
+        if (deleteCheck) {
+            await deleteDoc(doc(db, 'Post', post.id));
+            const deleted = myPosts.filter((data) => {
+                return data.id !== post.id;
+            });
+            setMyPosts(deleted);
+        } else {
+            return;
+        }
     };
 
     return (
-        <>
+        <Container>
             <Header>
                 <LogoContainer onClick={() => navigate('/')}>Try Eat</LogoContainer>
-
                 <Title>마이페이지</Title>
             </Header>
             <ProfileEdit>
@@ -137,7 +139,7 @@ export default function MyPage() {
                                 <Buttons>
                                     <Button
                                         onClick={() => {
-                                            navigate(`/Edit/${post.id}`);
+                                            navigate(`/edit/${post.id}`);
                                         }}
                                     >
                                         수정
@@ -155,38 +157,45 @@ export default function MyPage() {
                     <LikePost>
                         {likePosts.map((item) => {
                             return (
-                                <>
-                                    <LikedImage
-                                        onClick={() => {
-                                            navigate(`/detailpage/${item.id}`);
-                                        }}
-                                        src={item.image}
-                                        alt='이미지'
-                                    />
-                                    <LikedTitle>{item.title}</LikedTitle>
-                                    <LikedContent>{item.content}</LikedContent>
-                                    <LikedNickname>작성자 : {item.nickname}</LikedNickname>
-                                </>
+                                <Post key={item.timestamp}>
+                                    <div>
+                                        <LikedImage
+                                            onClick={() => {
+                                                navigate(`/detailpage/${item.id}`);
+                                            }}
+                                            src={item.image}
+                                            alt='이미지'
+                                        />
+                                        <LikedTitle>{item.title}</LikedTitle>
+                                        <LikedContent>{item.content}</LikedContent>
+                                        <LikedNickname>작성자 : {item.nickname}</LikedNickname>
+                                    </div>
+                                </Post>
                             );
                         })}
                     </LikePost>
                 </LikeList>
             </LikePostContainer>
-        </>
+        </Container>
     );
 }
 
+const Container = styled.div`
+    width: 100vw;
+    height: 100%;
+`;
 const Header = styled.div`
     display: flex;
     align-items: center;
-    justify-items: center;
+    justify-content: center;
     border-bottom: 2px solid lightgrey;
     height: 120px;
+    width: 80vw;
 `;
 
 const Title = styled.span`
     display: flex;
-    margin: 30px 30px;
+    justify-content: center;
     font-size: 30px;
     font-weight: 500;
     font-family: GmarketSansMedium;
@@ -201,7 +210,7 @@ const Comment = styled.div`
 const ProfileEdit = styled.section`
     display: flex;
     justify-content: flex-start;
-    margin-left: 100px;
+    margin-left: 150px;
     padding-top: 50px;
     padding-bottom: 50px;
     gap: 80px;
@@ -245,27 +254,31 @@ const EditBtn = styled.button`
     }
 `;
 
+const PostContainer = styled.section`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 80vw;
+    height: 100%;
+    margin: 0 auto 100px auto;
+`;
+
 const MyPost = styled.h2`
     display: block;
     padding-top: 50px;
     padding-bottom: 70px;
-    padding-left: 120px;
+    padding-left: 150px;
     font-family: GmarketSansMedium;
     font-size: 25px;
     font-weight: 500;
     border-top: 2px solid lightgrey;
 `;
 
-const PostContainer = styled.section`
-    display: flex;
-    justify-content: center;
-`;
-
 const PostList = styled.ul`
     display: grid;
-    grid-template-columns: 1fr, 1fr, 1fr;
+    grid-template-columns: repeat(3, 1fr);
     justify-items: start;
-    gap: 100px;
+    gap: 80px;
 `;
 const Post = styled.div`
     display: flex;
@@ -314,7 +327,7 @@ const PostImage = styled.img`
 `;
 
 const PostTitle = styled.p`
-    height: 100px;
+    height: 70px;
     font-size: 23px;
     font-family: GmarketSansMedium;
 `;
@@ -322,15 +335,15 @@ const PostTitle = styled.p`
 const PostComment = styled.p`
     height: 150px;
     font-family: GmarketSansLight;
+    line-height: 25px;
 `;
 
 const LogoContainer = styled.span`
-    margin-left: 20px;
     font-size: 36px;
     color: #e14d2a;
     font-family: 'EF_jejudoldam';
-    padding: 20px;
-    margin: 0 500px 0 100px;
+    display: flex;
+    justify-content: flex-start;
     cursor: pointer;
 `;
 
@@ -338,7 +351,7 @@ const Like = styled.h2`
     display: block;
     padding-top: 50px;
     padding-bottom: 70px;
-    padding-left: 120px;
+    padding-left: 150px;
     font-family: GmarketSansMedium;
     font-size: 25px;
     font-weight: 500;
@@ -349,19 +362,26 @@ const Like = styled.h2`
 const LikePostContainer = styled.section`
     display: flex;
     justify-content: center;
+    align-items: center;
+    width: 80vw;
+    height: 100%;
+    margin: 0 auto 100px auto;
 `;
+
 const LikeList = styled.ul`
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     justify-items: start;
-    gap: 100px;
+    gap: 80px;
+    margin: 0;
 `;
 
 const LikePost = styled.div`
     display: flex;
     flex-direction: column;
     width: 400px;
-    height: 600px;
+    height: 500px;
+    margin-bottom: 100px;
 `;
 
 const LikedImage = styled.img`
@@ -380,17 +400,18 @@ const LikedImage = styled.img`
 `;
 
 const LikedTitle = styled.p`
-    height: 80px;
+    margin: 10px auto 10px auto;
     font-size: 23px;
     font-family: GmarketSansMedium;
 `;
 
 const LikedContent = styled.p`
-    height: 150px;
+    margin: 10px auto 10px auto;
     font-family: GmarketSansLight;
+    line-height: 25px;
 `;
 
 const LikedNickname = styled.div`
-    height: 150px;
+    margin: 10px auto 10px auto;
     font-family: GmarketSansLight;
 `;
