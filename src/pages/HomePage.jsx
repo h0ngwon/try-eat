@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import styled from 'styled-components';
 import { db } from '../shared/firebase';
+import { useDispatch, useSelector } from 'react-redux';
+
 import {
     arrayRemove,
     arrayUnion,
@@ -15,19 +17,24 @@ import {
 } from 'firebase/firestore';
 import { auth } from '../shared/firebase';
 import Like from '../components/Like';
+import Loading from '../components/ui/Loading';
+import { done, load } from '../redux/modules/loadingReducer';
 //auto scroll 자동으로 스크롤을 내려줌
 
 const HomePage = () => {
     //post의 likebox
     const [post, setPost] = useState([]);
-
+    const dispatch = useDispatch();
+    const isLoading = useSelector((state) => state.loadingReducer.isLoading);
     useEffect(() => {
         const fetchCard = async () => {
             //최신순정렬
+            dispatch(load());
             const q = query(collection(db, 'Post'), orderBy('timestamp', 'desc'));
             const docSnap = await getDocs(q);
             const postData = docSnap.docs.map((doc) => doc.data());
             setPost(postData);
+            dispatch(done());
         };
         fetchCard();
     }, []);
@@ -66,8 +73,8 @@ const HomePage = () => {
 
     const onHandleLike = (e, item) => {
         e.stopPropagation(); //버블링 방지
-        //비로그인시 방지
 
+        //비로그인시 방지
         if (auth.currentUser === null) return;
 
         const userLikListRef = doc(db, 'userInfo', currentUser.displayName);
@@ -115,39 +122,44 @@ const HomePage = () => {
                     justifyContent: 'center'
                 }}
             >
-                <Container>
-                    {post.map((item) => {
-                        return (
-                            <CardList
-                                key={item.id}
-                                $img={item.image}
-                                onClick={(e) => {
-                                    onHandleNavigate(item.id);
-                                }}
-                            >
-                                <CardImgWrap>
-                                    <img
-                                        src={item.image}
-                                        alt='이미지'
-                                        style={{
-                                            width: '100%',
-                                            height: '100%',
-                                            objectFit: 'cover'
-                                        }}
-                                    />
-                                </CardImgWrap>
-                                <ImgCover></ImgCover>
-                                <CardTextWrap>
-                                    <CardTitle>{item.title}</CardTitle>
-                                    <CardContent>{item.content}</CardContent>
-                                </CardTextWrap>
-                                <LikeWrap onClick={(e) => onHandleLike(e, item)}>
-                                    <Like currentUserInfo={currentUserInfo} item={item} />
-                                </LikeWrap>
-                            </CardList>
-                        );
-                    })}
-                </Container>
+                {isLoading ? (
+                    <Loading />
+                ) : (
+                    <Container>
+                        {post.map((item) => {
+                            return (
+                                <CardList
+                                    key={item.id}
+                                    $img={item.image}
+                                    onClick={(e) => {
+                                        onHandleNavigate(item.id);
+                                    }}
+                                >
+                                    <CardImgWrap>
+                                        <img
+                                            src={item.image}
+                                            ß
+                                            alt='이미지'
+                                            style={{
+                                                width: '100%',
+                                                height: '100%',
+                                                objectFit: 'cover'
+                                            }}
+                                        />
+                                    </CardImgWrap>
+                                    <ImgCover></ImgCover>
+                                    <CardTextWrap>
+                                        <CardTitle>{item.title}</CardTitle>
+                                        <CardContent>{item.content}</CardContent>
+                                    </CardTextWrap>
+                                    <LikeWrap onClick={(e) => onHandleLike(e, item)}>
+                                        <Like currentUserInfo={currentUserInfo} item={item} />
+                                    </LikeWrap>
+                                </CardList>
+                            );
+                        })}
+                    </Container>
+                )}
                 <TopBtn
                     onClick={() => {
                         window.scrollTo({
@@ -196,12 +208,12 @@ const CardContent = styled.p`
     justify-content: flex-start;
     align-items: flex-end;
     width: 90%;
-    height: 85%;
+    height: 72%;
     position: absolute;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-size: 17px;
+    font-size: 16px;
     font-family: GmarketSansLight;
     color: white;
     text-shadow: 0px 0px 2px rgba(0, 0, 0, 0.5);
@@ -211,7 +223,7 @@ const CardTitle = styled.p`
     justify-content: flex-start;
     align-items: flex-end;
     width: 90%;
-    height: 70%;
+    height: 57%;
     font-size: 42px;
     color: white;
     text-shadow: 0px 0px 5px rgba(0, 0, 0, 0.7);
