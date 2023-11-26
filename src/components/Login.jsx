@@ -138,7 +138,7 @@ const Login = () => {
             .then((res) => {
                 const data = {
                     nickname: auth.currentUser.displayName,
-                    
+                    email: auth.currentUser.email
                 }
                 setDoc(doc(db, 'userInfo', auth.currentUser.displayName), data);
                 dispatch(login());
