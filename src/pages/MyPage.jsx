@@ -1,10 +1,10 @@
-import { collection, getDocs, orderBy, query, getDoc, doc, where } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import styled from 'styled-components';
 import { db } from '../shared/firebase';
 import { auth } from '../shared/firebase';
-import { onAuthStateChanged } from '@firebase/auth';
+import { onAuthStateChanged } from 'firebase/auth';
 
 export default function MyPage() {
     //회원정보
@@ -13,6 +13,9 @@ export default function MyPage() {
     const [userPhoto, setUserPhoto] = useState('');
     const [comment, setCommnet] = useState('');
     const [posts, setPosts] = useState([]);
+    const [likeList, setLikeList] = useState([]);
+    const [likedPosts, setLikedPosts] = useState([]);
+
     const navigate = useNavigate();
     const user = auth.currentUser;
     const displayName = user.displayName;
@@ -22,6 +25,7 @@ export default function MyPage() {
         const fetchData = async () => {
             // collection 이름이 post인 collection의 모든 document를 가져옴
             const q = query(collection(db, 'Post'), where('nickname', '==', displayName));
+
             const querySnapshot = await getDocs(q);
             const fbdata = querySnapshot.docs.map((doc) => doc.data());
             setPosts(fbdata);
@@ -29,7 +33,7 @@ export default function MyPage() {
         fetchData();
     }, []);
 
-    console.log('현재유저', auth.currentUser);
+    // console.log('현재유저', auth.currentUser);
 
     // 로그인한 사용자 이름과 사진 가져오기
     useEffect(() => {
@@ -56,13 +60,45 @@ export default function MyPage() {
         fetchData();
     }, []);
 
-    // post 삭제 기능
-    const deletePost = (post) => {
-        const deleted = posts.filter((data) => {
-            return data.id !== post.id;
-        });
-        setPosts(deleted);
-    };
+    // likeList 가져오기
+    // auth의 디스플레이네임이랑 스토리지 이름이랑 비교
+    // 화면에 작성자도 표시
+    //post 전체 들고오기 --> 배열순회 --> 조건에 맞는 값 찾기
+    // Post id === userInfo의 likeList 값이 같으면
+    // 출력
+
+    // 1. userInfo의 likelist 가져오기
+    // 2. Post 배열의 객체 다 가져오기 getDocs
+    // 3. likeList의 map --> post.find해서 post의 id값이
+    useEffect(() => {
+        const fetchData = async () => {
+            const docRef = doc(db, 'userInfo', auth.currentUser.displayName);
+            const docSnap = await getDoc(docRef);
+
+            setLikeList(docSnap.data().likeList);
+        };
+        fetchData();
+    }, []);
+
+    // console.log('이거', likeList);
+
+    // Post 데이터 다 가져오기
+    useEffect(() => {
+        const fetchData = async () => {
+            const q = query(collection(db, 'Post'));
+            const docSnap = await getDocs(q);
+            const likedData = docSnap.docs.map((doc) => doc.data());
+            setLikedPosts(likedData);
+        };
+        fetchData();
+    }, []);
+
+    // console.log('ㅇㅇㅇ', likedPosts);
+
+    const a = likeList.map((data) => {
+        return likedPosts.find((item) => item.id.includes(data));
+    });
+    console.log('aaa', a);
 
     return (
         <>
@@ -114,7 +150,7 @@ export default function MyPage() {
                                 <PostComment>{post.content}</PostComment>
                                 <Buttons>
                                     {/* user에 따라 좋아요 눌린 값 가져오기 */}
-                                    <div>♥️</div>
+
                                     <Button
                                         onClick={() => {
                                             navigate(`/Edit/${post.id}`);
@@ -123,21 +159,37 @@ export default function MyPage() {
                                         수정
                                     </Button>
                                     {/* 삭제 기능 리덕스로 구현해보기 */}
-                                    <Button
-                                        onClick={() => {
-                                            alert('삭제하시겠습니까?');
-                                            deletePost(post);
-                                        }}
-                                    >
-                                        삭제
-                                    </Button>
+                                    <Button>삭제</Button>
                                 </Buttons>
                             </Post>
                         );
                     })}
                 </PostList>
             </PostContainer>
-            <LikeList>좋아요</LikeList>
+            <Like>좋아요</Like>
+            <LikePostContainer>
+                <LikeList>
+                    <LikePost>
+                        {a.map((item) => {
+                            return (
+                                <>
+                                    <LikedImage
+                                        onClick={() => {
+                                            // navigate(`/detailpage/${item.id}`);
+                                        }}
+                                        src={item.image}
+                                        alt='이미지'
+                                    />
+
+                                    <LikedTitle>{item.title}</LikedTitle>
+                                    <LikedContent>{item.content}</LikedContent>
+                                    <LikedNickname>작성자 : {item.nickname}</LikedNickname>
+                                </>
+                            );
+                        })}
+                    </LikePost>
+                </LikeList>
+            </LikePostContainer>
         </>
     );
 }
@@ -146,8 +198,6 @@ const Header = styled.div`
     display: flex;
     align-items: center;
     justify-items: center;
-    /* justify-content: center; */
-    /* grid-template-columns: 1fr 1fr 1fr; */
     border-bottom: 2px solid lightgrey;
     height: 120px;
 `;
@@ -211,12 +261,6 @@ const EditBtn = styled.button`
     }
 `;
 
-const PostContainer = styled.section`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-`;
-
 const MyPost = styled.h2`
     display: block;
     padding-top: 50px;
@@ -228,10 +272,15 @@ const MyPost = styled.h2`
     border-top: 2px solid lightgrey;
 `;
 
-const PostList = styled.ul`
+const PostContainer = styled.section`
     display: flex;
     justify-content: center;
-    flex-wrap: wrap;
+`;
+
+const PostList = styled.ul`
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    justify-items: start;
     gap: 100px;
 `;
 const Post = styled.div`
@@ -301,7 +350,7 @@ const LogoContainer = styled.span`
     cursor: pointer;
 `;
 
-const LikeList = styled.h2`
+const Like = styled.h2`
     display: block;
     padding-top: 50px;
     padding-bottom: 70px;
@@ -311,4 +360,53 @@ const LikeList = styled.h2`
     font-weight: 500;
     border-top: 2px solid lightgrey;
     margin-top: 50px;
+`;
+
+const LikePostContainer = styled.section`
+    display: flex;
+    justify-content: center;
+`;
+const LikeList = styled.ul`
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    justify-items: start;
+    gap: 100px;
+`;
+
+const LikePost = styled.div`
+    display: flex;
+    flex-direction: column;
+    width: 400px;
+    height: 600px;
+`;
+
+const LikedImage = styled.img`
+    width: 400px;
+    height: 400px;
+    border: none;
+    border-radius: 30px;
+    margin-bottom: 20px;
+    object-fit: cover;
+    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    &:hover {
+        transform: scale(1.05);
+        transition: all 0.5s;
+    }
+`;
+
+const LikedTitle = styled.p`
+    height: 80px;
+    font-size: 23px;
+    font-family: GmarketSansMedium;
+`;
+
+const LikedContent = styled.p`
+    height: 150px;
+    font-family: GmarketSansLight;
+`;
+
+const LikedNickname = styled.div`
+    height: 150px;
+    font-family: GmarketSansLight;
 `;
