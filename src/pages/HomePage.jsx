@@ -60,15 +60,11 @@ const HomePage = () => {
             const userRef = doc(db, 'userInfo', currentUser.displayName);
             const userInfo = await getDoc(userRef);
             if (userInfo.exists() && userInfo.data()) {
-                console.log('fetch!!!!!!!!', userInfo.data);
-
                 setCurrentUserInfo(userInfo.data());
             }
-            console.log('fetch!!!!!!!!', userInfo);
         };
 
         fetchLikeList();
-        console.log('커런트찾음!');
     }, [currentUser]); //최초 읽을때 auth.
 
     const onHandleLike = (e, item) => {

@@ -8,14 +8,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { done, load } from '../redux/modules/loadingReducer';
 import Loading from '../components/ui/Loading';
 
-// 등록하기 클릭 후 상세페이지로 자동이동
-// 취소하기 클릭 후 마이페이지로 자동이동
-// 글쓰기를 클릭해서 접근한 페이지로 내용이 비어있고 버튼이 '등록하기'
-
-// 유효성검사
-// 로그인 하지 않은 상태로 게시물 등록하면 '로그인이 필요합니다' 모달창
-// 등록완료 버튼 클릭 시 ‘이대로 등록하시겠습니까?’ 모달창
-
 const PostAdd = ({ navigate }) => {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
@@ -72,6 +64,7 @@ const PostAdd = ({ navigate }) => {
     const cancelBtn = () => {
         navigate('/mypage');
     };
+
     // 업로드 버튼
     const uploadHandler = async () => {
         const uploadCheck = window.confirm('등록하시겠습니까?');
@@ -153,7 +146,6 @@ const PostAdd = ({ navigate }) => {
                             <ImgDeleteButton onClick={imageDeleteBtn}>X</ImgDeleteButton>
                         </ButtonWrap>
                         <ImageWrap>
-                            {/* <ImageButton onClick={uploadHandler}>업로드</ImageButton> */}
                             <Img src={imageFile} />
                             {!imageFile && <Span>이미지를 업로드해주세요</Span>}
                         </ImageWrap>
@@ -219,7 +211,7 @@ const ImageWrap = styled.div`
 `;
 
 const Span = styled.span`
-    padding-bottom: 420px;
+    padding-bottom: 400px;
     text-align: center;
     font-size: 20px;
     color: gray;
@@ -273,7 +265,7 @@ const InputContent = styled.textarea`
     height: 300px;
     padding: 20px;
     margin: 50px auto 0 auto;
-    font-size: 25px;
+    font-size: 22px;
     font-family: GmarketSansMedium;
     line-height: 35px;
     resize: none;
