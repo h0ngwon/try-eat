@@ -63,6 +63,7 @@ export default function MyPage() {
     }, []);
     const [allPost, setAllPost] = useState();
     console.log('all===================', allPost);
+
     useEffect(() => {
         const fetchAll = async () => {
             const allPost = await getDocs(collection(db, 'Post'));
@@ -111,7 +112,6 @@ export default function MyPage() {
         }
     };
 
-    // console.log('ㅇㅇㅇ', likedPosts);
     return (
         <>
             <Header>
