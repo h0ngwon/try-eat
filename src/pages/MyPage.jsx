@@ -279,9 +279,12 @@ const MyPost = styled.h2`
 `;
 
 const PostList = styled.ul`
-    display: grid;
+    width: 80vw;
+    display: flex;
+    justify-content: space-between;
+    /* display: grid;
     grid-template-columns: repeat(3, 1fr);
-    justify-items: start;
+    justify-items: start; */
     gap: 80px;
 `;
 const Post = styled.div`
@@ -347,7 +350,7 @@ const LogoContainer = styled.span`
     font-size: 36px;
     color: #e14d2a;
     font-family: 'EF_jejudoldam';
-    justify-content:flex-start
+    justify-content: flex-start;
     cursor: pointer;
 `;
 
@@ -366,8 +369,8 @@ const Like = styled.h2`
 const LikePostContainer = styled.section`
     display: flex;
     justify-content: center;
-    align-items: center;
-    width: 80vw;
+    /* align-items: center; */
+    width: 100vw;
     height: 100%;
     margin: 0 auto 100px auto;
 `;
