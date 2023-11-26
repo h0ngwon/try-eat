@@ -117,6 +117,7 @@ const Content = styled.div`
     margin: 50px auto 0 auto;
     font-size: 25px;
     font-family: GmarketSansMedium;
+    line-height: 35px;
     resize: none;
     background: none;
     border-width: 0 0 2px;

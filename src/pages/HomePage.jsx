@@ -210,7 +210,7 @@ const CardContent = styled.p`
     justify-content: flex-start;
     align-items: flex-end;
     width: 90%;
-    height: 75%;
+    height: 72%;
     position: absolute;
     white-space: nowrap;
     overflow: hidden;

@@ -59,10 +59,15 @@ export default function MyPage() {
 
     // post 삭제 기능
     const deletePost = (post) => {
-        const deleted = posts.filter((data) => {
-            return data.id !== post.id;
-        });
-        setPosts(deleted);
+        const deleteCheck = window.confirm('삭제하시겠습니까?');
+        if (deleteCheck) {
+            const deleted = posts.filter((data) => {
+                return data.id !== post.id;
+            });
+            setPosts(deleted);
+        } else {
+            return;
+        }
     };
 
     return (
@@ -115,7 +120,6 @@ export default function MyPage() {
                                 <PostComment>{post.content}</PostComment>
                                 <Buttons>
                                     {/* user에 따라 좋아요 눌린 값 가져오기 */}
-                                    <div>♥️</div>
                                     <Button
                                         onClick={() => {
                                             navigate(`/edit/${post.id}`);
@@ -126,7 +130,6 @@ export default function MyPage() {
                                     {/* 삭제 기능 리덕스로 구현해보기 */}
                                     <Button
                                         onClick={() => {
-                                            alert('삭제하시겠습니까?');
                                             deletePost(post);
                                         }}
                                     >
@@ -215,6 +218,7 @@ const PostContainer = styled.section`
     display: flex;
     justify-content: center;
     align-items: center;
+    margin: 0 0 100px 0;
 `;
 
 const MyPost = styled.h2`
@@ -281,7 +285,7 @@ const PostImage = styled.img`
 `;
 
 const PostTitle = styled.p`
-    height: 100px;
+    height: 70px;
     font-size: 23px;
     font-family: GmarketSansMedium;
 `;
@@ -289,6 +293,7 @@ const PostTitle = styled.p`
 const PostComment = styled.p`
     height: 150px;
     font-family: GmarketSansLight;
+    line-height: 25px;
 `;
 
 const LogoContainer = styled.span`
