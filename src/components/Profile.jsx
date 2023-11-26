@@ -1,24 +1,22 @@
 import { getDoc, doc, updateDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
-import dummy from '../shared/sampleUserinfo.json';
 import styled from 'styled-components';
 import { auth, db, onAuthStateChanged } from '../shared/firebase';
 import { useNavigate } from 'react-router-dom';
 import { ref } from 'firebase/storage';
 import { storage } from '../shared/firebase';
 import { getDownloadURL } from 'firebase/storage';
-import { uploadString } from 'firebase/storage';
 import { updateProfile } from '../shared/firebase';
 import { uploadBytes } from 'firebase/storage';
 
-function Modal() {
+function Profile() {
     const navigate = useNavigate();
-    // const user = dummy[0];
+    const myPageNavi = useNavigate();
 
     const [name, setName] = useState();
     const [comment, setComment] = useState();
     const [fileImage, setFileImage] = useState();
-    const [userList, setUserList] = useState();
+    const [previewImage, setPreviewImage] = useState();
 
     useEffect(() => {
         const fetchUser = onAuthStateChanged(auth, (user) => {
@@ -26,7 +24,7 @@ function Modal() {
                 const displayName = user.displayName;
                 const photoUrl = user.photoURL;
                 setName(displayName);
-                setFileImage(photoUrl);
+                setPreviewImage(photoUrl);
             } else {
                 navigate('/');
             }
@@ -38,11 +36,7 @@ function Modal() {
         const fetchData = async () => {
             const docRef = doc(db, 'userInfo', auth.currentUser.displayName);
             const docSnap = await getDoc(docRef);
-            if (comment) {
-                return setComment(docSnap.data().comment);
-            } else {
-                return;
-            }
+            setComment(docSnap.data().comment);
         };
 
         fetchData();
@@ -54,72 +48,46 @@ function Modal() {
     // 가져온거 수정해서 다시 저장하기.
 
     //    파일 업로드
-
     const saveFileImage = (e) => {
-        setFileImage(URL.createObjectURL(e.target.files[0]));
-        // console.log(e.target.files[0]);
+        setFileImage(e.target.files[0]);
+        setPreviewImage(URL.createObjectURL(e.target.files[0]));
+        console.log(e.target.files[0]);
     };
 
     // 이름, 소개 onChange
     const nickNameChangeHandler = (e) => {
         setName(e.target.value);
-        // console.log(name);
     };
     const commentChangeHandler = (e) => {
         setComment(e.target.value);
-        // console.log(comment);
     };
 
-    // 바뀐부분에 대해 감지를 하는가?
-    console.log('12315648979789', auth.currentUser);
-
-    const updateUserData = async () => {
+    // 수정 코드
+    const updateUserDataHandler = async () => {
+        // 코멘트 수정 -> displayName이 변경되면 오류남
+        const userRef = doc(db, 'userInfo', auth.currentUser.displayName);
+        await updateDoc(userRef, { comment: comment });
         // 닉네임 수정
-        const user = await auth.currentUser;
-        await updateProfile(user, { displayName: name, photoURL: fileImage });
-        // 코멘트 수정 아직 오류남
-        // const todoRef = doc(db, 'userInfo', auth.currentUser.displayName);
-        // await updateDoc(todoRef, { comment: comment });
+        const user = auth.currentUser;
+        await updateProfile(user, { displayName: name });
+        // ---> 바로 photoURL에 집어 넣는게 아닌 storage업로드한 파일을 다시 다운 받아와서 phothURL에 집어 넣을 것.
+        // 이미지 업로드
+        if (fileImage) {
+            const storageRef = ref(storage, `${auth.currentUser.uid}/profile`);
+            await uploadBytes(storageRef, fileImage);
+            // const downloadRef = ref(storage, `${auth.currentUser.uid}`);
+            const downloadURL = await getDownloadURL(storageRef);
+            console.log('다운로드된 이미지다', downloadURL);
+            await updateProfile(user, { photoURL: downloadURL });
 
-        // // 이미지 수정
-        // const imageRef = ref(storage, `${auth.currentUser.uid}/${fileImage.profile}`);
-        // await uploadBytes(imageRef, fileImage);
+            // 불러오는 값 photoULR로
+            // const downloadURL = await getDownloadURL(storageRef);
+        }
     };
 
+    console.log('유저다.', auth.currentUser);
+    console.log('파일이미지다', fileImage);
     console.log('코멘트다', comment);
-    // const updateUserData = async () => {
-    //     // 1. Firebase Authentication 업데이트
-    //     const user = auth.currentUser;
-    //     await updateProfile(user, {
-    //         displayName: name,
-    //         photoURL: fileImage ? fileImage.name : user.photoURL
-    //     });
-
-    //     // 2. Firestore 업데이트
-    //     const docRef = doc(db, 'userInfo', auth.currentUser.displayName);
-    //     await updateDoc(docRef, {
-    //         comment: comment
-    //     });
-
-    //     // 3. Storage 업데이트 (프로필 이미지가 변경된 경우에만)
-    //     if (fileImage) {
-    //         const storageRef = ref(storage, `users/${auth.currentUser.uid}/profile.jpg`);
-    //         await uploadString(storageRef, fileImage, 'data_url');
-    //         const downloadURL = await getDownloadURL(storageRef);
-
-    //         // Firestore에도 프로필 이미지 URL 업데이트
-    //         await updateDoc(docRef, {
-    //             avatar: downloadURL
-    //         });
-    //     }
-
-    //     // 업데이트가 완료되면 다시 데이터를 불러옵니다.
-    //     const updatedDocSnap = await getDoc(docRef);
-    //     setComment(updatedDocSnap.data().comment);
-
-    // 그 외에 필요한 작업을 수행할 수 있습니다.
-    // 예: 화면을 갱신하거나 사용자에게 알림을 표시합니다.
-    // };
 
     // 무엇을 수정할것인가? -> userList
     // 그렇다면 userList에 변경할 기존의 값이 있어야 함.
@@ -141,7 +109,7 @@ function Modal() {
         <Container
             onSubmit={(event) => {
                 event.preventDefault();
-                updateUserData();
+                updateUserDataHandler();
             }}
         >
             <Box1>
@@ -155,7 +123,7 @@ function Modal() {
             </Box1>
             <Box2>
                 <StP>프로필</StP>
-                <StImage alt='이미지를 넣어주세요' src={fileImage} accept='image/*' />
+                <StImage alt='이미지를 넣어주세요' src={previewImage} accept='image/*' />
                 <form>
                     <Button3 htmlFor='profileImg'>등록하기</Button3>
                     <StImg type='file' id='profileImg' accept='image/*' onChange={saveFileImage} />
@@ -258,4 +226,4 @@ const StImage = styled.img`
     border-radius: 10px;
     object-fit: cover;
 `;
-export default Modal;
+export default Profile;

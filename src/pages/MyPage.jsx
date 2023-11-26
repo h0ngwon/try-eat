@@ -140,7 +140,7 @@ export default function MyPage() {
                     <Comment>{comment}</Comment>
                     <EditBtn
                         onClick={() => {
-                            navigate(`/modal`);
+                            navigate(`/profile`);
                         }}
                     >
                         프로필 수정
