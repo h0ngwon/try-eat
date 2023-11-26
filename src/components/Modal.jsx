@@ -18,6 +18,7 @@ function Modal() {
     const [comment, setComment] = useState();
     const [fileImage, setFileImage] = useState();
     const [userList, setUserList] = useState();
+    const [previewImage, setPreviewImage] = useState();
 
     useEffect(() => {
         const fetchUser = onAuthStateChanged(auth, (user) => {
@@ -25,7 +26,7 @@ function Modal() {
                 const displayName = user.displayName;
                 const photoUrl = user.photoURL;
                 setName(displayName);
-                setFileImage(photoUrl);
+                setPreviewImage(photoUrl);
             } else {
                 navigate('/');
             }
@@ -49,10 +50,10 @@ function Modal() {
     // 가져온거 수정해서 다시 저장하기.
 
     //    파일 업로드
-
     const saveFileImage = (e) => {
-        setFileImage(URL.createObjectURL(e.target.files[0]));
-        // console.log(e.target.files[0]);
+        setFileImage(e.target.files[0]);
+        setPreviewImage(URL.createObjectURL(e.target.files[0]));
+        console.log(e.target.files[0]);
     };
 
     // 이름, 소개 onChange
@@ -63,21 +64,23 @@ function Modal() {
         setComment(e.target.value);
     };
 
+    // 수정 코드
     const updateUserDataHandler = async () => {
         // 코멘트 수정 -> displayName이 변경되면 오류남
         const userRef = doc(db, 'userInfo', auth.currentUser.displayName);
         await updateDoc(userRef, { comment: comment });
         // 닉네임 수정
         const user = auth.currentUser;
-        await updateProfile(user, { displayName: name, photoURL: fileImage });
+        await updateProfile(user, { displayName: name });
         // ---> 바로 photoURL에 집어 넣는게 아닌 storage업로드한 파일을 다시 다운 받아와서 phothURL에 집어 넣을 것.
         // 이미지 업로드
         if (fileImage) {
             const storageRef = ref(storage, `${auth.currentUser.uid}/profile`);
             await uploadBytes(storageRef, fileImage);
-            const downloadRef = ref(storage, `${auth.currentUser.uid}`);
-            const downloadURL = await getDownloadURL(downloadRef);
+            // const downloadRef = ref(storage, `${auth.currentUser.uid}`);
+            const downloadURL = await getDownloadURL(storageRef);
             console.log('다운로드된 이미지다', downloadURL);
+            await updateProfile(user, { photoURL: downloadURL });
 
             // 불러오는 값 photoULR로
             // const downloadURL = await getDownloadURL(storageRef);
@@ -122,7 +125,7 @@ function Modal() {
             </Box1>
             <Box2>
                 <StP>프로필</StP>
-                <StImage alt='이미지를 넣어주세요' src={fileImage} accept='image/*' />
+                <StImage alt='이미지를 넣어주세요' src={previewImage} accept='image/*' />
                 <form>
                     <Button3 htmlFor='profileImg'>등록하기</Button3>
                     <StImg type='file' id='profileImg' accept='image/*' onChange={saveFileImage} />
