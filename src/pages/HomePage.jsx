@@ -66,12 +66,6 @@ const HomePage = () => {
         console.log('커런트찾음!');
     }, [currentUser]); //최초 읽을때 auth.
 
-    // useEffect(() => {
-    //     const heart = () => currentUserInfo.likeList.includes(item.id);
-    // }, [currentUserInfo]);
-
-    //닉네임으로 userInfo에 likeList 넣기, 업데이트하기
-
     const onHandleLike = (e, item) => {
         e.stopPropagation(); //버블링 방지
         //비로그인시 방지
@@ -112,22 +106,6 @@ const HomePage = () => {
 
         setCurrentUserInfo(updateUserInfo);
         updateDoc(userLikListRef, updateData);
-
-        // const postLikeBoxRef = doc(db,'Post',)
-        // console.log('==================================');
-        // console.log('state', updateLikeState);
-        // console.log(userLikListRef, updateData);
-
-        // const articleLikeListRef =
-        // console.log(item.like);
-        // const updateLike = async () => {
-        //     await updateDoc(doc(db, 'article', `${item.id}`), { like: !item.like });
-        // };
-        // const likechage = fbDB.map((obj) => {
-        //     return obj.id === item.id ? { ...obj, like: !obj.like } : obj;
-        // });
-        // setFbDB(likechage);
-        // updateLike();
     };
 
     return (
