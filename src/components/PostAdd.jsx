@@ -4,6 +4,9 @@ import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import React, { useRef, useState } from 'react';
 import { styled } from 'styled-components';
 import { auth, db, storage } from '../shared/firebase';
+import { useDispatch, useSelector } from 'react-redux';
+import { done, load } from '../redux/modules/loadingReducer';
+import Loading from '../components/ui/Loading';
 
 // 등록하기 클릭 후 상세페이지로 자동이동
 // 취소하기 클릭 후 마이페이지로 자동이동
@@ -19,6 +22,8 @@ const PostAdd = ({ navigate }) => {
     const [imageFile, setImageFile] = useState(null);
     const [imageUrl, setImageUrl] = useState(null);
     const [inputImg, setInputImg] = useState('');
+    const dispatch = useDispatch();
+    const isLoading = useSelector((state) => state.loadingReducer.isLoading);
 
     const fileInput = useRef();
     const user = auth.currentUser;
@@ -85,14 +90,13 @@ const PostAdd = ({ navigate }) => {
             }
 
             try {
+                dispatch(load());
                 await setDoc(doc(db, 'Post', postToAdd.id), postToAdd);
 
                 const imageRef = ref(storage, `${displayName}/Post-image`);
                 await uploadBytes(imageRef, imageUrl);
                 await getDownloadURL(imageRef);
-                setImageFile('');
-                setTitle('');
-                setContent('');
+                dispatch(done());
                 navigate(`/detailpage/${postToAdd.id}`);
             } catch (error) {
                 console.error(error);
@@ -116,54 +120,58 @@ const PostAdd = ({ navigate }) => {
 
     return (
         <div>
-            <Container>
-                <FormWrap onSubmit={onSubmit}>
-                    <InputTitle
-                        value={title}
-                        type='text'
-                        onChange={titleChangeHandler}
-                        placeholder='제목을 입력해주세요(최대 15자)'
-                        maxLength={15}
-                    />
-                    <div
-                        style={{
-                            width: '100vw',
-                            borderTop: '1px solid black',
-                            marginBottom: '50px'
-                        }}
-                    ></div>
-                    <ButtonWrap>
-                        <ImageInput
-                            id='inputFile'
-                            type='file'
-                            ref={fileInput}
-                            accept='image/*'
-                            value={inputImg}
-                            style={{ display: 'none' }}
-                            onChange={(e) => imageChangeHandler(e)}
+            {isLoading ? (
+                <Loading />
+            ) : (
+                <Container>
+                    <FormWrap onSubmit={onSubmit}>
+                        <InputTitle
+                            value={title}
+                            type='text'
+                            onChange={titleChangeHandler}
+                            placeholder='제목을 입력해주세요(최대 15자)'
+                            maxLength={15}
                         />
-                        <ImgUploadButton htmlFor='inputFile'>O</ImgUploadButton>
-                        <ImgDeleteButton onClick={imageDeleteBtn}>X</ImgDeleteButton>
-                    </ButtonWrap>
-                    <ImageWrap>
-                        {/* <ImageButton onClick={uploadHandler}>업로드</ImageButton> */}
-                        <Img src={imageFile} />
-                        {!imageFile && <Span>이미지를 업로드해주세요</Span>}
-                    </ImageWrap>
+                        <div
+                            style={{
+                                width: '100vw',
+                                borderTop: '1px solid black',
+                                marginBottom: '50px'
+                            }}
+                        ></div>
+                        <ButtonWrap>
+                            <ImageInput
+                                id='inputFile'
+                                type='file'
+                                ref={fileInput}
+                                accept='image/*'
+                                value={inputImg}
+                                style={{ display: 'none' }}
+                                onChange={(e) => imageChangeHandler(e)}
+                            />
+                            <ImgUploadButton htmlFor='inputFile'>O</ImgUploadButton>
+                            <ImgDeleteButton onClick={imageDeleteBtn}>X</ImgDeleteButton>
+                        </ButtonWrap>
+                        <ImageWrap>
+                            {/* <ImageButton onClick={uploadHandler}>업로드</ImageButton> */}
+                            <Img src={imageFile} />
+                            {!imageFile && <Span>이미지를 업로드해주세요</Span>}
+                        </ImageWrap>
 
-                    <InputContent
-                        value={content}
-                        type='text'
-                        onChange={contentChangeHandler}
-                        placeholder='설명을 입력해주세요(최대 300자)'
-                        maxLength={300}
-                    />
-                    <ButtonWrap>
-                        <Button onClick={uploadHandler}>등록하기</Button>
-                        <Button onClick={cancelBtn}>취소하기</Button>
-                    </ButtonWrap>
-                </FormWrap>
-            </Container>
+                        <InputContent
+                            value={content}
+                            type='text'
+                            onChange={contentChangeHandler}
+                            placeholder='설명을 입력해주세요(최대 300자)'
+                            maxLength={300}
+                        />
+                        <ButtonWrap>
+                            <Button onClick={uploadHandler}>등록하기</Button>
+                            <Button onClick={cancelBtn}>취소하기</Button>
+                        </ButtonWrap>
+                    </FormWrap>
+                </Container>
+            )}
         </div>
     );
 };
