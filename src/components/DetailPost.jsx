@@ -3,31 +3,47 @@ import styled from 'styled-components';
 
 function DetailPost({ post }) {
     return (
-        <main>
-            <Title>{post.title}</Title>
-            <div
-                style={{
-                    width: '100vw',
-                    borderTop: '1px solid black'
-                }}
-            ></div>
-            <ProfileWrap>
-                <Profilephoto>
-                    <Img src={post.photoURL} />
-                </Profilephoto>
-                <p>{post.nickname}</p>
-            </ProfileWrap>
-
-            <ImageWrap>
-                <Img src={post.image} />
-            </ImageWrap>
-
-            <Content>{post.content} </Content>
-        </main>
+        <Container>
+            <Main>
+                <Title>{post.title}</Title>
+                <div
+                    style={{
+                        width: '100vw',
+                        borderTop: '1px solid black'
+                    }}
+                ></div>
+                <ProfileWrap>
+                    <Profilephoto>
+                        <Img src={post.photoURL} />
+                    </Profilephoto>
+                    <p>{post.nickname}</p>
+                </ProfileWrap>
+                <ImageWrap>
+                    <Img src={post.image} />
+                </ImageWrap>
+                <Content>{post.content} </Content>
+            </Main>
+        </Container>
     );
 }
 
 export default DetailPost;
+
+const Container = styled.div`
+    display: flex;
+    justify-content: center;
+    width: 100vw;
+    height: 200vh;
+`;
+
+const Main = styled.div`
+    width: 80vw;
+    height: 170vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+`;
 const Profilephoto = styled.figure`
     width: 50px;
     height: 50px;
@@ -46,7 +62,7 @@ const Title = styled.div`
     height: 120px;
     font-size: 50px;
     font-family: GmarketSansMedium;
-    /* margin: 150px auto 30px auto; */
+    margin: 150px auto 30px auto;
     padding: 20px;
     border: none;
     outline: none;

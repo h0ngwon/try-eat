@@ -16,13 +16,13 @@ import { useParams } from 'react-router-dom';
 // 등록완료 버튼 클릭 시 ‘이대로 등록하시겠습니까?’ 모달창
 
 const PostEdit = ({ navigate }) => {
-    const [title, setTitle] = useState('');
-    const [content, setContent] = useState('');
+    const [editTitle, setEditTitle] = useState('');
+    const [editContent, setEditContent] = useState('');
     const [imageFile, setImageFile] = useState(null);
     const [imageUrl, setImageUrl] = useState(null);
     const [inputImg, setInputImg] = useState('');
     const [clickPost, setClickPost] = useState('');
-    const param = useParams();
+    const { id } = useParams();
     const fileInput = useRef();
     const user = auth.currentUser;
     const displayName = user.displayName;
@@ -30,13 +30,13 @@ const PostEdit = ({ navigate }) => {
 
     const postToAdd = {
         id: uuidv4(),
-        title,
-        content,
+        title: editTitle,
+        content: editContent,
         timestamp: serverTimestamp(),
-        image: imageFile,
         nickname: displayName,
-        photoURL,
-        likeBox: []
+        image: imageFile,
+        likeBox: [],
+        photoURL
     };
 
     const onSubmit = (e) => {
@@ -44,77 +44,55 @@ const PostEdit = ({ navigate }) => {
     };
 
     const titleChangeHandler = (event) => {
-        setTitle(event.target.value);
+        setEditTitle(event.target.value);
     };
 
     const contentChangeHandler = (event) => {
-        setContent(event.target.value);
-    };
-
-    // 이미지 미리보기
-    const imageChangeHandler = (event) => {
-        const file = event.target.files[0];
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-
-        return new Promise((resolve) => {
-            reader.onload = () => {
-                setImageFile(reader.result || null);
-                resolve();
-            };
-            setImageUrl(file);
-        });
+        setEditContent(event.target.value);
     };
 
     useEffect(() => {
         const editPostData = async () => {
-            const editPostRef = doc(db, 'Post', param.id);
+            const editPostRef = doc(db, 'Post', id);
             const clickPost = await getDoc(editPostRef);
-            // if (docSnap.exists()) {
-            //     console.log('Document data:', docSnap.data());
-            // } else {
-            //     console.log('No such document!');
-            // }
-            setClickPost(clickPost.data());
+            const clickData = clickPost.data();
+            setClickPost(clickData);
+            setEditTitle(clickData.title);
+            setEditContent(clickData.content);
+            setImageFile(clickData.image);
         };
         editPostData();
     }, []);
+
+    // 이미지 업로드
+    const imageChangeHandler = (event) => {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+            setImageFile(reader.result || null);
+            setImageUrl(reader.result);
+        };
+        fileInput.current.value = '';
+    };
 
     // 수정완료 버튼
     const uploadHandler = async () => {
         const uploadCheck = window.confirm('수정하시겠습니까?');
         if (uploadCheck) {
-            if (title === '') {
-                alert('제목을 입력해주세요');
-                return;
-            }
-            if (!inputImg && !imageUrl) {
-                alert('이미지를 업로드해주세요');
-                return;
-            }
-            if (content === '') {
-                alert('설명을 입력해주세요');
-                return;
-            }
-
             try {
-                // await setDoc(doc(db, 'Post', postToAdd.id), postToAdd);
-                const washingtonRef = doc(db, 'Post', postToAdd.id);
-                await updateDoc(
-                    washingtonRef,
-                    {
-                        capital: true
-                    },
-                    postToAdd
-                );
-
-                const imageRef = ref(storage, `${postToAdd.id}/Post-image`);
-                await uploadBytes(imageRef, imageUrl);
+                const imageRef = ref(storage, `${displayName}/Post-image`);
+                await uploadBytes(imageRef, imageFile || imageUrl);
                 await getDownloadURL(imageRef);
-                setImageFile('');
-                setTitle('');
-                setContent('');
-                // navigate('/detailpage/:id');
+
+                const editPostRef = doc(db, 'Post', id);
+                await updateDoc(editPostRef, {
+                    title: editTitle,
+                    content: editContent,
+                    image: imageFile,
+                    timestamp: serverTimestamp()
+                });
+                navigate(`/detailpage/${id}`);
             } catch (error) {
                 console.error(error);
             }
@@ -127,9 +105,9 @@ const PostEdit = ({ navigate }) => {
     const imageDeleteBtn = () => {
         const deleteCheck = window.confirm('삭제하시겠습니까?');
         if (deleteCheck) {
-            setImageFile('');
+            setImageFile(null);
+            setInputImg(null);
             fileInput.current.value = '';
-            setInputImg('');
         } else {
             return;
         }
@@ -143,56 +121,37 @@ const PostEdit = ({ navigate }) => {
         <div>
             <Container>
                 <FormWrap onSubmit={onSubmit}>
-                    {clickPost
-                        .filter((post) => {
-                            return post.id === param.id;
-                        })
-                        .map((post) => {
-                            <>
-                                <InputTitle
-                                    key={post.id}
-                                    value={title}
-                                    type='text'
-                                    onChange={titleChangeHandler}
-                                    placeholder={post.title}
-                                    maxLength={15}
-                                />
-                                <div
-                                    style={{
-                                        width: '100vw',
-                                        borderTop: '1px solid black',
-                                        marginBottom: '50px'
-                                    }}
-                                ></div>
-                                <ButtonWrap>
-                                    <ImageInput
-                                        id='inputFile'
-                                        type='file'
-                                        ref={fileInput}
-                                        accept='image/*'
-                                        value={inputImg}
-                                        style={{ display: 'none' }}
-                                        onChange={(e) => imageChangeHandler(e)}
-                                    />
-                                    <ImgUploadButton htmlFor='inputFile'>O</ImgUploadButton>
-                                    <ImgDeleteButton onClick={imageDeleteBtn}>X</ImgDeleteButton>
-                                </ButtonWrap>
-                                <ImageWrap>
-                                    {/* <ImageButton onClick={uploadHandler}>업로드</ImageButton> */}
-                                    <Img src={post.image} />
-                                    {!imageFile && <Span>이미지를 업로드해주세요</Span>}
-                                </ImageWrap>
-
-                                <InputContent
-                                    value={content}
-                                    type='text'
-                                    onChange={contentChangeHandler}
-                                    placeholder={post.content}
-                                    maxLength={300}
-                                />
-                            </>;
-                        })}
-
+                    <InputTitle
+                        key={clickPost.id}
+                        type='text'
+                        onChange={titleChangeHandler}
+                        value={editTitle}
+                        maxLength={15}
+                    />
+                    <div
+                        style={{
+                            width: '100vw',
+                            borderTop: '1px solid black',
+                            marginBottom: '50px'
+                        }}
+                    ></div>
+                    <ButtonWrap>
+                        <ImageInput
+                            id='inputFile'
+                            type='file'
+                            ref={fileInput}
+                            accept='image/*'
+                            value={inputImg}
+                            style={{ display: 'none' }}
+                            onChange={(e) => imageChangeHandler(e)}
+                        />
+                        <ImgUploadButton htmlFor='inputFile'>O</ImgUploadButton>
+                        <ImgDeleteButton onClick={imageDeleteBtn}>X</ImgDeleteButton>
+                    </ButtonWrap>
+                    <ImageWrap>
+                        <Img src={imageFile} />
+                    </ImageWrap>
+                    <InputContent value={editContent} type='text' onChange={contentChangeHandler} maxLength={300} />
                     <ButtonWrap>
                         <Button onClick={uploadHandler}>수정완료</Button>
                         <Button onClick={cancelBtn}>취소하기</Button>
@@ -243,14 +202,6 @@ const ImageWrap = styled.div`
     margin: 0 auto;
     border: 2px solid black;
     overflow: hidden;
-`;
-
-const Span = styled.span`
-    padding-bottom: 420px;
-    text-align: center;
-    font-size: 20px;
-    color: gray;
-    font-family: GmarketSansMedium;
 `;
 
 const ImageInput = styled.input`
@@ -325,7 +276,6 @@ const Button = styled.button`
     color: white;
     border: none;
     border-radius: 100px;
-    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
     margin: 30px 0 0 30px;
     cursor: pointer;
     &:hover {
