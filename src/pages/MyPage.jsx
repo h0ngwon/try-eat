@@ -98,10 +98,9 @@ export default function MyPage() {
     };
 
     return (
-        <>
+        <Container>
             <Header>
                 <LogoContainer onClick={() => navigate('/')}>Try Eat</LogoContainer>
-
                 <Title>마이페이지</Title>
             </Header>
             <ProfileEdit>
@@ -158,38 +157,45 @@ export default function MyPage() {
                     <LikePost>
                         {likePosts.map((item) => {
                             return (
-                                <>
-                                    <LikedImage
-                                        onClick={() => {
-                                            navigate(`/detailpage/${item.id}`);
-                                        }}
-                                        src={item.image}
-                                        alt='이미지'
-                                    />
-                                    <LikedTitle>{item.title}</LikedTitle>
-                                    <LikedContent>{item.content}</LikedContent>
-                                    <LikedNickname>작성자 : {item.nickname}</LikedNickname>
-                                </>
+                                <Post key={item.timestamp}>
+                                    <div>
+                                        <LikedImage
+                                            onClick={() => {
+                                                navigate(`/detailpage/${item.id}`);
+                                            }}
+                                            src={item.image}
+                                            alt='이미지'
+                                        />
+                                        <LikedTitle>{item.title}</LikedTitle>
+                                        <LikedContent>{item.content}</LikedContent>
+                                        <LikedNickname>작성자 : {item.nickname}</LikedNickname>
+                                    </div>
+                                </Post>
                             );
                         })}
                     </LikePost>
                 </LikeList>
             </LikePostContainer>
-        </>
+        </Container>
     );
 }
 
+const Container = styled.div`
+    width: 100vw;
+    height: 100%;
+`;
 const Header = styled.div`
     display: flex;
     align-items: center;
-    justify-items: center;
+    justify-content: center;
     border-bottom: 2px solid lightgrey;
     height: 120px;
+    width: 80vw;
 `;
 
 const Title = styled.span`
     display: flex;
-    margin: 30px 30px;
+    justify-content: center;
     font-size: 30px;
     font-weight: 500;
     font-family: GmarketSansMedium;
@@ -252,7 +258,9 @@ const PostContainer = styled.section`
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 0 0 100px 0;
+    width: 80vw;
+    height: 100%;
+    margin: 0 auto 100px auto;
 `;
 
 const MyPost = styled.h2`
@@ -268,9 +276,9 @@ const MyPost = styled.h2`
 
 const PostList = styled.ul`
     display: grid;
-    grid-template-columns: 1fr, 1fr, 1fr;
+    grid-template-columns: repeat(3, 1fr);
     justify-items: start;
-    gap: 100px;
+    gap: 80px;
 `;
 const Post = styled.div`
     display: flex;
@@ -331,12 +339,11 @@ const PostComment = styled.p`
 `;
 
 const LogoContainer = styled.span`
-    margin-left: 20px;
     font-size: 36px;
     color: #e14d2a;
     font-family: 'EF_jejudoldam';
-    padding: 20px;
-    margin: 0 500px 0 100px;
+    display: flex;
+    justify-content: flex-start;
     cursor: pointer;
 `;
 
@@ -355,19 +362,26 @@ const Like = styled.h2`
 const LikePostContainer = styled.section`
     display: flex;
     justify-content: center;
+    align-items: center;
+    width: 80vw;
+    height: 100%;
+    margin: 0 auto 100px auto;
 `;
+
 const LikeList = styled.ul`
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     justify-items: start;
-    gap: 100px;
+    gap: 80px;
+    margin: 0;
 `;
 
 const LikePost = styled.div`
     display: flex;
     flex-direction: column;
     width: 400px;
-    height: 600px;
+    height: 500px;
+    margin-bottom: 100px;
 `;
 
 const LikedImage = styled.img`
@@ -386,17 +400,18 @@ const LikedImage = styled.img`
 `;
 
 const LikedTitle = styled.p`
-    height: 80px;
+    margin: 10px auto 10px auto;
     font-size: 23px;
     font-family: GmarketSansMedium;
 `;
 
 const LikedContent = styled.p`
-    height: 150px;
+    margin: 10px auto 10px auto;
     font-family: GmarketSansLight;
+    line-height: 25px;
 `;
 
 const LikedNickname = styled.div`
-    height: 150px;
+    margin: 10px auto 10px auto;
     font-family: GmarketSansLight;
 `;
