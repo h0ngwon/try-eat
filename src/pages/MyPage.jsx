@@ -12,30 +12,19 @@ export default function MyPage() {
     const [userPhoto, setUserPhoto] = useState('');
     const [comment, setCommnet] = useState('');
     const [posts, setPosts] = useState([]);
+    const [likeList, setLikeList] = useState([]);
+    const [likedPosts, setLikedPosts] = useState([]);
+
     const navigate = useNavigate();
     const user = auth.currentUser;
     const displayName = user.displayName;
-
-    let likeList = ['a', 'b', 'c'];
-
-    let post = [
-        { id: 'a', ab: 1, cd: 3 },
-        { id: 'f', ab: 1, cd: 3 },
-        { id: 'e', ab: 1, cd: 3 },
-        { id: 'd', ab: 1, cd: 3 },
-        { id: 'b', ab: 1, cd: 3 },
-        { id: 'c', ab: 1, cd: 3 }
-    ];
-    const bbb = likeList.map((item) => {
-        return post.find((a) => a.id.includes(item));
-    });
-    console.log(bbb);
 
     // getDocs 모든 문서를 가져오기
     useEffect(() => {
         const fetchData = async () => {
             // collection 이름이 post인 collection의 모든 document를 가져옴
             const q = query(collection(db, 'Post'), where('nickname', '==', displayName));
+
             const querySnapshot = await getDocs(q);
             const fbdata = querySnapshot.docs.map((doc) => doc.data());
             const sortedData = fbdata.sort((a, b) => {
@@ -46,7 +35,8 @@ export default function MyPage() {
         fetchData();
     }, []);
 
-    console.log('현재유저', auth.currentUser);
+    // console.log('현재유저', auth.currentUser);
+
     // 로그인한 사용자 이름과 사진 가져오기
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -85,6 +75,34 @@ export default function MyPage() {
             return;
         }
     };
+    // likeList 가져오기
+    useEffect(() => {
+        const fetchData = async () => {
+            const docRef = doc(db, 'userInfo', auth.currentUser.displayName);
+            const docSnap = await getDoc(docRef);
+            setLikeList(docSnap.data().likeList);
+        };
+        fetchData();
+    }, []);
+
+    // Post 데이터 다 가져오기
+    useEffect(() => {
+        const fetchData = async () => {
+            const q = query(collection(db, 'Post'));
+            const docSnap = await getDocs(q);
+            const likedData = docSnap.docs.map((doc) => doc.data());
+            setLikedPosts(likedData);
+        };
+        fetchData();
+    }, []);
+
+    const [likePosts, setLikePosts] = useState([]);
+    useEffect(() => {
+        const likePosts = likeList.map((data) => {
+            return likedPosts.find((item) => item.id.includes(data));
+        });
+        setLikePosts(likePosts);
+    }, []);
 
     return (
         <>
@@ -157,6 +175,29 @@ export default function MyPage() {
                     })}
                 </PostList>
             </PostContainer>
+            <Like>좋아요 목록</Like>
+            <LikePostContainer>
+                <LikeList>
+                    <LikePost>
+                        {likePosts.map((item) => {
+                            return (
+                                <>
+                                    <LikedImage
+                                        onClick={() => {
+                                            // navigate(`/detailpage/${item.id}`);
+                                        }}
+                                        src={item.image}
+                                        alt='이미지'
+                                    />
+                                    <LikedTitle>{item.title}</LikedTitle>
+                                    <LikedContent>{item.content}</LikedContent>
+                                    <LikedNickname>작성자 : {item.nickname}</LikedNickname>
+                                </>
+                            );
+                        })}
+                    </LikePost>
+                </LikeList>
+            </LikePostContainer>
         </>
     );
 }
@@ -165,8 +206,6 @@ const Header = styled.div`
     display: flex;
     align-items: center;
     justify-items: center;
-    /* justify-content: center; */
-    /* grid-template-columns: 1fr 1fr 1fr; */
     border-bottom: 2px solid lightgrey;
     height: 120px;
 `;
@@ -181,12 +220,14 @@ const Title = styled.span`
     padding: 20px;
 `;
 
-const Comment = styled.div``;
+const Comment = styled.div`
+    height: 20px;
+`;
 
 const ProfileEdit = styled.section`
     display: flex;
     justify-content: flex-start;
-    margin-left: 100px;
+    margin-left: 150px;
     padding-top: 50px;
     padding-bottom: 50px;
     gap: 80px;
@@ -241,7 +282,7 @@ const MyPost = styled.h2`
     display: block;
     padding-top: 50px;
     padding-bottom: 70px;
-    padding-left: 120px;
+    padding-left: 150px;
     font-family: GmarketSansMedium;
     font-size: 25px;
     font-weight: 500;
@@ -249,9 +290,10 @@ const MyPost = styled.h2`
 `;
 
 const PostList = styled.ul`
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    /* justify-items: start; */
+    width: 80vw;
     gap: 100px;
 `;
 const Post = styled.div`
@@ -320,4 +362,65 @@ const LogoContainer = styled.span`
     padding: 20px;
     margin: 0 500px 0 100px;
     cursor: pointer;
+`;
+
+const Like = styled.h2`
+    display: block;
+    padding-top: 50px;
+    padding-bottom: 70px;
+    padding-left: 150px;
+    font-family: GmarketSansMedium;
+    font-size: 25px;
+    font-weight: 500;
+    border-top: 2px solid lightgrey;
+    margin-top: 50px;
+`;
+
+const LikePostContainer = styled.section`
+    display: flex;
+    justify-content: center;
+`;
+const LikeList = styled.ul`
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    justify-items: start;
+    gap: 100px;
+`;
+
+const LikePost = styled.div`
+    display: flex;
+    flex-direction: column;
+    width: 400px;
+    height: 600px;
+`;
+
+const LikedImage = styled.img`
+    width: 400px;
+    height: 400px;
+    border: none;
+    border-radius: 30px;
+    margin-bottom: 20px;
+    object-fit: cover;
+    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    &:hover {
+        transform: scale(1.05);
+        transition: all 0.5s;
+    }
+`;
+
+const LikedTitle = styled.p`
+    height: 80px;
+    font-size: 23px;
+    font-family: GmarketSansMedium;
+`;
+
+const LikedContent = styled.p`
+    height: 150px;
+    font-family: GmarketSansLight;
+`;
+
+const LikedNickname = styled.div`
+    height: 150px;
+    font-family: GmarketSansLight;
 `;

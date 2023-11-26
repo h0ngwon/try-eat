@@ -1,40 +1,49 @@
 import React from 'react';
 import styled from 'styled-components';
 
-function DetailMain({ post }) {
+function DetailPost({ post }) {
     return (
         <Container>
-            <Title>{post.title}</Title>
-            <div
-                style={{
-                    width: '100vw',
-                    borderTop: '1px solid black'
-                }}
-            ></div>
-            <ProfileWrap>
-                <Profilephoto>
-                    <Img src={post.photoURL} />
-                </Profilephoto>
-                <p>{post.nickname}</p>
-            </ProfileWrap>
-            <ImageWrap>
-                <Img src={post.image} />
-            </ImageWrap>
-            <Content>{post.content} </Content>
+            <Main>
+                <Title>{post.title}</Title>
+                <div
+                    style={{
+                        width: '100vw',
+                        borderTop: '1px solid black'
+                    }}
+                ></div>
+                <ProfileWrap>
+                    <Profilephoto>
+                        <Img src={post.photoURL} />
+                    </Profilephoto>
+                    <p>{post.nickname}</p>
+                </ProfileWrap>
+                <ImageWrap>
+                    <Img src={post.image} />
+                </ImageWrap>
+                <Content>{post.content} </Content>
+            </Main>
         </Container>
     );
 }
 
-export default DetailMain;
+export default DetailPost;
 
 const Container = styled.div`
     display: flex;
     justify-content: center;
-    flex-direction: column;
     width: 100vw;
     height: 200vh;
 `;
 
+const Main = styled.div`
+    width: 80vw;
+    height: 170vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+`;
 const Profilephoto = styled.figure`
     width: 50px;
     height: 50px;

@@ -1,9 +1,8 @@
 import { doc, getDoc } from '@firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
-import styled from 'styled-components';
 import { db } from '../shared/firebase';
-import DetailMain from '../components/DetailMain';
+import DetailPost from '../components/DetailPost';
 
 function DetailPage() {
     const param = useParams();
@@ -22,7 +21,7 @@ function DetailPage() {
 
     return (
         <>
-            <DetailMain post={post} />
+            <DetailPost post={post} />
         </>
     );
 }

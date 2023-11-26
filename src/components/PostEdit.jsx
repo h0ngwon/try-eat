@@ -81,7 +81,7 @@ const PostEdit = ({ navigate }) => {
         const uploadCheck = window.confirm('수정하시겠습니까?');
         if (uploadCheck) {
             try {
-                const imageRef = ref(storage, `${displayName}${id}`);
+                const imageRef = ref(storage, `${displayName}/Post-image`);
                 await uploadBytes(imageRef, imageFile || imageUrl);
                 await getDownloadURL(imageRef);
 

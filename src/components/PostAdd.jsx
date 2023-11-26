@@ -87,7 +87,7 @@ const PostAdd = ({ navigate }) => {
             try {
                 await setDoc(doc(db, 'Post', postToAdd.id), postToAdd);
 
-                const imageRef = ref(storage, `${displayName}${postToAdd.id}`);
+                const imageRef = ref(storage, `${displayName}/Post-image`);
                 await uploadBytes(imageRef, imageUrl);
                 await getDownloadURL(imageRef);
                 setImageFile('');
