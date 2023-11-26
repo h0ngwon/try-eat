@@ -18,6 +18,7 @@ export default function MyPage() {
 
     useEffect(() => {
         const fetchData = async () => {
+            //
             const q = query(collection(db, 'Post'), where('nickname', '==', displayName));
 
             const querySnapshot = await getDocs(q);
@@ -49,7 +50,7 @@ export default function MyPage() {
         const fetchData = async () => {
             const docRef = doc(db, 'userInfo', auth.currentUser.displayName);
             const docSnap = await getDoc(docRef);
-
+            setLikeList(docSnap.data().likeList);
             setCommnet(docSnap.data().comment);
         };
         fetchData();
@@ -74,15 +75,6 @@ export default function MyPage() {
         });
         setLikePosts(a);
     }, [likeList]);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            const docRef = doc(db, 'userInfo', auth.currentUser.displayName);
-            const docSnap = await getDoc(docRef);
-            setLikeList(docSnap.data().likeList);
-        };
-        fetchData();
-    }, []);
 
     const deletePost = async (post) => {
         const deleteCheck = window.confirm('삭제하시겠습니까?');
@@ -154,26 +146,24 @@ export default function MyPage() {
             <Like>좋아요 목록</Like>
             <LikePostContainer>
                 <LikeList>
-                    <LikePost>
-                        {likePosts.map((item) => {
-                            return (
-                                <Post key={item.timestamp}>
-                                    <div>
-                                        <LikedImage
-                                            onClick={() => {
-                                                navigate(`/detailpage/${item.id}`);
-                                            }}
-                                            src={item.image}
-                                            alt='이미지'
-                                        />
-                                        <LikedTitle>{item.title}</LikedTitle>
-                                        <LikedContent>{item.content}</LikedContent>
-                                        <LikedNickname>작성자 : {item.nickname}</LikedNickname>
-                                    </div>
-                                </Post>
-                            );
-                        })}
-                    </LikePost>
+                    {likePosts.map((item) => {
+                        return (
+                            <Post key={item.timestamp}>
+                                <div>
+                                    <LikedImage
+                                        onClick={() => {
+                                            navigate(`/detailpage/${item.id}`);
+                                        }}
+                                        src={item.image}
+                                        alt='이미지'
+                                    />
+                                    <LikedTitle>{item.title}</LikedTitle>
+                                    <LikedContent>{item.content}</LikedContent>
+                                    <LikedNickname>작성자 : {item.nickname}</LikedNickname>
+                                </div>
+                            </Post>
+                        );
+                    })}
                 </LikeList>
             </LikePostContainer>
         </Container>
