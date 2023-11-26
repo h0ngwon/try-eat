@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import MyPage from '../pages/MyPage';
 import PostAddPage from '../pages/PostAddPage';
-import Modal from '../components/Modal';
+import Profile from '../components/Profile';
 import RegisterPage from '../pages/RegisterPage';
 import HomePage from '../pages/HomePage';
 import LoginPage from '../pages/LoginPage';
@@ -22,7 +22,7 @@ const Router = () => {
                     <Route path='/detailpage/:id' element={<DetailPage />} />
                 </Route>
                 <Route path='/login' element={<LoginPage />} />
-                <Route path='/modal' element={<Modal />} />
+                <Route path='/profile' element={<Profile />} />
                 <Route path='/mypage' element={<MyPage />} />
             </Routes>
         </BrowserRouter>
