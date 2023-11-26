@@ -8,12 +8,9 @@ import RegisterPage from '../pages/RegisterPage';
 import HomePage from '../pages/HomePage';
 import LoginPage from '../pages/LoginPage';
 import DetailPage from '../pages/DetailPage';
-import dummy from '../shared/sampleUserinfo.json';
-import { useState } from 'react';
 import PostEditPage from '../pages/PostEditPage';
 
 const Router = () => {
-    const [users, setUsers] = useState(dummy);
     return (
         <BrowserRouter>
             <Routes>
@@ -25,7 +22,7 @@ const Router = () => {
                     <Route path='/detailpage/:id' element={<DetailPage />} />
                 </Route>
                 <Route path='/login' element={<LoginPage />} />
-                <Route path='/modal' element={<Modal users={users} setUsers={setUsers} />} />
+                <Route path='/modal' element={<Modal />} />
                 <Route path='/mypage' element={<MyPage />} />
             </Routes>
         </BrowserRouter>
