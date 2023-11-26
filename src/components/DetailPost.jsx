@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-function DetailMain({ post }) {
+function DetailPost({ post }) {
     return (
         <main>
             <Title>{post.title}</Title>
@@ -27,7 +27,7 @@ function DetailMain({ post }) {
     );
 }
 
-export default DetailMain;
+export default DetailPost;
 const Profilephoto = styled.figure`
     width: 50px;
     height: 50px;
