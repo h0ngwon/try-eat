@@ -214,15 +214,31 @@ const Register = () => {
     };
 
     const emailCheck = async (email) => {
+        if(email.trim() === '') {
+            alert('이메일을 입력하세요');
+            return;
+        }
         const userRef = collection(db, 'userInfo');
         const q = query(userRef, where('email', '==', email));
         const querySnapshot = await getDocs(q);
 
-        if (querySnapshot.docs.length > 0) alert('이미 존재하는 이메일입니다.');
-        if (querySnapshot.docs.length === 0) alert('사용 가능한 이메일입니다.');
+        if (querySnapshot.docs.length > 0) {
+            alert('이미 존재하는 이메일입니다.');
+            return;
+        }
+
+        if (querySnapshot.docs.length === 0) {
+            alert('사용 가능한 이메일입니다.');
+            return;
+        }
     };
 
     const nicknameCheck = async (nickname) => {
+        if(nickname.trim() === '') {
+            alert('닉네임을 입력하세요')
+            return;
+        }
+
         const userRef = collection(db, 'userInfo');
         const q = query(userRef, where('nickname', '==', nickname));
         const querySnapshot = await getDocs(q);
@@ -230,10 +246,12 @@ const Register = () => {
         if (querySnapshot.docs.length > 0) {
             alert('이미 존재하는 닉네임입니다.');
             setIsValidNickname(false);
+            return;
         }
         if (querySnapshot.docs.length === 0) {
             alert('사용 가능한 닉네임입니다.');
             setIsValidNickname(true);
+            return;
         }
     };
 
@@ -249,6 +267,7 @@ const Register = () => {
         try {
             await createUserWithEmailAndPassword(auth, form.email, form.confirmPassword);
             setDoc(doc(db, 'userInfo', form.nickname), data);
+            console.log("from register : ", auth.currentUser)
             updateProfile(auth.currentUser, {
                 displayName: form.nickname,
                 photoURL: form.image
