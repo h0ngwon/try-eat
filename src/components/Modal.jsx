@@ -13,6 +13,7 @@ import { uploadBytes } from 'firebase/storage';
 
 function Modal() {
     const navigate = useNavigate();
+    const myPageNavi = useNavigate();
     // const user = dummy[0];
 
     const [name, setName] = useState();
@@ -38,11 +39,7 @@ function Modal() {
         const fetchData = async () => {
             const docRef = doc(db, 'userInfo', auth.currentUser.displayName);
             const docSnap = await getDoc(docRef);
-            if (comment) {
-                return setComment(docSnap.data().comment);
-            } else {
-                return;
-            }
+            setComment(docSnap.data().comment);
         };
 
         fetchData();
@@ -70,56 +67,25 @@ function Modal() {
         // console.log(comment);
     };
 
-    // 바뀐부분에 대해 감지를 하는가?
-    console.log('12315648979789', auth.currentUser);
-
-    const updateUserData = async () => {
+    const updateUserDataHandler = async () => {
+        // 코멘트 수정 -> displayName이 변경되면 오류남
+        const userRef = doc(db, 'userInfo', auth.currentUser.displayName);
+        await updateDoc(userRef, { comment: comment });
         // 닉네임 수정
-        const user = await auth.currentUser;
+        const user = auth.currentUser;
         await updateProfile(user, { displayName: name, photoURL: fileImage });
-        // 코멘트 수정 아직 오류남
-        // const todoRef = doc(db, 'userInfo', auth.currentUser.displayName);
-        // await updateDoc(todoRef, { comment: comment });
+        // ---> 바로 photoURL에 집어 넣는게 아닌 storage업로드한 파일을 다시 다운 받아와서 phothURL에 집어 넣을 것.
+        // 이미지 업로드
+        if (fileImage) {
+            const storageRef = ref(storage, `${auth.currentUser.uid}/profile`);
+            await uploadBytes(storageRef, fileImage);
 
-        // // 이미지 수정
-        // const imageRef = ref(storage, `${auth.currentUser.uid}/${fileImage.profile}`);
-        // await uploadBytes(imageRef, fileImage);
+            // const downloadURL = await getDownloadURL(storageRef);
+        }
     };
-
+    console.log('유저다.', auth.currentUser);
+    console.log('파일이미지다', fileImage);
     console.log('코멘트다', comment);
-    // const updateUserData = async () => {
-    //     // 1. Firebase Authentication 업데이트
-    //     const user = auth.currentUser;
-    //     await updateProfile(user, {
-    //         displayName: name,
-    //         photoURL: fileImage ? fileImage.name : user.photoURL
-    //     });
-
-    //     // 2. Firestore 업데이트
-    //     const docRef = doc(db, 'userInfo', auth.currentUser.displayName);
-    //     await updateDoc(docRef, {
-    //         comment: comment
-    //     });
-
-    //     // 3. Storage 업데이트 (프로필 이미지가 변경된 경우에만)
-    //     if (fileImage) {
-    //         const storageRef = ref(storage, `users/${auth.currentUser.uid}/profile.jpg`);
-    //         await uploadString(storageRef, fileImage, 'data_url');
-    //         const downloadURL = await getDownloadURL(storageRef);
-
-    //         // Firestore에도 프로필 이미지 URL 업데이트
-    //         await updateDoc(docRef, {
-    //             avatar: downloadURL
-    //         });
-    //     }
-
-    //     // 업데이트가 완료되면 다시 데이터를 불러옵니다.
-    //     const updatedDocSnap = await getDoc(docRef);
-    //     setComment(updatedDocSnap.data().comment);
-
-    // 그 외에 필요한 작업을 수행할 수 있습니다.
-    // 예: 화면을 갱신하거나 사용자에게 알림을 표시합니다.
-    // };
 
     // 무엇을 수정할것인가? -> userList
     // 그렇다면 userList에 변경할 기존의 값이 있어야 함.
@@ -141,7 +107,7 @@ function Modal() {
         <Container
             onSubmit={(event) => {
                 event.preventDefault();
-                updateUserData();
+                updateUserDataHandler();
             }}
         >
             <Box1>
