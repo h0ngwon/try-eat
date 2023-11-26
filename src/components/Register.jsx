@@ -263,7 +263,8 @@ const Register = () => {
         const data = {
             email: form.email,
             nickname: form.nickname,
-            comment: form.comment
+            comment: form.comment,
+            likeList: []
         };
 
         try {

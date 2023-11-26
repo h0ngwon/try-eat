@@ -6,23 +6,18 @@ import { auth, db } from '../shared/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 
 export default function MyPage() {
-    //회원정보
-    // const [userInfo, setUserInfo] = useState('');
     const [nickname, setNikcname] = useState('');
     const [userPhoto, setUserPhoto] = useState('');
     const [comment, setCommnet] = useState('');
     const [myPosts, setMyPosts] = useState([]);
     const [likeList, setLikeList] = useState([]);
-    console.log('likeList====================', likeList);
 
     const navigate = useNavigate();
     const user = auth.currentUser;
     const displayName = user.displayName;
 
-    // getDocs 모든 문서를 가져오기
     useEffect(() => {
         const fetchData = async () => {
-            // collection 이름이 post인 collection의 모든 document를 가져옴
             const q = query(collection(db, 'Post'), where('nickname', '==', displayName));
 
             const querySnapshot = await getDocs(q);
@@ -34,8 +29,6 @@ export default function MyPage() {
         };
         fetchData();
     }, []);
-
-    // console.log('현재유저', auth.currentUser);
 
     // 로그인한 사용자 이름과 사진 가져오기
     useEffect(() => {
@@ -51,7 +44,7 @@ export default function MyPage() {
         });
         return () => unsubscribe();
     }, []);
-    // 로그인한 사용자 소개글 가져오기
+    // 로그인한 사용자 userInfo 가져오기
     useEffect(() => {
         const fetchData = async () => {
             const docRef = doc(db, 'userInfo', auth.currentUser.displayName);
@@ -61,13 +54,11 @@ export default function MyPage() {
         };
         fetchData();
     }, []);
-    const [allPost, setAllPost] = useState();
-    console.log('all===================', allPost);
 
+    const [allPost, setAllPost] = useState();
     useEffect(() => {
         const fetchAll = async () => {
             const allPost = await getDocs(collection(db, 'Post'));
-            console.log(allPost.docs);
             const Posts = allPost.docs.map((doc) => doc.data());
             setAllPost(Posts);
         };
@@ -75,20 +66,15 @@ export default function MyPage() {
     }, []);
 
     const [likePosts, setLikePosts] = useState([]);
-    console.log('likePosts=================', likePosts);
     useEffect(() => {
         const a = likeList.map((data) => {
-            console.log(data);
             return allPost.find((item) => {
-                console.log('item======', item.id);
-                console.log('data======', data);
                 return item.id.includes(data);
             });
         });
         setLikePosts(a);
     }, [likeList]);
 
-    // likeList 가져오기
     useEffect(() => {
         const fetchData = async () => {
             const docRef = doc(db, 'userInfo', auth.currentUser.displayName);
@@ -98,7 +84,6 @@ export default function MyPage() {
         fetchData();
     }, []);
 
-    // post 삭제 기능
     const deletePost = async (post) => {
         const deleteCheck = window.confirm('삭제하시겠습니까?');
         if (deleteCheck) {
@@ -121,13 +106,9 @@ export default function MyPage() {
             </Header>
             <ProfileEdit>
                 <MyPhoto>
-                    {/* 로그인한 user의 photo 불러오기 */}
-                    {/* 사용자가 이미지 안 넣으면 기본이미지 나오게 */}
                     <img src={userPhoto} />
                 </MyPhoto>
                 <UserEdit>
-                    {/* 로그인한 user의 displayname, 소개글 불러오기 */}
-                    {/* 비동기 처리하면 됨 */}
                     <Ment>{nickname}님, 반갑습니다!</Ment>
                     <Comment>{comment}</Comment>
                     <EditBtn
@@ -141,15 +122,11 @@ export default function MyPage() {
             </ProfileEdit>
             <MyPost>나의 게시물</MyPost>
             <PostContainer>
-                {/* PostList.jsx 컴포넌트 생성 */}
                 <PostList>
-                    {/* 로그인한 회원 아이디 비교해서 필터링 */}
                     {myPosts.map((post) => {
                         return (
-                            // Post.jsx 컴포넌트 생성
                             <Post key={post.timestamp}>
                                 <div>
-                                    {/* 이미지 누르면 상세페이지로 이동 구현 */}
                                     <PostImage
                                         onClick={() => {
                                             navigate(`/detailpage/${post.id}`);
@@ -161,7 +138,6 @@ export default function MyPage() {
                                 <PostTitle>{post.title}</PostTitle>
                                 <PostComment>{post.content}</PostComment>
                                 <Buttons>
-                                    {/* user에 따라 좋아요 눌린 값 가져오기 */}
                                     <Button
                                         onClick={() => {
                                             navigate(`/edit/${post.id}`);
@@ -169,7 +145,6 @@ export default function MyPage() {
                                     >
                                         수정
                                     </Button>
-                                    {/* 삭제 기능 리덕스로 구현해보기 */}
                                     <Button onClick={() => deletePost(post)}>삭제</Button>
                                 </Buttons>
                             </Post>
@@ -186,7 +161,7 @@ export default function MyPage() {
                                 <>
                                     <LikedImage
                                         onClick={() => {
-                                            // navigate(`/detailpage/${item.id}`);
+                                            navigate(`/detailpage/${item.id}`);
                                         }}
                                         src={item.image}
                                         alt='이미지'
@@ -293,9 +268,8 @@ const MyPost = styled.h2`
 
 const PostList = styled.ul`
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    /* justify-items: start; */
-    width: 80vw;
+    grid-template-columns: 1fr, 1fr, 1fr;
+    justify-items: start;
     gap: 100px;
 `;
 const Post = styled.div`
