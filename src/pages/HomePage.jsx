@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router';
 import styled from 'styled-components';
 import { db } from '../shared/firebase';
 import { useDispatch, useSelector } from 'react-redux';
+import { done, load } from '../redux/modules/loadingReducer';
 
 import {
     arrayRemove,
@@ -18,7 +19,6 @@ import {
 import { auth } from '../shared/firebase';
 import Like from '../components/Like';
 import Loading from '../components/ui/Loading';
-import { done, load } from '../redux/modules/loadingReducer';
 //auto scroll 자동으로 스크롤을 내려줌
 
 const HomePage = () => {
@@ -56,25 +56,18 @@ const HomePage = () => {
         if (!currentUser) return;
 
         const fetchLikeList = async () => {
-            //여기에러
             const userRef = doc(db, 'userInfo', currentUser.displayName);
             const userInfo = await getDoc(userRef);
             if (userInfo.exists() && userInfo.data()) {
-                console.log('fetch!!!!!!!!', userInfo.data);
-
                 setCurrentUserInfo(userInfo.data());
             }
-            console.log('fetch!!!!!!!!', userInfo);
         };
 
         fetchLikeList();
-        console.log('커런트찾음!');
-    }, [currentUser]); //최초 읽을때 auth.
+    }, [currentUser]);
 
     const onHandleLike = (e, item) => {
-        e.stopPropagation(); //버블링 방지
-
-        //비로그인시 방지
+        e.stopPropagation();
         if (auth.currentUser === null) return;
 
         const userLikListRef = doc(db, 'userInfo', currentUser.displayName);

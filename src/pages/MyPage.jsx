@@ -1,9 +1,11 @@
-import { collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, where } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { auth, db } from '../shared/firebase';
-import { onAuthStateChanged } from 'firebase/auth';
+import { useDispatch, useSelector } from 'react-redux';
+import { done, load } from '../redux/modules/loadingReducer';
+import Loading from '../components/ui/Loading';
 
 export default function MyPage() {
     const [nickname, setNikcname] = useState('');
@@ -11,52 +13,64 @@ export default function MyPage() {
     const [comment, setCommnet] = useState('');
     const [myPosts, setMyPosts] = useState([]);
     const [likeList, setLikeList] = useState([]);
-
+    const [likePosts, setLikePosts] = useState([]);
+    const [allPost, setAllPost] = useState();
+    const dispatch = useDispatch();
+    const isLoading = useSelector((state) => state.loadingReducer.isLoading);
     const navigate = useNavigate();
-    const user = auth.currentUser;
-    const displayName = user.displayName;
 
     useEffect(() => {
         const fetchData = async () => {
-            //
-            const q = query(collection(db, 'Post'), where('nickname', '==', displayName));
-
-            const querySnapshot = await getDocs(q);
-            const fbdata = querySnapshot.docs.map((doc) => doc.data());
-            const sortedData = fbdata.sort((a, b) => {
-                return b.timestamp - a.timestamp;
-            });
-            setMyPosts(sortedData);
+            try {
+                const q = query(collection(db, 'Post'), where('nickname', '==', auth.currentUser.displayName));
+                const querySnapshot = await getDocs(q);
+                const fbdata = querySnapshot.docs.map((doc) => doc.data());
+                const sortedData = fbdata.sort((a, b) => {
+                    return b.timestamp - a.timestamp;
+                });
+                setMyPosts(sortedData);
+            } catch (e) {
+                console.log(e);
+            }
         };
         fetchData();
     }, []);
 
     // 로그인한 사용자 이름과 사진 가져오기
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user) {
-                const displayName = user.displayName;
-                const photoUrl = user.photoURL;
-                setNikcname(displayName);
-                setUserPhoto(photoUrl);
-            } else {
-                navigate('/');
-            }
-        });
-        return () => unsubscribe();
+        const unsubscribe = () => {
+            dispatch(load());
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    const displayName = auth.currentUser.displayName;
+                    const photoUrl = auth.currentUser.photoURL;
+                    setNikcname(displayName);
+                    setUserPhoto(photoUrl);
+                    dispatch(done());
+                } else {
+                    navigate('/');
+                }
+            });
+        };
+        unsubscribe();
     }, []);
+
     // 로그인한 사용자 userInfo 가져오기
     useEffect(() => {
         const fetchData = async () => {
-            const docRef = doc(db, 'userInfo', auth.currentUser.displayName);
-            const docSnap = await getDoc(docRef);
-            setLikeList(docSnap.data().likeList);
-            setCommnet(docSnap.data().comment);
+            dispatch(load());
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    const docRef = doc(db, 'userInfo', auth.currentUser.displayName);
+                    const docSnap = await getDoc(docRef);
+                    setCommnet(docSnap.data().comment);
+                    dispatch(done());
+                }
+            });
         };
         fetchData();
     }, []);
 
-    const [allPost, setAllPost] = useState();
     useEffect(() => {
         const fetchAll = async () => {
             const allPost = await getDocs(collection(db, 'Post'));
@@ -66,7 +80,19 @@ export default function MyPage() {
         fetchAll();
     }, []);
 
-    const [likePosts, setLikePosts] = useState([]);
+    useEffect(() => {
+        const fetchData = async () => {
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    const docRef = doc(db, 'userInfo', auth.currentUser.displayName);
+                    const docSnap = await getDoc(docRef);
+                    setLikeList(docSnap.data().likeList);
+                }
+            });
+        };
+        fetchData();
+    }, []);
+
     useEffect(() => {
         const a = likeList.map((data) => {
             return allPost.find((item) => {
@@ -91,81 +117,87 @@ export default function MyPage() {
 
     return (
         <Container>
-            <Header>
-                <LogoContainer onClick={() => navigate('/')}>Try Eat</LogoContainer>
-                <Title>마이페이지</Title>
-            </Header>
-            <ProfileEdit>
-                <MyPhoto>
-                    <img src={userPhoto} />
-                </MyPhoto>
-                <UserEdit>
-                    <Ment>{nickname}님, 반갑습니다!</Ment>
-                    <Comment>{comment}</Comment>
-                    <EditBtn
-                        onClick={() => {
-                            navigate(`/profile`);
-                        }}
-                    >
-                        프로필 수정
-                    </EditBtn>
-                </UserEdit>
-            </ProfileEdit>
-            <MyPost>나의 게시물</MyPost>
-            <PostContainer>
-                <PostList>
-                    {myPosts.map((post) => {
-                        return (
-                            <Post key={post.timestamp}>
-                                <div>
-                                    <PostImage
-                                        onClick={() => {
-                                            navigate(`/detailpage/${post.id}`);
-                                        }}
-                                        src={post.image}
-                                        alt='이미지'
-                                    />
-                                </div>
-                                <PostTitle>{post.title}</PostTitle>
-                                <PostComment>{post.content}</PostComment>
-                                <Buttons>
-                                    <Button
-                                        onClick={() => {
-                                            navigate(`/edit/${post.id}`);
-                                        }}
-                                    >
-                                        수정
-                                    </Button>
-                                    <Button onClick={() => deletePost(post)}>삭제</Button>
-                                </Buttons>
-                            </Post>
-                        );
-                    })}
-                </PostList>
-            </PostContainer>
-            <Like>좋아요 목록</Like>
-            <LikePostContainer>
-                <LikeList>
-                    {likePosts.map((item) => {
-                        return (
-                            <Post key={item.timestamp}>
-                                <div>
-                                    <LikedImage
-                                        onClick={() => {
-                                            navigate(`/detailpage/${item.id}`);
-                                        }}
-                                        src={item.image}
-                                        alt='이미지'
-                                    />
-                                    <LikedTitle>{item.title}</LikedTitle>
-                                    <LikedContent>{item.content}</LikedContent>
-                                    <LikedNickname>작성자 : {item.nickname}</LikedNickname>
-                                </div>
-                            </Post>
-                        );
-                    })}
-                </LikeList>
-            </LikePostContainer>
+            {isLoading ? (
+                <Loading />
+            ) : (
+                <>
+                    <Header>
+                        <LogoContainer onClick={() => navigate('/')}>Try Eat</LogoContainer>
+                        <Title>마이페이지</Title>
+                    </Header>
+                    <ProfileEdit>
+                        <MyPhoto>
+                            <img src={userPhoto} />
+                        </MyPhoto>
+                        <UserEdit>
+                            <Ment>{nickname}님, 반갑습니다!</Ment>
+                            <Comment>{comment}</Comment>
+                            <EditBtn
+                                onClick={() => {
+                                    navigate(`/profile`);
+                                }}
+                            >
+                                프로필 수정
+                            </EditBtn>
+                        </UserEdit>
+                    </ProfileEdit>
+                    <MyPost>나의 게시물</MyPost>
+                    <PostContainer>
+                        <PostList>
+                            {myPosts.map((post) => {
+                                return (
+                                    <Post key={post.timestamp}>
+                                        <div>
+                                            <PostImage
+                                                onClick={() => {
+                                                    navigate(`/detailpage/${post.id}`);
+                                                }}
+                                                src={post.image}
+                                                alt='이미지'
+                                            />
+                                        </div>
+                                        <PostTitle>{post.title}</PostTitle>
+                                        <PostComment>{post.content}</PostComment>
+                                        <Buttons>
+                                            <Button
+                                                onClick={() => {
+                                                    navigate(`/edit/${post.id}`);
+                                                }}
+                                            >
+                                                수정
+                                            </Button>
+                                            <Button onClick={() => deletePost(post)}>삭제</Button>
+                                        </Buttons>
+                                    </Post>
+                                );
+                            })}
+                        </PostList>
+                    </PostContainer>
+                    <LikeWrap>좋아요 목록</LikeWrap>
+                    <LikePostContainer>
+                        <LikeList>
+                            {likePosts.map((item) => {
+                                return (
+                                    <Post key={item.timestamp}>
+                                        <div>
+                                            <LikedImage
+                                                onClick={() => {
+                                                    navigate(`/detailpage/${item.id}`);
+                                                }}
+                                                src={item.image}
+                                                alt='이미지'
+                                            />
+                                            <LikedTitle>{item.title}</LikedTitle>
+                                            <LikedContent>{item.content}</LikedContent>
+                                            <LikedNickname>작성자 : {item.nickname}</LikedNickname>
+                                        </div>
+                                    </Post>
+                                );
+                            })}
+                        </LikeList>
+                    </LikePostContainer>
+                </>
+            )}
         </Container>
     );
 }
@@ -173,17 +205,21 @@ export default function MyPage() {
 const Container = styled.div`
     width: 100vw;
     height: 100%;
+    margin-bottom: 300px;
 `;
 const Header = styled.div`
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-items: center;
     border-bottom: 2px solid lightgrey;
     height: 120px;
-    width: 80vw;
 `;
 
 const Title = styled.span`
+    display: flex;
+    justify-content: center;
+    width: 50vw;
+    margin: 30px 30px;
     display: flex;
     justify-content: center;
     font-size: 30px;
@@ -248,7 +284,7 @@ const PostContainer = styled.section`
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 80vw;
+    width: 100vw;
     height: 100%;
     margin: 0 auto 100px auto;
 `;
@@ -267,8 +303,9 @@ const MyPost = styled.h2`
 const PostList = styled.ul`
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    justify-items: start;
+    /* justify-items: start; */
     gap: 80px;
+    margin: 0;
 `;
 const Post = styled.div`
     display: flex;
@@ -329,15 +366,15 @@ const PostComment = styled.p`
 `;
 
 const LogoContainer = styled.span`
+    margin-left: 180px;
     font-size: 36px;
     color: #e14d2a;
     font-family: 'EF_jejudoldam';
-    display: flex;
     justify-content: flex-start;
     cursor: pointer;
 `;
 
-const Like = styled.h2`
+const LikeWrap = styled.h2`
     display: block;
     padding-top: 50px;
     padding-bottom: 70px;
@@ -352,8 +389,7 @@ const Like = styled.h2`
 const LikePostContainer = styled.section`
     display: flex;
     justify-content: center;
-    align-items: center;
-    width: 80vw;
+    width: 100vw;
     height: 100%;
     margin: 0 auto 100px auto;
 `;
@@ -364,14 +400,6 @@ const LikeList = styled.ul`
     justify-items: start;
     gap: 80px;
     margin: 0;
-`;
-
-const LikePost = styled.div`
-    display: flex;
-    flex-direction: column;
-    width: 400px;
-    height: 500px;
-    margin-bottom: 100px;
 `;
 
 const LikedImage = styled.img`

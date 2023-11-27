@@ -72,7 +72,6 @@ function Profile() {
                 const storageRef = ref(storage, `${auth.currentUser.uid}/profile`);
                 await uploadBytes(storageRef, fileImage);
                 const downloadURL = await getDownloadURL(storageRef);
-                console.log('다운로드된 이미지다', downloadURL);
                 await updateProfile(user, { photoURL: downloadURL });
             }
             await updateFireStore(keyName);
@@ -95,18 +94,16 @@ function Profile() {
         const querySnap = await getDocs(q);
 
         if (querySnap.docs.length === 0) {
-            alert('사용가능한 아이디 입니다.');
+            alert('사용가능한 닉네임 입니다.');
             setValidationName(true);
         }
         if (querySnap.docs.length > 0) {
-            alert('이미 존재하는 아이디입니다.');
+            alert('이미 존재하는 닉네임 입니다.');
             setValidationName(false);
         }
-        console.log('이름이다', querySnap.docs.length);
     };
 
     const updateFireStore = async (keyName) => {
-        console.log('들어옴');
         const getUserInfo = (await getDoc(doc(db, 'userInfo', keyName))).data();
         const newUserInfo = { ...getUserInfo, comment: comment, nickname: name };
         await setDoc(doc(db, 'userInfo', name), newUserInfo);
@@ -117,7 +114,6 @@ function Profile() {
 
         const updatePromises = querySnapshot.docs.map(async (x) => {
             const a = x.data();
-            console.log('a===========', a);
             const docRef = doc(db, 'Post', a.id);
             return updateDoc(docRef, {
                 ...a,
@@ -126,10 +122,6 @@ function Profile() {
         });
         await Promise.all(updatePromises);
     };
-
-    console.log('유저다.', auth.currentUser);
-    console.log('파일이미지다', fileImage);
-    console.log('코멘트다', comment);
 
     return (
         <Container
@@ -168,8 +160,8 @@ function Profile() {
 }
 
 const Container = styled.form`
-    width: 450px;
-    height: 500px;
+    width: 500px;
+    height: 600px;
     margin: 100px auto 0px auto;
     background-color: #fff6ec;
     border-radius: 10px;
@@ -178,7 +170,7 @@ const Container = styled.form`
 `;
 
 const Box1 = styled.div`
-    margin: 40px 0px 0px 30px;
+    margin: 70px 0px 0px 30px;
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -202,39 +194,61 @@ const Button1 = styled.button`
     border-radius: 17px;
     background-color: #e14d2a;
     color: white;
-    height: 25px;
-    width: 75px;
+    height: 30px;
+    width: 80px;
     box-shadow: none;
     border: none;
+    cursor: pointer;
+    &:hover {
+        transform: scale(1.1);
+        transition: all 0.3s;
+    }
 `;
 
 const Button2 = styled.button`
-    border-radius: 10px;
+    border-radius: 50px;
     background-color: #e14d2a;
     color: white;
-    height: 30px;
-    width: 140px;
+    height: 35px;
+    width: 270px;
     box-shadow: none;
     border: none;
+    cursor: pointer;
+    &:hover {
+        transform: scale(1.1);
+        transition: all 0.3s;
+    }
 `;
 const Button3 = styled.label`
     border-radius: 17px;
     background-color: #e14d2a;
+    width: 80px;
+    height: 30px;
     color: white;
-    padding: 5px 13px 5px 13px;
+    padding: 8px 20px 8px 20px;
     font-size: 13px;
+    cursor: pointer;
+    &:hover {
+        transform: scale(1.1);
+        transition: all 0.3s;
+    }
 `;
 const StInput = styled.input`
     width: 200px;
     height: 30px;
     border-radius: 15px;
+    border: 1px solid black;
+    padding: 0px 10px;
+    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.2);
 `;
 const TextArea = styled.textarea`
     width: 200px;
     height: 80px;
     border-radius: 15px;
-    border: 2px solid black;
+    border: 1px solid black;
     resize: none;
+    padding: 10px;
+    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.2);
 `;
 const StP = styled.p`
     font-size: 15px;
