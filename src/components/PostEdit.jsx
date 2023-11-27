@@ -4,9 +4,9 @@ import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import React, { useEffect, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 import { auth, db, storage } from '../shared/firebase';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
-const PostEdit = ({ navigate }) => {
+const PostEdit = () => {
     const [editTitle, setEditTitle] = useState('');
     const [editContent, setEditContent] = useState('');
     const [imageFile, setImageFile] = useState(null);
@@ -18,6 +18,7 @@ const PostEdit = ({ navigate }) => {
     const user = auth.currentUser;
     const displayName = user.displayName;
     const photoURL = user.photoURL;
+    const navigate = useNavigate();
 
     const postToAdd = {
         id: uuidv4(),

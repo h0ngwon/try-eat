@@ -7,8 +7,9 @@ import { auth, db, storage } from '../shared/firebase';
 import { useDispatch, useSelector } from 'react-redux';
 import { done, load } from '../redux/modules/loadingReducer';
 import Loading from '../components/ui/Loading';
+import { useNavigate } from 'react-router-dom';
 
-const PostAdd = ({ navigate }) => {
+const PostAdd = () => {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [imageFile, setImageFile] = useState(null);
@@ -21,6 +22,7 @@ const PostAdd = ({ navigate }) => {
     const user = auth.currentUser;
     const displayName = user.displayName;
     const photoURL = user.photoURL;
+    const navigate = useNavigate();
 
     const postToAdd = {
         id: uuidv4(),
