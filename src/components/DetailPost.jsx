@@ -1,7 +1,22 @@
-import React from 'react';
+import { doc, getDoc } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
+import { db } from '../shared/firebase';
 
-function DetailPost({ post }) {
+function DetailPost() {
+    window.scrollTo(0, 0);
+    const param = useParams();
+    const [post, setPost] = useState('');
+
+    useEffect(() => {
+        const getArticle = async () => {
+            const postRef = doc(db, 'Post', param.id);
+            const post = await getDoc(postRef);
+            setPost(post.data());
+        };
+        getArticle();
+    }, []);
     return (
         <Container>
             <Main>
