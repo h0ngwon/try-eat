@@ -428,6 +428,9 @@ const LikedContent = styled.p`
     margin: 10px auto 10px auto;
     font-family: GmarketSansLight;
     line-height: 25px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 `;
 
 const LikedNickname = styled.div`
