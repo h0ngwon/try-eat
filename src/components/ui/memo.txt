@@ -1,0 +1,6 @@
+
+collection : 폴더
+document : 파일
+
+필드 추가 하기
+database 읽기 권한 - 규칙 탭에서 true 로 바꿔주기 - 게시 (누구나 데이터베이스를 읽고 쓸 수 있다)
