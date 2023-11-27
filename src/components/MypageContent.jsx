@@ -364,6 +364,9 @@ const PostComment = styled.p`
     height: 150px;
     font-family: GmarketSansLight;
     line-height: 25px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 `;
 
 const LogoContainer = styled.span`

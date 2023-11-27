@@ -251,9 +251,9 @@ const CardList = styled.li`
 
     min-height: 400px;
     &:nth-child(10n + 1),
-    :nth-child(10n + 4),
-    :nth-child(10n + 7),
-    :nth-child(10n + 10) {
+    &:nth-child(10n + 4),
+    &:nth-child(10n + 7),
+    &:nth-child(10n + 10) {
         grid-column: auto/span 2;
     }
     &:nth-child(10n + 3) {
