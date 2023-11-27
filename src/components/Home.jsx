@@ -18,7 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import { done, load } from '../redux/modules/loadingReducer';
 import { useDispatch, useSelector } from 'react-redux';
 
-function HomeMain() {
+function Home() {
     const [post, setPost] = useState([]);
     const dispatch = useDispatch();
     const isLoading = useSelector((state) => state.loadingReducer.isLoading);
@@ -150,7 +150,7 @@ function HomeMain() {
     );
 }
 
-export default HomeMain;
+export default Home;
 const TopBtn = styled.button`
     background-color: #e14d2a;
     position: fixed;
