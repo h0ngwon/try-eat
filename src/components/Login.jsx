@@ -138,7 +138,8 @@ const Login = () => {
                 const data = {
                     nickname: auth.currentUser.displayName,
                     email: auth.currentUser.email,
-                    liketList: []
+                    liketList: [],
+                    comment: "안녕하세요."
                 };
                 setDoc(doc(db, 'userInfo', auth.currentUser.displayName), data);
                 dispatch(login());
