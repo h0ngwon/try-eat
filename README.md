@@ -6,17 +6,23 @@
 
 # 페이지 설명
 
-## 메인페이지
+## 메인
 <img src="./src/assets/메인페이지.png">
 
-## 회원가입 페이지
+## 회원가입
 <img src="./src/assets/회원가입.png">
 
-## 로그인페이지
+## 로그인
 <img src="./src/assets/로그인.png">
 
-## 상세페이지
+## 상세정보
 <img src="./src/assets/상세페이지.png">
 
-## 글등록페이지
-<img src="./src/assets/상세페이지.png">
+## 글등록
+<img src="./src/assets/글등록페이지.png">
+
+## 글등록
+<img src="./src/assets/마이페이지.png">
+
+## 프로필수정
+<img src="./src/assets/프로필수정.png">
