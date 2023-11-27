@@ -34,7 +34,7 @@ export default function MyPage() {
             }
         };
         fetchData();
-    }, [myPosts]);
+    }, []);
 
     // 로그인한 사용자 이름과 사진 가져오기
     useEffect(() => {
@@ -78,7 +78,7 @@ export default function MyPage() {
             setAllPost(Posts);
         };
         fetchAll();
-    }, [allPost]);
+    }, []);
 
     useEffect(() => {
         const fetchData = async () => {

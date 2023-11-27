@@ -53,7 +53,7 @@ const Nav = () => {
         auth.onAuthStateChanged((user) => {
             if (user) dispatch(login());
         });
-    });
+    }, []);
 
     const signout = async (e) => {
         await signOut(auth).then(() => {
