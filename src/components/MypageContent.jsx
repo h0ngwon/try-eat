@@ -94,12 +94,21 @@ function MypageContent() {
     }, []);
 
     useEffect(() => {
-        const a = likeList.map((data) => {
-            return allPost.find((item) => {
-                return item.id.includes(data);
-            });
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                if (!likeList) {
+                    setLikePosts([]);
+                } else {
+                    const a = likeList.map((data) => {
+                        return allPost.find((item) => {
+                            console.log(item.id.includes(data));
+                            return item.id.includes(data);
+                        });
+                    });
+                    setLikePosts(a);
+                }
+            }
         });
-        setLikePosts(a);
     }, [likeList]);
 
     const deletePost = async (post) => {
